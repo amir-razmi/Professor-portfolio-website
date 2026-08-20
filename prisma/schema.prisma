@@ -75,11 +75,22 @@ model ProfessorProfile {
   institution         String?
   shortBio            String?
   biography           String?
+  education           String[]   @default([])
+  academicPositions   String[]   @default([])
+  researchInterests   String[]   @default([])
+  teachingInterests   String[]   @default([])
+  awards              String[]   @default([])
+  experience          String[]   @default([])
   email               String?
   office              String?
   phone               String?
   websiteUrl          String?
   orcid               String?
+  googleScholarUrl    String?
+  researchGateUrl     String?
+  linkedinUrl         String?
+  githubUrl           String?
+  profileImageUrl     String?
   profileImageAssetId String?    @db.ObjectId
   profileImage        FileAsset? @relation("ProfessorProfileImage", fields: [profileImageAssetId], references: [id])
   isPublished         Boolean    @default(false)
@@ -90,20 +101,22 @@ model ProfessorProfile {
 }
 
 model SiteSettings {
-  id               String     @id @default(auto()) @map("_id") @db.ObjectId
-  key              String     @unique @default("default")
-  siteName         String
-  siteDescription  String?
-  contactEmail     String?
-  defaultLocale    String     @default("en")
-  timezone         String     @default("UTC")
-  maintenanceMode  Boolean    @default(false)
-  defaultOgImageId String?    @db.ObjectId
-  defaultOgImage   FileAsset? @relation("SiteSettingsOgImage", fields: [defaultOgImageId], references: [id])
-  createdById      String?    @db.ObjectId
-  updatedById      String?    @db.ObjectId
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  key               String     @unique @default("default")
+  siteName          String
+  siteDescription   String?
+  contactEmail      String?
+  defaultLocale     String     @default("en")
+  timezone          String     @default("UTC")
+  maintenanceMode   Boolean    @default(false)
+  footerText        String?
+  defaultOgImageUrl String?
+  defaultOgImageId  String?    @db.ObjectId
+  defaultOgImage    FileAsset? @relation("SiteSettingsOgImage", fields: [defaultOgImageId], references: [id])
+  createdById       String?    @db.ObjectId
+  updatedById       String?    @db.ObjectId
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 }
 
 model BlogPost {

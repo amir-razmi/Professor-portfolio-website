@@ -10,7 +10,7 @@ export default async function AdminLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  await requireAuth();
+  const admin = await requireAuth();
 
-  return <AdminShell>{children}</AdminShell>;
+  return <AdminShell admin={admin}>{children}</AdminShell>;
 }

@@ -21,9 +21,17 @@ authentication, and centralized role-based authorization:
 - Bcrypt password hashing, server-side Zod validation, login, logout, and protected admin access
 - Centralized role and permission checks for server components, actions, route handlers, and services
 - Guarded administrator role changes with privilege-escalation protection and audit logging
+- Protected administrator dashboard at `/admin/dashboard` with responsive navigation and account
+  controls
+- Profile and site-settings management with server actions, Zod validation, audit entries, and
+  permission checks
+- Public home/layout content read from the published professor profile and site settings in
+  MongoDB
+- Accessible loading, empty, success, error, and forbidden states for the initial admin workflows
 
-The full admin dashboard, content CRUD workflows, file uploads, and public content screens are
-intentionally deferred.
+Blog/research/publication CRUD, administrator-management screens, and file uploads remain
+intentionally deferred to later stages. Profile images currently use a validated URL field;
+binary storage is not implemented.
 
 ## Local setup
 
@@ -112,9 +120,14 @@ Start the development server:
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) for the public shell. Administrator sign-in is
-available at [http://localhost:3000/login](http://localhost:3000/login), and the protected test
-page is available at [http://localhost:3000/admin](http://localhost:3000/admin).
+Open [http://localhost:3000](http://localhost:3000) for the public portfolio. Administrator
+sign-in is available at [http://localhost:3000/login](http://localhost:3000/login). The protected
+administrator routes are:
+
+- `/admin` — authenticated entry point (redirects to the dashboard)
+- `/admin/dashboard` — account and content status overview
+- `/admin/profile` — professor profile management
+- `/admin/settings` — site-wide settings management
 
 ## Authentication model
 
@@ -165,30 +178,35 @@ the permission check as a defense in depth. No administrator-management UI is in
 
 ## Scripts
 
-| Command             | Purpose                                              |
-| ------------------- | ---------------------------------------------------- |
-| `pnpm dev`          | Start the development server                         |
-| `pnpm build`        | Generate Prisma Client and create a production build |
-| `pnpm start`        | Serve the production build                           |
-| `pnpm lint`         | Run ESLint                                           |
-| `pnpm test`         | Run focused authentication and authorization tests   |
-| `pnpm typecheck`    | Run the TypeScript compiler without emitting files   |
-| `pnpm format`       | Format supported files with Prettier                 |
-| `pnpm format:check` | Check formatting without writing                     |
-| `pnpm db:generate`  | Generate Prisma Client                               |
-| `pnpm db:validate`  | Validate the Prisma schema                           |
-| `pnpm db:push`      | Synchronize the Prisma schema with MongoDB           |
-| `pnpm db:check`     | Run a read-only MongoDB ping                         |
-| `pnpm db:seed`      | Run the guarded development seed                     |
+| Command             | Purpose                                                                 |
+| ------------------- | ----------------------------------------------------------------------- |
+| `pnpm dev`          | Start the development server                                            |
+| `pnpm build`        | Generate Prisma Client and create a production build                    |
+| `pnpm start`        | Serve the production build                                              |
+| `pnpm lint`         | Run ESLint                                                              |
+| `pnpm test`         | Run focused authentication, authorization, and content-management tests |
+| `pnpm typecheck`    | Run the TypeScript compiler without emitting files                      |
+| `pnpm format`       | Format supported files with Prettier                                    |
+| `pnpm format:check` | Check formatting without writing                                        |
+| `pnpm db:generate`  | Generate Prisma Client                                                  |
+| `pnpm db:validate`  | Validate the Prisma schema                                              |
+| `pnpm db:push`      | Synchronize the Prisma schema with MongoDB                              |
+| `pnpm db:check`     | Run a read-only MongoDB ping                                            |
+| `pnpm db:seed`      | Run the guarded development seed                                        |
 
 ## Project structure
 
 ```text
 src/
   app/                 App Router routes and layouts
-  components/          Reusable presentation components
+  components/          Reusable presentation components and form controls
   config/              Public, non-secret site configuration
-  features/            Feature-specific page composition and future domain modules
+  features/
+    admin-dashboard/   Dashboard summaries and protected admin composition
+    professor-profile/ Profile schema, repository, service, actions, and form
+    public-content/    Cached public profile/settings readers
+    site-settings/     Settings schema, repository, service, actions, and form
+    home/              Public portfolio page composition
   lib/                 Small shared utilities and environment parsing
   server/admin/        Protected administrator-domain actions and services
   server/auth/         Authentication, roles, permissions, and authorization helpers
@@ -200,9 +218,13 @@ prisma/
   check-connection.ts  Read-only connectivity check
 prisma.config.ts       Prisma schema and seed configuration
 tests/auth/             Focused authentication and authorization tests
+tests/content/          Profile/settings validation and authorization tests
 ```
 
 The data layer currently includes `AdminUser`, `ProfessorProfile`, `SiteSettings`, `BlogPost`,
 `BlogCategory`, `BlogTag`, `FileAsset`, `ResearchItem`, `Publication`, and `AuditLog`. MongoDB
 many-to-many blog relations use explicit ObjectId arrays on both models. Environment values remain
-server-side and are never placed in reusable presentation components.
+server-side and are never placed in reusable presentation components. Profile list fields are
+entered one item per line in the initial management form. `pnpm db:push` is the supported MongoDB
+schema synchronization workflow; MongoDB transactions require a replica set (a local development
+replica set or an appropriately configured hosted cluster).

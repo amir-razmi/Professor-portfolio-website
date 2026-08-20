@@ -5,8 +5,8 @@ Tailwind CSS, Prisma, MongoDB, and Zod.
 
 ## Current scope
 
-This stage establishes the application shell, the initial server-side data layer, and administrator
-authentication:
+This stage establishes the application shell, the initial server-side data layer, administrator
+authentication, and centralized role-based authorization:
 
 - Public App Router layout with a responsive navigation placeholder
 - Reusable header, footer, container, section heading, and surface components
@@ -19,8 +19,10 @@ authentication:
 - File metadata and storage keys without storing uploaded binary content in MongoDB
 - Auth.js credentials authentication with an encrypted JWT session cookie
 - Bcrypt password hashing, server-side Zod validation, login, logout, and protected admin access
+- Centralized role and permission checks for server components, actions, route handlers, and services
+- Guarded administrator role changes with privilege-escalation protection and audit logging
 
-Role-specific authorization, CRUD workflows, file uploads, and public/admin content screens are
+The full admin dashboard, content CRUD workflows, file uploads, and public content screens are
 intentionally deferred.
 
 ## Local setup
@@ -133,6 +135,34 @@ adapter tables are created.
 The credentials flow intentionally returns the same generic `Invalid email or password.` message
 for malformed, unknown, inactive, and incorrect credentials.
 
+## Authorization model
+
+Authorization is server-side and centralized in `src/server/auth/`. Page components and server
+operations use `requireAuth()`, `requireRole()`, `requireAnyRole()`, or `requirePermission()`
+instead of comparing roles directly. Every protected request re-reads the administrator from the
+database, so a client-supplied identity or stale session role is not trusted.
+
+| Capability                       | `SUPER_ADMIN` | `ADMIN` | `EDITOR` |
+| -------------------------------- | ------------- | ------- | -------- |
+| Manage professor profile         | Yes           | Yes     | No       |
+| Manage site settings             | Yes           | Yes     | No       |
+| Manage research and publications | Yes           | Yes     | No       |
+| Create and edit blog posts       | Yes           | Yes     | Yes      |
+| Publish blog posts               | Yes           | Yes     | No       |
+| Manage files                     | Yes           | Yes     | No       |
+| Manage administrators/roles      | Yes           | No      | No       |
+| Manage authentication settings   | Yes           | No      | No       |
+| View audit logs                  | Yes           | No      | No       |
+
+`EDITOR` publishing is deliberately disabled by the current permission matrix. It can be enabled
+later by changing the centralized matrix rather than individual pages or actions.
+
+The administrator role service rejects self-escalation, attempts to manage a higher-ranked
+administrator, and attempts to assign a role above the actor's own role. Successful role changes
+record only non-secret role metadata in `AuditLog`. The protected action and API route both return
+generic unauthorized (`401`) or forbidden (`403`) failures and delegate to a service that repeats
+the permission check as a defense in depth. No administrator-management UI is included yet.
+
 ## Scripts
 
 | Command             | Purpose                                              |
@@ -141,7 +171,7 @@ for malformed, unknown, inactive, and incorrect credentials.
 | `pnpm build`        | Generate Prisma Client and create a production build |
 | `pnpm start`        | Serve the production build                           |
 | `pnpm lint`         | Run ESLint                                           |
-| `pnpm test`         | Run focused password and credential tests            |
+| `pnpm test`         | Run focused authentication and authorization tests   |
 | `pnpm typecheck`    | Run the TypeScript compiler without emitting files   |
 | `pnpm format`       | Format supported files with Prettier                 |
 | `pnpm format:check` | Check formatting without writing                     |
@@ -160,7 +190,8 @@ src/
   config/              Public, non-secret site configuration
   features/            Feature-specific page composition and future domain modules
   lib/                 Small shared utilities and environment parsing
-  server/auth/         Password, credentials, session, and authentication actions
+  server/admin/        Protected administrator-domain actions and services
+  server/auth/         Authentication, roles, permissions, and authorization helpers
   server/db/           Compatibility export for server-only database access
   types/               Auth.js TypeScript module augmentation
 prisma/
@@ -168,7 +199,7 @@ prisma/
   seed.ts              Guarded development seed
   check-connection.ts  Read-only connectivity check
 prisma.config.ts       Prisma schema and seed configuration
-tests/auth/             Focused password and credential verification tests
+tests/auth/             Focused authentication and authorization tests
 ```
 
 The data layer currently includes `AdminUser`, `ProfessorProfile`, `SiteSettings`, `BlogPost`,

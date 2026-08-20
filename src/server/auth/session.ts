@@ -4,6 +4,8 @@ import { z } from "zod";
 
 import { auth } from "@/auth";
 
+import { UnauthorizedError } from "./authorization-error";
+
 const objectIdSchema = z.string().regex(/^[a-f\d]{24}$/i);
 
 export type CurrentAdmin = {
@@ -11,6 +13,10 @@ export type CurrentAdmin = {
   email: string;
   displayName: string;
   role: AdminRole;
+};
+
+export type RequireAuthOptions = {
+  onUnauthenticated?: "redirect" | "throw";
 };
 
 export async function getCurrentAdmin(): Promise<CurrentAdmin | null> {
@@ -46,10 +52,14 @@ export async function getCurrentAdmin(): Promise<CurrentAdmin | null> {
   };
 }
 
-export async function requireAuth(): Promise<CurrentAdmin> {
+export async function requireAuth(options: RequireAuthOptions = {}): Promise<CurrentAdmin> {
   const admin = await getCurrentAdmin();
 
   if (!admin) {
+    if (options.onUnauthenticated === "throw") {
+      throw new UnauthorizedError();
+    }
+
     redirect("/login");
   }
 

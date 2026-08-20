@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { AdminShell } from "@/components/layout/admin-shell";
-import { requireAuth } from "@/server/auth/session";
+import { requireAuth } from "@/server/auth/authorization";
 
 export const dynamic = "force-dynamic";
 

@@ -12,6 +12,7 @@ const serverEnvSchema = z.object({
       "MONGODB_URL must be a MongoDB connection string",
     ),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  DATABASE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
@@ -20,6 +21,7 @@ export function getServerEnv(): ServerEnv {
   const result = serverEnvSchema.safeParse({
     MONGODB_URL: process.env.MONGODB_URL,
     NODE_ENV: process.env.NODE_ENV,
+    DATABASE_ENV: process.env.DATABASE_ENV,
   });
 
   if (!result.success) {

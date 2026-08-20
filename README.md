@@ -5,7 +5,8 @@ Tailwind CSS, Prisma, MongoDB, and Zod.
 
 ## Current scope
 
-This stage establishes the application shell and the initial server-side data layer:
+This stage establishes the application shell, the initial server-side data layer, and administrator
+authentication:
 
 - Public App Router layout with a responsive navigation placeholder
 - Reusable header, footer, container, section heading, and surface components
@@ -16,9 +17,11 @@ This stage establishes the application shell and the initial server-side data la
 - Prisma 6.19.1 schema for administration, profile/settings, publishing, assets, research, and auditing
 - Development-only, idempotent seed data with an explicit safety guard
 - File metadata and storage keys without storing uploaded binary content in MongoDB
+- Auth.js credentials authentication with an encrypted JWT session cookie
+- Bcrypt password hashing, server-side Zod validation, login, logout, and protected admin access
 
-Authentication, CRUD workflows, file uploads, and public/admin content screens are intentionally
-deferred.
+Role-specific authorization, CRUD workflows, file uploads, and public/admin content screens are
+intentionally deferred.
 
 ## Local setup
 
@@ -39,6 +42,17 @@ Set `DATABASE_ENV=development` and a development MongoDB URL in `.env`, then ins
 ```bash
 pnpm install
 ```
+
+Set an Auth.js secret before opening the login route. It must be at least 32 characters and must
+never be committed:
+
+```bash
+openssl rand -base64 32
+```
+
+Copy the generated value into `AUTH_SECRET` in `.env`. Auth.js also supports
+`AUTH_TRUST_HOST=true` when the application is behind a trusted reverse proxy; local development
+trusts localhost automatically.
 
 Generate the Prisma client:
 
@@ -70,12 +84,25 @@ pnpm db:check
 Seed only a clearly identified development/test-named database, with an explicit confirmation:
 
 ```bash
+ADMIN_SEED_PASSWORD="$(openssl rand -base64 24)" \
+DATABASE_ENV=development \
+SEED_DATABASE_CONFIRMATION=YES \
+pnpm db:seed
+```
+
+For a safer shell workflow, read the password without putting it in shell history:
+
+```bash
+read -s ADMIN_SEED_PASSWORD
+export ADMIN_SEED_PASSWORD
 DATABASE_ENV=development SEED_DATABASE_CONFIRMATION=YES pnpm db:seed
+unset ADMIN_SEED_PASSWORD
 ```
 
 The seed contains fake `.test` values, is idempotent, and refuses production or
-non-development-named connection strings. It does not create a password or write secrets to
-audit logs.
+non-development-named connection strings. On the first run it hashes `ADMIN_SEED_PASSWORD` into
+the development administrator record; it never stores the plaintext password or writes secrets
+to audit logs. Later seed runs preserve an existing administrator hash.
 
 Start the development server:
 
@@ -83,8 +110,28 @@ Start the development server:
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) for the public shell. The admin layout
-placeholder is available at [http://localhost:3000/admin](http://localhost:3000/admin).
+Open [http://localhost:3000](http://localhost:3000) for the public shell. Administrator sign-in is
+available at [http://localhost:3000/login](http://localhost:3000/login), and the protected test
+page is available at [http://localhost:3000/admin](http://localhost:3000/admin).
+
+## Authentication model
+
+The application uses `next-auth@5.0.0-beta.32` with the Credentials provider and an explicit JWT
+session strategy. The custom `AdminUser` model remains the only administrator store; no Auth.js
+adapter tables are created.
+
+1. The login server action validates the submitted email and password with Zod.
+2. The Credentials provider looks up the normalized email, compares the password with the stored
+   bcrypt hash, and accepts only administrators with `status=ACTIVE` and `isActive=true`.
+3. A successful login returns only the administrator ID, email, and display name to Auth.js.
+   Password hashes, account status, and role are not placed in client-visible session data.
+4. Auth.js stores the session in its encrypted JWT cookie. `getCurrentAdmin()` then rechecks the
+   administrator record on the server, and `requireAuth()` redirects unauthenticated requests to
+   `/login`.
+5. Logout is a server action exposed in the protected admin shell.
+
+The credentials flow intentionally returns the same generic `Invalid email or password.` message
+for malformed, unknown, inactive, and incorrect credentials.
 
 ## Scripts
 
@@ -94,6 +141,7 @@ placeholder is available at [http://localhost:3000/admin](http://localhost:3000/
 | `pnpm build`        | Generate Prisma Client and create a production build |
 | `pnpm start`        | Serve the production build                           |
 | `pnpm lint`         | Run ESLint                                           |
+| `pnpm test`         | Run focused password and credential tests            |
 | `pnpm typecheck`    | Run the TypeScript compiler without emitting files   |
 | `pnpm format`       | Format supported files with Prettier                 |
 | `pnpm format:check` | Check formatting without writing                     |
@@ -112,12 +160,15 @@ src/
   config/              Public, non-secret site configuration
   features/            Feature-specific page composition and future domain modules
   lib/                 Small shared utilities and environment parsing
+  server/auth/         Password, credentials, session, and authentication actions
   server/db/           Compatibility export for server-only database access
+  types/               Auth.js TypeScript module augmentation
 prisma/
   schema.prisma        MongoDB datasource, enums, models, and indexes
   seed.ts              Guarded development seed
   check-connection.ts  Read-only connectivity check
 prisma.config.ts       Prisma schema and seed configuration
+tests/auth/             Focused password and credential verification tests
 ```
 
 The data layer currently includes `AdminUser`, `ProfessorProfile`, `SiteSettings`, `BlogPost`,

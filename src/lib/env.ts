@@ -15,6 +15,8 @@ const serverEnvSchema = z.object({
   DATABASE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
+const authSecretSchema = z.string().trim().min(32);
+
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
 export function getServerEnv(): ServerEnv {
@@ -29,6 +31,18 @@ export function getServerEnv(): ServerEnv {
       .map((issue) => issue.path.join(".") || "environment")
       .join(", ");
     throw new Error(`Invalid server environment: ${fields}`);
+  }
+
+  return result.data;
+}
+
+export function getAuthSecret(): string {
+  const result = authSecretSchema.safeParse(process.env.AUTH_SECRET);
+
+  if (!result.success) {
+    throw new Error(
+      "Invalid authentication environment: AUTH_SECRET must be at least 32 characters.",
+    );
   }
 
   return result.data;

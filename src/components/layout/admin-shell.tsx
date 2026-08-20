@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 
+import { logoutAction } from "@/server/auth/actions";
+
 import { Container } from "../ui/container";
 
 export function AdminShell({ children }: Readonly<{ children: ReactNode }>) {
@@ -14,12 +16,22 @@ export function AdminShell({ children }: Readonly<{ children: ReactNode }>) {
             </p>
             <p className="mt-1 text-sm font-medium text-slate-950">Academic portfolio workspace</p>
           </div>
-          <Link
-            href="/"
-            className="rounded-full px-3 py-2 text-sm font-medium text-muted transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          >
-            Return to site
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/"
+              className="rounded-full px-3 py-2 text-sm font-medium text-muted transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              Return to site
+            </Link>
+            <form action={logoutAction}>
+              <button
+                type="submit"
+                className="rounded-full bg-slate-950 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
         </Container>
       </header>
       <main>{children}</main>

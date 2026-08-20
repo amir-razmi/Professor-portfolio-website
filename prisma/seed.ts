@@ -9,6 +9,8 @@ import {
   PrismaClient,
 } from "@prisma/client";
 
+import { hashPassword } from "../src/server/auth/password";
+
 const prisma = new PrismaClient();
 const seedTimestamp = new Date("2026-01-01T00:00:00.000Z");
 
@@ -43,6 +45,14 @@ function assertSafeSeedEnvironment() {
 async function main() {
   assertSafeSeedEnvironment();
 
+  const existingAdmin = await prisma.adminUser.findUnique({
+    where: { email: "admin@example.test" },
+    select: { passwordHash: true },
+  });
+
+  const passwordHash =
+    existingAdmin?.passwordHash ?? (await hashPassword(requireSeedAdminPassword()));
+
   const admin = await prisma.adminUser.upsert({
     where: { email: "admin@example.test" },
     update: {
@@ -50,7 +60,7 @@ async function main() {
       role: AdminRole.SUPER_ADMIN,
       status: AdminAccountStatus.ACTIVE,
       isActive: true,
-      passwordHash: null,
+      passwordHash,
       updatedAt: seedTimestamp,
     },
     create: {
@@ -59,7 +69,7 @@ async function main() {
       role: AdminRole.SUPER_ADMIN,
       status: AdminAccountStatus.ACTIVE,
       isActive: true,
-      passwordHash: null,
+      passwordHash,
       createdAt: seedTimestamp,
       updatedAt: seedTimestamp,
     },
@@ -333,6 +343,18 @@ async function main() {
   }
 
   console.log("Development seed completed.");
+}
+
+function requireSeedAdminPassword() {
+  const password = process.env.ADMIN_SEED_PASSWORD;
+
+  if (!password) {
+    throw new Error(
+      "Refusing to seed. Set ADMIN_SEED_PASSWORD for the first development administrator seed.",
+    );
+  }
+
+  return password;
 }
 
 main()

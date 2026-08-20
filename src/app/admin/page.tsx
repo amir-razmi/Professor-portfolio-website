@@ -1,24 +1,27 @@
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Surface } from "@/components/ui/surface";
+import { requireAuth } from "@/server/auth/session";
 
 export const metadata = {
   title: "Admin",
 };
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  const admin = await requireAuth();
+
   return (
     <Container className="py-16 lg:py-24">
       <SectionHeading
         eyebrow="Administration"
-        title="The editorial workspace will live here."
-        description="Authentication, CRUD workflows, and content management are intentionally deferred to a later stage."
+        title="Administrator access is working."
+        description="This protected test page verifies the server-side authentication boundary before editorial workflows are added."
       />
       <Surface className="mt-10 max-w-2xl bg-white">
-        <p className="text-sm font-semibold text-foreground">Foundation placeholder</p>
+        <p className="text-sm font-semibold text-foreground">Signed in as {admin.displayName}</p>
         <p className="mt-3 leading-7 text-muted">
-          This route establishes the admin layout boundary without implying that the area is
-          protected yet.
+          The current administrator session is valid for {admin.email}. Role-specific permissions
+          will be introduced in a later stage.
         </p>
       </Surface>
     </Container>

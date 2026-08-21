@@ -35,6 +35,11 @@ const navigationItems: readonly (AdminNavigationItem & {
     label: "Administrators",
     permission: Permission.MANAGE_ADMINISTRATORS,
   },
+  {
+    href: "/admin/audit-logs",
+    label: "Audit log",
+    permission: Permission.VIEW_AUDIT_LOGS,
+  },
 ];
 
 function getInitials(displayName: string): string {

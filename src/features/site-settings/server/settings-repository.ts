@@ -1,8 +1,9 @@
 import "server-only";
 
-import { AuditAction, type Prisma } from "@prisma/client";
+import { type Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+import { recordAuditLogInTransaction } from "@/server/audit/audit-service";
 
 import type { SiteSettingsRecord, SiteSettingsRepository } from "./settings-policy";
 
@@ -47,14 +48,12 @@ export const siteSettingsRepository: SiteSettingsRepository = {
         select: settingsSelect,
       });
 
-      await transaction.auditLog.create({
-        data: {
-          action: existing ? AuditAction.UPDATE : AuditAction.CREATE,
-          targetResource: "SiteSettings",
-          targetId: settings.id,
-          summary: existing ? "Site settings updated." : "Site settings created.",
-          actorId,
-        },
+      await recordAuditLogInTransaction(transaction, {
+        action: existing ? "UPDATE" : "CREATE",
+        targetResource: "SiteSettings",
+        targetId: settings.id,
+        summary: existing ? "Site settings updated." : "Site settings created.",
+        actorId,
       });
 
       return settings;

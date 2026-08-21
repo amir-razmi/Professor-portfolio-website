@@ -4,6 +4,7 @@ import { AuditAction, BlogPostStatus, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { ContentValidationError } from "@/server/content/content-errors";
+import { recordAuditLogInTransaction } from "@/server/audit/audit-service";
 
 import type { BlogListQuery, BlogPostInput } from "../blog-schema";
 import type {
@@ -524,19 +525,21 @@ export const blogPostRepository: BlogPostRepository = {
               ? AuditAction.UNPUBLISH
               : AuditAction.UPDATE;
 
-        await transaction.auditLog.create({
-          data: {
-            action,
-            targetResource: "BlogPost",
-            targetId: post.id,
-            summary: !existing
-              ? "Blog post created."
-              : action === AuditAction.PUBLISH
-                ? "Blog post published."
-                : action === AuditAction.UNPUBLISH
-                  ? "Blog post unpublished."
-                  : "Blog post updated.",
-            actorId,
+        await recordAuditLogInTransaction(transaction, {
+          action,
+          targetResource: "BlogPost",
+          targetId: post.id,
+          summary: !existing
+            ? "Blog post created."
+            : action === AuditAction.PUBLISH
+              ? "Blog post published."
+              : action === AuditAction.UNPUBLISH
+                ? "Blog post unpublished."
+                : "Blog post updated.",
+          actorId,
+          metadata: {
+            status: input.status,
+            isFeatured: input.isFeatured,
           },
         });
 
@@ -578,18 +581,14 @@ export const blogPostRepository: BlogPostRepository = {
           select: blogPostSelect,
         });
 
-        await transaction.auditLog.create({
-          data: {
-            action:
-              status === BlogPostStatus.PUBLISHED ? AuditAction.PUBLISH : AuditAction.UNPUBLISH,
-            targetResource: "BlogPost",
-            targetId: postId,
-            summary:
-              status === BlogPostStatus.PUBLISHED
-                ? "Blog post published."
-                : "Blog post unpublished.",
-            actorId,
-          },
+        await recordAuditLogInTransaction(transaction, {
+          action: status === BlogPostStatus.PUBLISHED ? AuditAction.PUBLISH : AuditAction.UNPUBLISH,
+          targetResource: "BlogPost",
+          targetId: postId,
+          summary:
+            status === BlogPostStatus.PUBLISHED ? "Blog post published." : "Blog post unpublished.",
+          actorId,
+          metadata: { status },
         });
 
         return mapPost(post);
@@ -615,14 +614,12 @@ export const blogPostRepository: BlogPostRepository = {
         syncTagPostIds(transaction, postId, existing.tagIds, []),
       ]);
       await transaction.blogPost.delete({ where: { id: postId } });
-      await transaction.auditLog.create({
-        data: {
-          action: AuditAction.DELETE,
-          targetResource: "BlogPost",
-          targetId: postId,
-          summary: "Blog post deleted.",
-          actorId,
-        },
+      await recordAuditLogInTransaction(transaction, {
+        action: AuditAction.DELETE,
+        targetResource: "BlogPost",
+        targetId: postId,
+        summary: "Blog post deleted.",
+        actorId,
       });
     });
   },
@@ -670,14 +667,12 @@ export const blogPostRepository: BlogPostRepository = {
               select: categorySelect,
             });
 
-        await transaction.auditLog.create({
-          data: {
-            action: input.id ? AuditAction.UPDATE : AuditAction.CREATE,
-            targetResource: "BlogCategory",
-            targetId: category.id,
-            summary: input.id ? "Blog category updated." : "Blog category created.",
-            actorId,
-          },
+        await recordAuditLogInTransaction(transaction, {
+          action: input.id ? AuditAction.UPDATE : AuditAction.CREATE,
+          targetResource: "BlogCategory",
+          targetId: category.id,
+          summary: input.id ? "Blog category updated." : "Blog category created.",
+          actorId,
         });
 
         return mapCategory(category);
@@ -728,14 +723,12 @@ export const blogPostRepository: BlogPostRepository = {
               select: tagSelect,
             });
 
-        await transaction.auditLog.create({
-          data: {
-            action: input.id ? AuditAction.UPDATE : AuditAction.CREATE,
-            targetResource: "BlogTag",
-            targetId: tag.id,
-            summary: input.id ? "Blog tag updated." : "Blog tag created.",
-            actorId,
-          },
+        await recordAuditLogInTransaction(transaction, {
+          action: input.id ? AuditAction.UPDATE : AuditAction.CREATE,
+          targetResource: "BlogTag",
+          targetId: tag.id,
+          summary: input.id ? "Blog tag updated." : "Blog tag created.",
+          actorId,
         });
 
         return mapTag(tag);
@@ -764,14 +757,12 @@ export const blogPostRepository: BlogPostRepository = {
       }
 
       await transaction.blogCategory.delete({ where: { id } });
-      await transaction.auditLog.create({
-        data: {
-          action: AuditAction.DELETE,
-          targetResource: "BlogCategory",
-          targetId: id,
-          summary: "Blog category deleted.",
-          actorId,
-        },
+      await recordAuditLogInTransaction(transaction, {
+        action: AuditAction.DELETE,
+        targetResource: "BlogCategory",
+        targetId: id,
+        summary: "Blog category deleted.",
+        actorId,
       });
     });
   },
@@ -795,14 +786,12 @@ export const blogPostRepository: BlogPostRepository = {
       }
 
       await transaction.blogTag.delete({ where: { id } });
-      await transaction.auditLog.create({
-        data: {
-          action: AuditAction.DELETE,
-          targetResource: "BlogTag",
-          targetId: id,
-          summary: "Blog tag deleted.",
-          actorId,
-        },
+      await recordAuditLogInTransaction(transaction, {
+        action: AuditAction.DELETE,
+        targetResource: "BlogTag",
+        targetId: id,
+        summary: "Blog tag deleted.",
+        actorId,
       });
     });
   },

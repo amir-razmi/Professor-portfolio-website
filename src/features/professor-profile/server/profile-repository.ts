@@ -1,8 +1,9 @@
 import "server-only";
 
-import { AuditAction, type Prisma } from "@prisma/client";
+import { type Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+import { recordAuditLogInTransaction } from "@/server/audit/audit-service";
 
 import type { ProfessorProfileRecord, ProfessorProfileRepository } from "./profile-policy";
 
@@ -71,16 +72,14 @@ export const professorProfileRepository: ProfessorProfileRepository = {
         select: profileSelect,
       });
 
-      await transaction.auditLog.create({
-        data: {
-          action: existing ? AuditAction.UPDATE : AuditAction.CREATE,
-          targetResource: "ProfessorProfile",
-          targetId: profile.id,
-          summary: existing
-            ? "Professor profile content updated."
-            : "Professor profile content created.",
-          actorId,
-        },
+      await recordAuditLogInTransaction(transaction, {
+        action: existing ? "UPDATE" : "CREATE",
+        targetResource: "ProfessorProfile",
+        targetId: profile.id,
+        summary: existing
+          ? "Professor profile content updated."
+          : "Professor profile content created.",
+        actorId,
       });
 
       return profile;

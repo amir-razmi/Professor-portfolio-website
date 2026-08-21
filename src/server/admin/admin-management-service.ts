@@ -1,8 +1,9 @@
 import "server-only";
 
-import { AdminAccountStatus, AdminRole, AuditAction, Prisma } from "@prisma/client";
+import { AdminAccountStatus, AdminRole, Prisma } from "@prisma/client";
 
 import type { AuthorizationPrincipal } from "@/server/auth/permissions";
+import { recordAuditLogInTransaction } from "@/server/audit/audit-service";
 
 import {
   AdminManagementError,
@@ -115,14 +116,13 @@ const prismaAdministratorStore: AdministratorManagementStore = {
           select: administratorSelect,
         });
 
-        await transaction.auditLog.create({
-          data: {
-            action: AuditAction.CREATE,
-            targetResource: "AdminUser",
-            targetId: admin.id,
-            summary: `Administrator account created with role ${data.role}.`,
-            actorId: actor.id,
-          },
+        await recordAuditLogInTransaction(transaction, {
+          action: "CREATE",
+          targetResource: "AdminUser",
+          targetId: admin.id,
+          summary: `Administrator account created with role ${data.role}.`,
+          actorId: actor.id,
+          metadata: { role: data.role, status: data.status },
         });
 
         return admin;
@@ -153,14 +153,12 @@ const prismaAdministratorStore: AdministratorManagementStore = {
           select: administratorSelect,
         });
 
-        await transaction.auditLog.create({
-          data: {
-            action: AuditAction.UPDATE,
-            targetResource: "AdminUser",
-            targetId: target.id,
-            summary: "Administrator profile details updated.",
-            actorId: actor.id,
-          },
+        await recordAuditLogInTransaction(transaction, {
+          action: "UPDATE",
+          targetResource: "AdminUser",
+          targetId: target.id,
+          summary: "Administrator profile details updated.",
+          actorId: actor.id,
         });
 
         return admin;
@@ -239,16 +237,15 @@ const prismaAdministratorStore: AdministratorManagementStore = {
         select: administratorSelect,
       });
 
-      await transaction.auditLog.create({
-        data: {
-          action: isActive ? AuditAction.ENABLE : AuditAction.DISABLE,
-          targetResource: "AdminUser",
-          targetId: target.id,
-          summary: isActive
-            ? "Administrator account reactivated."
-            : "Administrator account deactivated.",
-          actorId: actor.id,
-        },
+      await recordAuditLogInTransaction(transaction, {
+        action: isActive ? "ENABLE" : "DISABLE",
+        targetResource: "AdminUser",
+        targetId: target.id,
+        summary: isActive
+          ? "Administrator account reactivated."
+          : "Administrator account deactivated.",
+        actorId: actor.id,
+        metadata: { status, isActive },
       });
 
       return admin;
@@ -270,14 +267,13 @@ const prismaAdministratorStore: AdministratorManagementStore = {
         select: administratorSelect,
       });
 
-      await transaction.auditLog.create({
-        data: {
-          action: AuditAction.UPDATE,
-          targetResource: "AdminUser",
-          targetId: target.id,
-          summary: "Administrator password reset.",
-          actorId: actor.id,
-        },
+      await recordAuditLogInTransaction(transaction, {
+        action: "UPDATE",
+        targetResource: "AdminUser",
+        targetId: target.id,
+        summary: "Administrator password reset.",
+        actorId: actor.id,
+        metadata: { passwordReset: true },
       });
 
       return admin;

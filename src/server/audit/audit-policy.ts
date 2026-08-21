@@ -4,12 +4,7 @@ const sensitiveKeyPattern =
   /(pass(word|hash)?|token|secret|session|cookie|authorization|credential|api[-_]?key|private[-_]?key)/i;
 
 export type AuditMetadataValue =
-  | string
-  | number
-  | boolean
-  | null
-  | AuditMetadataValue[]
-  | { [key: string]: AuditMetadataValue };
+  string | number | boolean | null | AuditMetadataValue[] | { [key: string]: AuditMetadataValue };
 
 export type AuditMetadata = Record<string, AuditMetadataValue>;
 
@@ -91,10 +86,7 @@ export function sanitizeAuditMetadata(input: unknown): AuditMetadata | undefined
  * the primary operation. Callers may pass a Prisma transaction client so the
  * event is committed with the mutation when the database supports it.
  */
-export async function writeAuditLog(
-  writer: AuditLogWriter,
-  input: AuditLogInput,
-): Promise<void> {
+export async function writeAuditLog(writer: AuditLogWriter, input: AuditLogInput): Promise<void> {
   const metadata = sanitizeAuditMetadata(input.metadata);
 
   try {

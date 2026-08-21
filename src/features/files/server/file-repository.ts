@@ -1,8 +1,9 @@
 import "server-only";
 
-import { AuditAction, FileVisibility, Prisma } from "@prisma/client";
+import { FileVisibility, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+import { recordAuditLogInTransaction } from "@/server/audit/audit-service";
 
 import type { FileMetadataPersistenceInput, StoredPasswordState } from "../file-schema";
 import type { FilePasswordAccess, FileRecord, FileRepository } from "./file-policy";
@@ -132,13 +133,17 @@ export const fileRepository: FileRepository = {
           select: fileSelect,
         });
 
-        await transaction.auditLog.create({
-          data: {
-            action: AuditAction.UPLOAD,
-            targetResource: "FileAsset",
-            targetId: created.id,
-            summary: "File uploaded.",
-            actorId,
+        await recordAuditLogInTransaction(transaction, {
+          action: "UPLOAD",
+          targetResource: "FileAsset",
+          targetId: created.id,
+          summary: "File uploaded.",
+          actorId,
+          metadata: {
+            visibility: input.visibility,
+            category: input.category,
+            fileType: input.fileType,
+            sizeBytes: input.sizeBytes,
           },
         });
 
@@ -192,18 +197,20 @@ export const fileRepository: FileRepository = {
         select: fileSelect,
       });
 
-      await transaction.auditLog.create({
-        data: {
-          action:
-            current.visibility !== input.visibility
-              ? input.visibility === FileVisibility.PUBLIC
-                ? AuditAction.ENABLE
-                : AuditAction.DISABLE
-              : AuditAction.UPDATE,
-          targetResource: "FileAsset",
-          targetId: id,
-          summary: "File metadata updated.",
-          actorId,
+      await recordAuditLogInTransaction(transaction, {
+        action:
+          current.visibility !== input.visibility
+            ? input.visibility === FileVisibility.PUBLIC
+              ? "ENABLE"
+              : "DISABLE"
+            : "UPDATE",
+        targetResource: "FileAsset",
+        targetId: id,
+        summary: "File metadata updated.",
+        actorId,
+        metadata: {
+          visibility: input.visibility,
+          category: input.category,
         },
       });
 
@@ -225,14 +232,12 @@ export const fileRepository: FileRepository = {
       }
 
       await transaction.fileAsset.delete({ where: { id } });
-      await transaction.auditLog.create({
-        data: {
-          action: AuditAction.DELETE_FILE,
-          targetResource: "FileAsset",
-          targetId: id,
-          summary: "File deleted.",
-          actorId,
-        },
+      await recordAuditLogInTransaction(transaction, {
+        action: "DELETE_FILE",
+        targetResource: "FileAsset",
+        targetId: id,
+        summary: "File deleted.",
+        actorId,
       });
     });
   },

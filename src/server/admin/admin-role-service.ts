@@ -1,8 +1,9 @@
 import "server-only";
 
-import { AdminAccountStatus, AdminRole, AuditAction } from "@prisma/client";
+import { AdminAccountStatus, AdminRole } from "@prisma/client";
 
 import { ForbiddenError } from "../auth/authorization-error";
+import { recordAuditLogInTransaction } from "../audit/audit-service";
 import {
   AdminRoleChangeError,
   AdminRoleChangeErrorCode,
@@ -94,14 +95,13 @@ const prismaAdminRoleStore: AdminRoleChangeStore = {
         },
       });
 
-      await transaction.auditLog.create({
-        data: {
-          action: AuditAction.UPDATE,
-          targetResource: "AdminUser",
-          targetId: target.id,
-          summary: `Administrator role changed from ${currentTarget.role} to ${role}.`,
-          actorId: actor.id,
-        },
+      await recordAuditLogInTransaction(transaction, {
+        action: "UPDATE",
+        targetResource: "AdminUser",
+        targetId: target.id,
+        summary: `Administrator role changed from ${currentTarget.role} to ${role}.`,
+        actorId: actor.id,
+        metadata: { previousRole: currentTarget.role, role },
       });
 
       return updatedAdmin;

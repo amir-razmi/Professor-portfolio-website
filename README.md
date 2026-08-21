@@ -152,6 +152,7 @@ administrator routes are:
 - `/admin/admins` — list administrator accounts (SUPER_ADMIN only)
 - `/admin/admins/new` — create an administrator account (SUPER_ADMIN only)
 - `/admin/admins/[id]/edit` — manage details, role, status, and password (SUPER_ADMIN only)
+- `/admin/audit-logs` — paginated audit events with action/resource filters (SUPER_ADMIN only)
 
 The public routes are:
 
@@ -228,27 +229,34 @@ The administrator role service rejects self-escalation, attempts to manage a hig
 administrator, attempts to assign a role above the actor's own role, and attempts to demote the
 last active `SUPER_ADMIN`. Administrator management is restricted to `SUPER_ADMIN` in both the
 pages/actions and the server-side policy/service layer. Successful account, role, status, details,
-and password-reset operations record only non-secret metadata in `AuditLog`; password hashes and
-plaintext passwords are never returned to the UI or written to audit summaries. Deactivation of
-the signed-in account is rejected, and the last active `SUPER_ADMIN` cannot be deactivated.
+and password-reset operations record only non-secret metadata in `AuditLog`; password hashes,
+plaintext passwords, tokens, sessions, and secrets are never returned to the UI or persisted in
+audit metadata. Audit persistence is best effort and cannot make a successful primary mutation
+fail. Deactivation of the signed-in account is rejected, and the last active `SUPER_ADMIN` cannot
+be deactivated.
+
+The audit viewer is available at `/admin/audit-logs` to principals with `VIEW_AUDIT_LOGS` (currently
+`SUPER_ADMIN` only). It supports 25-event pages and filters by action or target resource. Research
+and publication mutation screens are intentionally deferred; their target resource types are
+supported by the centralized audit service for the later CRUD stage.
 
 ## Scripts
 
-| Command             | Purpose                                                                    |
-| ------------------- | -------------------------------------------------------------------------- |
-| `pnpm dev`          | Start the development server                                               |
-| `pnpm build`        | Generate Prisma Client and create a production build                       |
-| `pnpm start`        | Serve the production build                                                 |
-| `pnpm lint`         | Run ESLint                                                                 |
-| `pnpm test`         | Run focused authentication, authorization, content, public, and blog tests |
-| `pnpm typecheck`    | Run the TypeScript compiler without emitting files                         |
-| `pnpm format`       | Format supported files with Prettier                                       |
-| `pnpm format:check` | Check formatting without writing                                           |
-| `pnpm db:generate`  | Generate Prisma Client                                                     |
-| `pnpm db:validate`  | Validate the Prisma schema                                                 |
-| `pnpm db:push`      | Synchronize the Prisma schema with MongoDB                                 |
-| `pnpm db:check`     | Run a read-only MongoDB ping                                               |
-| `pnpm db:seed`      | Run the guarded development seed                                           |
+| Command             | Purpose                                                                                 |
+| ------------------- | --------------------------------------------------------------------------------------- |
+| `pnpm dev`          | Start the development server                                                            |
+| `pnpm build`        | Generate Prisma Client and create a production build                                    |
+| `pnpm start`        | Serve the production build                                                              |
+| `pnpm lint`         | Run ESLint                                                                              |
+| `pnpm test`         | Run focused authentication, authorization, content, public, blog, file, and audit tests |
+| `pnpm typecheck`    | Run the TypeScript compiler without emitting files                                      |
+| `pnpm format`       | Format supported files with Prettier                                                    |
+| `pnpm format:check` | Check formatting without writing                                                        |
+| `pnpm db:generate`  | Generate Prisma Client                                                                  |
+| `pnpm db:validate`  | Validate the Prisma schema                                                              |
+| `pnpm db:push`      | Synchronize the Prisma schema with MongoDB                                              |
+| `pnpm db:check`     | Run a read-only MongoDB ping                                                            |
+| `pnpm db:seed`      | Run the guarded development seed                                                        |
 
 ## Project structure
 
@@ -264,12 +272,14 @@ src/
     public-content/    Public readers, visibility policy, shared cards, and page composition
     blog/              Blog schemas, repository/service policy, actions, admin UI, and public UI
     files/             Upload validation, file policy/repository/service, and admin UI
+    audit-log/         Protected paginated audit-log viewer and query policy
     site-settings/     Settings schema, repository, service, actions, and form
     home/              Public portfolio page composition
   lib/                 Small shared utilities and environment parsing
     storage/            Server-only storage contract and local filesystem provider
   server/admin/        Protected administrator-domain policies, actions, and services
   server/auth/         Authentication, roles, permissions, and authorization helpers
+  server/audit/        Centralized sanitized audit-log writer
   server/db/           Compatibility export for server-only database access
   types/               Auth.js TypeScript module augmentation
 prisma/
@@ -282,6 +292,7 @@ tests/content/          Profile/settings validation and authorization tests
 tests/public/           Public visibility, ordering, and empty-collection tests
 tests/blog/              Blog validation, authorization, visibility, and rendering tests
 tests/files/             Upload, storage, download, and cleanup security tests
+tests/audit/             Audit sanitization, event shape, and authorization tests
 ```
 
 The data layer currently includes `AdminUser`, `ProfessorProfile`, `SiteSettings`, `BlogPost`,

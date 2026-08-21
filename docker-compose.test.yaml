@@ -1,0 +1,23 @@
+services:
+  mongodb:
+    image: bitnami/mongodb:latest
+    restart: always
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=127.0.0.1
+      - MONGODB_REPLICA_SET_MODE=primary
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 27018:27017
+
+  redis:
+    image: "bitnami/redis:latest"
+    environment:
+      - REDIS_PASSWORD
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    ports:
+      - 6380:6379

@@ -27,7 +27,7 @@ function isLikelyDevelopmentDatabase(connectionString: string) {
 }
 
 function assertSafeSeedEnvironment() {
-  const connectionString = process.env.MONGODB_URL;
+  const connectionString = process.env.DATABASE_URL;
 
   if (
     process.env.NODE_ENV === "production" ||
@@ -385,6 +385,7 @@ main()
       console.error(error.message);
     } else {
       console.error("Development seed failed.");
+      console.error(error)
     }
     process.exitCode = 1;
   })

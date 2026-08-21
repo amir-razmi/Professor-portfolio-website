@@ -8,9 +8,9 @@ Tailwind CSS, Prisma, MongoDB, and Zod.
 This stage establishes the application shell, the initial server-side data layer, administrator
 authentication, and centralized role-based authorization:
 
-- Public App Router layout with a responsive navigation placeholder
+- Public App Router layout with responsive primary navigation
 - Reusable header, footer, container, section heading, and surface components
-- Admin layout and route placeholder
+- Protected administrator layout and dashboard routes
 - Strict TypeScript configuration
 - Tailwind CSS v4 with global styles
 - Server-only environment validation for MongoDB
@@ -27,11 +27,15 @@ authentication, and centralized role-based authorization:
   permission checks
 - Public home/layout content read from the published professor profile and site settings in
   MongoDB
-- Accessible loading, empty, success, error, and forbidden states for the initial admin workflows
+- Public About, Research, Publications, and Contact pages with responsive academic presentation
+- Server-side public readers that exclude draft and private research/publication records
+- Research status, visibility, and ordering fields plus publication type and PDF-reference fields
+- Accessible loading, empty, success, error, and forbidden states for the initial public/admin
+  workflows
 
 Blog/research/publication CRUD, administrator-management screens, and file uploads remain
-intentionally deferred to later stages. Profile images currently use a validated URL field;
-binary storage is not implemented.
+intentionally deferred to later stages. Profile images and publication PDFs currently use
+validated URL fields; binary storage is not implemented.
 
 ## Local setup
 
@@ -129,6 +133,14 @@ administrator routes are:
 - `/admin/profile` — professor profile management
 - `/admin/settings` — site-wide settings management
 
+The public routes are:
+
+- `/` — overview with selected research and publications
+- `/about` — biography and academic record
+- `/research` — public research interests and projects
+- `/publications` — published scholarly work
+- `/contact` — published contact details and academic links
+
 ## Authentication model
 
 The application uses `next-auth@5.0.0-beta.32` with the Credentials provider and an explicit JWT
@@ -204,7 +216,7 @@ src/
   features/
     admin-dashboard/   Dashboard summaries and protected admin composition
     professor-profile/ Profile schema, repository, service, actions, and form
-    public-content/    Cached public profile/settings readers
+    public-content/    Public readers, visibility policy, shared cards, and page composition
     site-settings/     Settings schema, repository, service, actions, and form
     home/              Public portfolio page composition
   lib/                 Small shared utilities and environment parsing
@@ -219,6 +231,7 @@ prisma/
 prisma.config.ts       Prisma schema and seed configuration
 tests/auth/             Focused authentication and authorization tests
 tests/content/          Profile/settings validation and authorization tests
+tests/public/           Public visibility, ordering, and empty-collection tests
 ```
 
 The data layer currently includes `AdminUser`, `ProfessorProfile`, `SiteSettings`, `BlogPost`,
@@ -227,4 +240,5 @@ many-to-many blog relations use explicit ObjectId arrays on both models. Environ
 server-side and are never placed in reusable presentation components. Profile list fields are
 entered one item per line in the initial management form. `pnpm db:push` is the supported MongoDB
 schema synchronization workflow; MongoDB transactions require a replica set (a local development
-replica set or an appropriately configured hosted cluster).
+replica set or an appropriately configured hosted cluster). Public research requires both
+`isPublished=true` and `visibility=PUBLIC`; publications require `isPublished=true`.

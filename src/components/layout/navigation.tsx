@@ -4,8 +4,8 @@ import { siteConfig } from "@/config/site";
 
 export function SiteNavigation() {
   return (
-    <nav aria-label="Primary navigation" className="w-full overflow-x-auto md:w-auto">
-      <ul className="flex min-w-max items-center gap-1 md:min-w-0 md:gap-2">
+    <nav aria-label="Primary navigation" className="w-full md:w-auto">
+      <ul className="flex flex-wrap items-center gap-1 md:gap-2">
         {siteConfig.navigation.map((item) => (
           <li key={item.href}>
             <Link

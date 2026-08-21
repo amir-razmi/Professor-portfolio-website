@@ -5,8 +5,11 @@ import {
   AdminRole,
   AuditAction,
   BlogPostStatus,
+  ContentVisibility,
   FileVisibility,
+  PublicationType,
   PrismaClient,
+  ResearchItemStatus,
 } from "@prisma/client";
 
 import { hashPassword } from "../src/server/auth/password";
@@ -284,6 +287,9 @@ async function main() {
       summary: "A development-only research record.",
       description: "Replace this record with a real research project in a future content workflow.",
       externalUrl: "https://example.test/research",
+      status: ResearchItemStatus.ACTIVE,
+      visibility: ContentVisibility.PUBLIC,
+      sortOrder: 10,
       isPublished: true,
       publishedAt: seedTimestamp,
       updatedById: admin.id,
@@ -295,6 +301,9 @@ async function main() {
       summary: "A development-only research record.",
       description: "Replace this record with a real research project in a future content workflow.",
       externalUrl: "https://example.test/research",
+      status: ResearchItemStatus.ACTIVE,
+      visibility: ContentVisibility.PUBLIC,
+      sortOrder: 10,
       isPublished: true,
       publishedAt: seedTimestamp,
       createdById: admin.id,
@@ -312,7 +321,10 @@ async function main() {
       abstract: "A development-only publication record.",
       authors: ["Dr. Development Example"],
       venue: "Development Journal",
+      publicationType: PublicationType.JOURNAL_ARTICLE,
+      doi: "10.0000/development-publication",
       url: "https://example.test/publication",
+      pdfUrl: "https://example.test/publication.pdf",
       publicationDate: seedTimestamp,
       isPublished: true,
       publishedAt: seedTimestamp,
@@ -328,7 +340,10 @@ async function main() {
       abstract: "A development-only publication record.",
       authors: ["Dr. Development Example"],
       venue: "Development Journal",
+      publicationType: PublicationType.JOURNAL_ARTICLE,
+      doi: "10.0000/development-publication",
       url: "https://example.test/publication",
+      pdfUrl: "https://example.test/publication.pdf",
       publicationDate: seedTimestamp,
       isPublished: true,
       publishedAt: seedTimestamp,
@@ -385,7 +400,7 @@ main()
       console.error(error.message);
     } else {
       console.error("Development seed failed.");
-      console.error(error)
+      console.error(error);
     }
     process.exitCode = 1;
   })

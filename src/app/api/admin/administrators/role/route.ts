@@ -5,6 +5,7 @@ import {
   type AdminRoleChangeFailure,
 } from "@/server/admin/admin-role-policy";
 import { changeAdminRoleAs } from "@/server/admin/admin-role-service";
+import { sameOriginFailureResponse } from "@/server/security/request-origin";
 
 export const runtime = "nodejs";
 
@@ -24,6 +25,12 @@ function errorResponse(failure: AdminRoleChangeFailure) {
 }
 
 export async function POST(request: Request) {
+  const originFailure = sameOriginFailureResponse(request);
+
+  if (originFailure) {
+    return originFailure;
+  }
+
   let input: unknown;
 
   try {
@@ -53,6 +60,19 @@ export async function POST(request: Request) {
       return errorResponse(failure);
     }
 
-    throw error;
+    console.error("Administrator role change failed unexpectedly.");
+
+    return Response.json(
+      {
+        error: "INTERNAL_ERROR",
+        message: "تغییر نقش مدیر انجام نشد. دوباره تلاش کنید.",
+      },
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
+    );
   }
 }

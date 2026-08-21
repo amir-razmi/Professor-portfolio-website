@@ -7,6 +7,7 @@ import {
 } from "@/features/files/server/file-access-token";
 import { fileErrorResponse } from "@/features/files/server/file-errors";
 import { unlockFile } from "@/features/files/server/file-service";
+import { sameOriginFailureResponse } from "@/server/security/request-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,6 +17,12 @@ type RouteContext = {
 };
 
 export async function POST(request: Request, context: RouteContext) {
+  const originFailure = sameOriginFailureResponse(request);
+
+  if (originFailure) {
+    return originFailure;
+  }
+
   const { id } = await context.params;
 
   if (!objectIdIsSafe(id)) {

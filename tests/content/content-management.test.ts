@@ -85,6 +85,25 @@ test("profile schema normalizes lists and optional blank fields", () => {
   assert.equal(parsed.websiteUrl, null);
 });
 
+test("profile validation rejects invalid email, unsafe URL, and excessive names", () => {
+  const invalidEmail = professorProfileSchema.safeParse({
+    ...validProfileInput(),
+    email: "not-an-email",
+  });
+  const unsafeUrl = professorProfileSchema.safeParse({
+    ...validProfileInput(),
+    websiteUrl: "javascript:alert(1)",
+  });
+  const excessiveName = professorProfileSchema.safeParse({
+    ...validProfileInput(),
+    fullName: "x".repeat(121),
+  });
+
+  assert.equal(invalidEmail.success, false);
+  assert.equal(unsafeUrl.success, false);
+  assert.equal(excessiveName.success, false);
+});
+
 test("ADMIN can update profile content through the policy service", async () => {
   const input = validProfileInput();
   const savedValues: { value: ProfessorProfileInput | null } = { value: null };
@@ -197,4 +216,23 @@ test("invalid site settings are rejected server-side", async () => {
       ),
     ContentValidationError,
   );
+});
+
+test("site settings validation rejects invalid email, URL, and excessive text", () => {
+  const invalidEmail = siteSettingsSchema.safeParse({
+    ...validSettingsInput(),
+    contactEmail: "not-an-email",
+  });
+  const unsafeUrl = siteSettingsSchema.safeParse({
+    ...validSettingsInput(),
+    defaultOgImageUrl: "javascript:alert(1)",
+  });
+  const excessiveSiteName = siteSettingsSchema.safeParse({
+    ...validSettingsInput(),
+    siteName: "x".repeat(121),
+  });
+
+  assert.equal(invalidEmail.success, false);
+  assert.equal(unsafeUrl.success, false);
+  assert.equal(excessiveSiteName.success, false);
 });

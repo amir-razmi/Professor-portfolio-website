@@ -5,6 +5,7 @@ import { fileErrorResponse } from "@/features/files/server/file-errors";
 import { fileMetadataFormDataToInput, MAX_FILE_SIZE_BYTES } from "@/features/files/file-schema";
 import { listAdminFiles, uploadFile } from "@/features/files/server/file-service";
 import { serializeAdminFile } from "@/features/files/server/file-serialization";
+import { sameOriginFailureResponse } from "@/server/security/request-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -49,6 +50,12 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const originFailure = sameOriginFailureResponse(request);
+
+  if (originFailure) {
+    return originFailure;
+  }
+
   try {
     const actor = await requirePermission(Permission.MANAGE_FILES, {
       onUnauthenticated: "throw",

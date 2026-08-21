@@ -314,6 +314,25 @@ test("delete cleanup restores storage when database deletion fails", async () =>
   assert.equal(storage.values.has(file.storageKey), true);
 });
 
+test("successful deletion removes both the stored binary and metadata", async () => {
+  const file = record();
+  const storage = memoryStorage({
+    [file.storageKey]: new TextEncoder().encode("%PDF-1.7\n"),
+  });
+  let deletedId: string | null = null;
+  const store = repository({
+    findById: async () => file,
+    delete: async (id) => {
+      deletedId = id;
+    },
+  });
+
+  await deleteFileForActor(admin, file.id, store, storage);
+
+  assert.equal(deletedId, file.id);
+  assert.equal(storage.values.has(file.storageKey), false);
+});
+
 test("delete refuses to remove metadata when the stored binary is missing", async () => {
   let deleteCalls = 0;
   const file = record();

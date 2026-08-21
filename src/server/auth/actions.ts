@@ -5,6 +5,7 @@ import { AuthError } from "next-auth";
 import { signIn, signOut } from "@/auth";
 
 import { adminCredentialsSchema, invalidCredentialsMessage } from "./credentials";
+import { performLogout } from "./logout";
 
 export type LoginActionState = {
   error: string | null;
@@ -43,5 +44,5 @@ export async function loginAction(
 }
 
 export async function logoutAction(): Promise<void> {
-  await signOut({ redirectTo: "/login" });
+  await performLogout(signOut);
 }

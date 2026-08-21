@@ -244,6 +244,24 @@ The audit viewer is available at `/admin/audit-logs` to principals with `VIEW_AU
 and publication mutation screens are intentionally deferred; their target resource types are
 supported by the centralized audit service for the later CRUD stage.
 
+## Security hardening notes
+
+- Auth.js protects its own sign-in/sign-out endpoints with its built-in CSRF flow. Custom
+  cookie-authenticated mutation routes additionally require a same-origin `Origin` or `Referer`
+  header; cross-origin and headerless browser mutations are rejected.
+- Production responses set `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, and
+  `Permissions-Policy` headers, and the default `X-Powered-By` header is disabled. HTTPS/HSTS
+  should still be enforced at the production reverse proxy or hosting platform.
+- Public file downloads are always `no-store` and expose only validated metadata. Private file
+  failures are intentionally returned as generic not-found responses. Local filesystem storage is
+  for development; use an S3-compatible provider with the same storage interface for production.
+- The application does not include distributed rate limiting or account lockout. Add an edge or
+  Redis-backed limiter for login, file-password unlock, uploads, and other expensive mutations
+  before production traffic.
+- Password reset is an administrator-only in-app operation. A production university deployment
+  should add a verified email-based recovery flow, centralized monitoring/alerting, HTTPS-only
+  cookies, backups, and an ongoing dependency-audit/update process.
+
 ## Scripts
 
 | Command             | Purpose                                                                                 |

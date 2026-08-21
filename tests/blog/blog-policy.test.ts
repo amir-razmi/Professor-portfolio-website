@@ -139,6 +139,25 @@ test("blog schema normalizes slugs and requires dates for published posts", () =
   assert.equal(published.publishedAt?.toISOString(), publishedAt.toISOString());
 });
 
+test("blog input validation rejects malformed IDs, unsafe lengths, and invalid dates", () => {
+  const malformedId = blogPostSchema.safeParse({
+    ...validInput(),
+    id: "not-an-object-id",
+  });
+  const excessiveTitle = blogPostSchema.safeParse({
+    ...validInput(),
+    title: "x".repeat(181),
+  });
+  const invalidDate = blogPostSchema.safeParse({
+    ...validInput(),
+    publishedAt: "not-a-date",
+  });
+
+  assert.equal(malformedId.success, false);
+  assert.equal(excessiveTitle.success, false);
+  assert.equal(invalidDate.success, false);
+});
+
 test("ADMIN can save a published post, while EDITOR can only create drafts", async () => {
   let saveCalls = 0;
   const store = repository({

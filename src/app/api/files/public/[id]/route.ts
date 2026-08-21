@@ -13,21 +13,25 @@ type RouteContext = {
 };
 
 export async function GET(_request: Request, context: RouteContext) {
-  const { id } = await context.params;
-  const accessToken = objectIdIsSafe(id)
-    ? (await cookies()).get(fileAccessCookieName(id))?.value
-    : undefined;
-  const result = await getPublicFileDownload(id, accessToken);
+  try {
+    const { id } = await context.params;
+    const accessToken = objectIdIsSafe(id)
+      ? (await cookies()).get(fileAccessCookieName(id))?.value
+      : undefined;
+    const result = await getPublicFileDownload(id, accessToken);
 
-  if (!result) {
-    return new Response("Not found.", {
-      status: 404,
-      headers: {
-        "Cache-Control": "no-store",
-        "X-Content-Type-Options": "nosniff",
-      },
-    });
+    if (result) {
+      return createFileDownloadResponse(result, "no-store");
+    }
+  } catch {
+    // Do not expose storage or database details through a public download URL.
   }
 
-  return createFileDownloadResponse(result, "no-store");
+  return new Response("Not found.", {
+    status: 404,
+    headers: {
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+    },
+  });
 }

@@ -4,6 +4,7 @@ import type { NextAuthConfig } from "next-auth";
 
 import { getAuthSecret } from "@/lib/env";
 import { authenticateAdmin } from "@/server/auth/admin-login";
+import { safeAuthRedirect } from "@/server/auth/redirect";
 
 const authConfig = (): NextAuthConfig => ({
   secret: getAuthSecret(),
@@ -51,19 +52,7 @@ const authConfig = (): NextAuthConfig => ({
       return session;
     },
     async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) {
-        return `${baseUrl}${url}`;
-      }
-
-      try {
-        if (new URL(url).origin === baseUrl) {
-          return url;
-        }
-      } catch {
-        // Fall through to the fixed admin destination for malformed URLs.
-      }
-
-      return `${baseUrl}/admin`;
+      return safeAuthRedirect(url, baseUrl);
     },
   },
 });

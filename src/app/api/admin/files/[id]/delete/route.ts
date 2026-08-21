@@ -3,6 +3,7 @@ import { getAuthorizationFailure } from "@/server/auth/authorization-error";
 
 import { fileErrorResponse } from "@/features/files/server/file-errors";
 import { deleteFile } from "@/features/files/server/file-service";
+import { sameOriginFailureResponse } from "@/server/security/request-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,7 +12,13 @@ type RouteContext = {
   params: Promise<{ id: string }>;
 };
 
-export async function DELETE(_request: Request, context: RouteContext) {
+export async function DELETE(request: Request, context: RouteContext) {
+  const originFailure = sameOriginFailureResponse(request);
+
+  if (originFailure) {
+    return originFailure;
+  }
+
   try {
     const actor = await requirePermission(Permission.MANAGE_FILES, {
       onUnauthenticated: "throw",

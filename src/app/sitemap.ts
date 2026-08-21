@@ -11,7 +11,7 @@ function siteUrl(): string {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteUrl().replace(/\/+$/, "");
-  const staticPaths = ["/", "/about", "/research", "/publications", "/contact", "/blog"];
+  const staticPaths = ["/", "/about", "/research", "/publications", "/contact", "/blog", "/files"];
   const slugs = await getPublicBlogSitemapSlugs();
 
   return [

@@ -11,11 +11,16 @@ import {
   uploadFileForActor,
 } from "./file-policy";
 import { fileRepository } from "./file-repository";
+import { listPublicFileRecords } from "./public-file-policy";
 
 const storage = getStorageProvider();
 
 export function listAdminFiles(actor: Parameters<typeof listFilesForActor>[0]) {
   return listFilesForActor(actor, fileRepository);
+}
+
+export function listPublicFiles() {
+  return listPublicFileRecords(fileRepository);
 }
 
 export function uploadFile(

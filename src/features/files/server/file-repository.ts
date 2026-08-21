@@ -65,9 +65,10 @@ function notFound(): never {
 }
 
 export const fileRepository: FileRepository = {
-  async list() {
+  async list(limit?: number) {
     const files = await prisma.fileAsset.findMany({
       orderBy: { uploadedAt: "desc" },
+      ...(limit && limit > 0 ? { take: Math.min(Math.floor(limit), 1000) } : {}),
       select: fileSelect,
     });
 

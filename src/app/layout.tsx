@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import "./globals.css";
+import { metadataBase } from "@/lib/seo";
 
-const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-const metadataBase =
-  configuredSiteUrl && /^https?:\/\//i.test(configuredSiteUrl)
-    ? new URL(configuredSiteUrl)
-    : new URL("http://localhost:3000");
+import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase,
@@ -16,6 +12,21 @@ export const metadata: Metadata = {
     template: "%s | Academic Portfolio",
   },
   description: "A focused foundation for presenting research, teaching, and academic work.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Academic Portfolio",
+    title: "Academic Portfolio",
+    description: "A focused foundation for presenting research, teaching, and academic work.",
+    url: "/",
+  },
+  twitter: {
+    card: "summary",
+    title: "Academic Portfolio",
+    description: "A focused foundation for presenting research, teaching, and academic work.",
+  },
 };
 
 export default function RootLayout({

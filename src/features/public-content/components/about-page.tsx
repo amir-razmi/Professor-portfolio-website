@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { AcademicLinks } from "./academic-links";
 import { AcademicRecordList } from "./academic-record-list";
 import { ContactDetails } from "./contact-details";
@@ -47,10 +49,13 @@ export function AboutPageContent({ profile, settings }: Readonly<PublicPortfolio
               <Surface className="bg-white">
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
                   {profileImageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={profileImageUrl}
                       alt={`${profile.fullName} profile`}
+                      width={128}
+                      height={128}
+                      sizes="128px"
+                      unoptimized
                       className="size-32 rounded-2xl border border-line object-cover"
                       referrerPolicy="no-referrer"
                     />

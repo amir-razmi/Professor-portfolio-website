@@ -54,23 +54,28 @@ test("public file projection keeps safe metadata and exposes downloads only for 
 });
 
 test("public file listing includes visible and restricted records", async () => {
+  let requestedLimit: number | undefined;
   const records = await listPublicFileRecords({
-    list: async () => [
-      file(),
-      file({
-        id: "507f1f77bcf86cd799439014",
-        visibility: FileVisibility.PASSWORD_PROTECTED,
-        hasPassword: true,
-        displayName: "Password-protected notes",
-      }),
-      file({
-        id: "507f1f77bcf86cd799439013",
-        visibility: FileVisibility.PRIVATE,
-        displayName: "Internal review notes",
-      }),
-    ],
+    list: async (limit) => {
+      requestedLimit = limit;
+      return [
+        file(),
+        file({
+          id: "507f1f77bcf86cd799439014",
+          visibility: FileVisibility.PASSWORD_PROTECTED,
+          hasPassword: true,
+          displayName: "Password-protected notes",
+        }),
+        file({
+          id: "507f1f77bcf86cd799439013",
+          visibility: FileVisibility.PRIVATE,
+          displayName: "Internal review notes",
+        }),
+      ];
+    },
   });
 
+  assert.equal(requestedLimit, 100);
   assert.deepEqual(
     records.map((record) => ({
       name: record.displayName,

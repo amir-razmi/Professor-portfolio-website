@@ -36,6 +36,9 @@ authentication, and centralized role-based authorization:
 - Complete blog workflow with protected post and taxonomy management, draft/publish transitions,
   duplicate-slug validation, public search/filtering/pagination, metadata, and a published-only
   sitemap
+- Public SEO metadata with canonical URLs, Open Graph/Twitter cards, robots rules, and a
+  request-time sitemap that excludes unpublished blog records
+- `next/image` profile media with meaningful alt text and bounded public file queries
 - Centralized blog taxonomy permission (`MANAGE_BLOG_TAXONOMY`) for category/tag administration
 - Plain-text blog content rendering that escapes hostile markup and does not interpret raw HTML or
   Markdown
@@ -165,6 +168,7 @@ The public routes are:
 - `/blog/[slug]` — a published blog article
 - `/files` — public, password-protected, and restricted academic file records
 - `/sitemap.xml` — static public routes plus published blog slugs only
+- `/robots.txt` — permits public pages and blocks `/admin/`, `/api/`, and `/login`
 - `/api/files/public/[id]` — streams a public file or an unlocked password-protected file
 - `/api/files/public/[id]/unlock` — verifies a file password and issues a short-lived HTTP-only
   signed access cookie

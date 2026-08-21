@@ -5,18 +5,25 @@ import { SiteFooter } from "@/components/layout/footer";
 import { SiteHeader } from "@/components/layout/header";
 import { siteConfig } from "@/config/site";
 import { getCachedPublicSiteSettings } from "@/features/public-content/server/public-content-service";
+import { createPublicMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getCachedPublicSiteSettings();
+  const siteName = settings?.siteName ?? siteConfig.name;
 
   return {
+    ...createPublicMetadata({
+      title: siteName,
+      description: settings?.siteDescription ?? siteConfig.description,
+      path: "/",
+      siteName,
+    }),
     title: {
-      default: settings?.siteName ?? siteConfig.name,
-      template: `%s | ${settings?.siteName ?? siteConfig.name}`,
+      default: siteName,
+      template: `%s | ${siteName}`,
     },
-    description: settings?.siteDescription ?? siteConfig.description,
   };
 }
 

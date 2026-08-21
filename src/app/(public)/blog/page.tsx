@@ -9,13 +9,15 @@ import { BlogPagination } from "@/features/blog/components/blog-pagination";
 import { BlogPostCard } from "@/features/blog/components/blog-post-card";
 import { normalizeBlogListQuery } from "@/features/blog/blog-schema";
 import { getPublicBlogFilters, getPublicBlogList } from "@/features/blog/server/blog-service";
+import { createPublicMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPublicMetadata({
   title: "Blog",
   description: "Academic notes, research updates, and reflections.",
-};
+  path: "/blog",
+});
 
 export default async function PublicBlogPage({
   searchParams,

@@ -45,6 +45,6 @@ export function toPublicFileRecord(file: FileRecord): PublicFileRecord {
 export async function listPublicFileRecords(
   repository: Pick<FileRepository, "list">,
 ): Promise<PublicFileRecord[]> {
-  const files = await repository.list();
+  const files = await repository.list(100);
   return files.map(toPublicFileRecord);
 }

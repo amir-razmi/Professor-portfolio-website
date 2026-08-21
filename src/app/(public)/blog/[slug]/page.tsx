@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { BlogArticle } from "@/features/blog/components/blog-article";
 import { getCachedPublicBlogPost } from "@/features/blog/server/blog-service";
+import { createPublicMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -25,16 +26,20 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     };
   }
 
-  return {
+  const metadata = createPublicMetadata({
     title: post.title,
     description: post.excerpt ?? "Academic notes and updates.",
+    path: `/blog/${post.slug}`,
+    type: "article",
+  });
+
+  return {
+    ...metadata,
     openGraph: {
+      ...metadata.openGraph,
       type: "article",
-      title: post.title,
-      description: post.excerpt ?? "Academic notes and updates.",
       publishedTime: post.publishedAt?.toISOString(),
       authors: post.authorName ? [post.authorName] : undefined,
-      url: `/blog/${post.slug}`,
     },
   };
 }

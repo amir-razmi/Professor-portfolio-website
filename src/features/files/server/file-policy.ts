@@ -48,7 +48,7 @@ export type FilePasswordAccess = {
 };
 
 export type FileRepository = {
-  list: () => Promise<FileRecord[]>;
+  list: (limit?: number) => Promise<FileRecord[]>;
   findById: (id: string) => Promise<FileRecord | null>;
   findPublicById: (id: string) => Promise<FileRecord | null>;
   findPasswordAccess: (id: string) => Promise<FilePasswordAccess | null>;

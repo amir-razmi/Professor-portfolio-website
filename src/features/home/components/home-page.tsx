@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import { AcademicRecordList } from "@/features/public-content/components/academic-record-list";
 import { ContactDetails } from "@/features/public-content/components/contact-details";
@@ -60,10 +61,14 @@ export default async function HomeFeaturePage() {
 
           <div className="flex justify-start lg:justify-end">
             {profileImageUrl && profile ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={profileImageUrl}
                 alt={`${profile.fullName} profile`}
+                width={256}
+                height={256}
+                sizes="(max-width: 1024px) 224px, 256px"
+                preload
+                unoptimized
                 className="size-56 rounded-3xl border border-white/20 object-cover shadow-2xl sm:size-64"
                 referrerPolicy="no-referrer"
               />

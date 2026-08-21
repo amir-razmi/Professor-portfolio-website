@@ -5,13 +5,15 @@ import { PublicEmptyState } from "@/features/public-content/components/public-em
 import { PublicPageHeader } from "@/features/public-content/components/public-page-header";
 import { PublicFileCard } from "@/features/files/components/public-file-card";
 import { listPublicFiles } from "@/features/files/server/file-service";
+import { createPublicMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPublicMetadata({
   title: "Files & downloads",
   description: "Academic documents and resources shared through the professor's website.",
-};
+  path: "/files",
+});
 
 export default async function PublicFilesPage() {
   const files = await listPublicFiles();

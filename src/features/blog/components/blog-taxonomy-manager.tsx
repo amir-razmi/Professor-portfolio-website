@@ -59,7 +59,7 @@ function CategoryForm({
           defaultValue={category?.slug ?? ""}
           className={formControlClassName}
         />
-        <FormFieldError id={`${prefix}-slug-error`} errors={state.fieldErrors.slug} />
+        <FormFieldError id={`${prefix}-slug-error`} errors={state.fieldErrors?.slug} />
       </div>
       <div>
         <label htmlFor={`${prefix}-description`} className="text-sm font-semibold text-slate-900">
@@ -119,7 +119,7 @@ function TagForm({
           defaultValue={tag?.name ?? ""}
           className={formControlClassName}
         />
-        <FormFieldError id={`${prefix}-name-error`} errors={state.fieldErrors.name} />
+        <FormFieldError id={`${prefix}-name-error`} errors={state.fieldErrors?.name} />
       </div>
       <div>
         <label htmlFor={`${prefix}-slug`} className="text-sm font-semibold text-slate-900">
@@ -134,7 +134,7 @@ function TagForm({
           defaultValue={tag?.slug ?? ""}
           className={formControlClassName}
         />
-        <FormFieldError id={`${prefix}-slug-error`} errors={state.fieldErrors.slug} />
+        <FormFieldError id={`${prefix}-slug-error`} errors={state.fieldErrors?.slug} />
       </div>
       <label className="flex items-center gap-2 text-sm text-slate-700">
         <input

@@ -39,6 +39,13 @@ FROM dependencies AS production-dependencies
 
 RUN pnpm prune --prod
 
+FROM dependencies AS tooling
+
+COPY . .
+
+RUN DATABASE_URL="mongodb://127.0.0.1:27017/academic_portfolio_tooling" \
+  pnpm prisma generate
+
 FROM node:20-bookworm-slim AS runner
 
 ENV NODE_ENV=production \

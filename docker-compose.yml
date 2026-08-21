@@ -1,0 +1,130 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    restart: unless-stopped
+    command:
+      - mongod
+      - --bind_ip_all
+      - --replSet
+      - rs0
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", 'mongosh --quiet --eval "db.adminCommand({ ping: 1 }).ok" | grep -q 1']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  mongodb-init:
+    image: mongo:7.0
+    restart: "no"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -c
+    command:
+      - |
+        set -eu
+        until mongosh --host mongodb:27017 --quiet --eval "db.adminCommand({ ping: 1 }).ok" | grep -q 1; do
+          sleep 1
+        done
+        mongosh --host mongodb:27017 --quiet --eval '
+          try {
+            rs.status();
+            print("MongoDB replica set is already initialized");
+          } catch (error) {
+            rs.initiate({
+              _id: "rs0",
+              members: [{ _id: 0, host: "mongodb:27017" }]
+            });
+            print("MongoDB replica set initialized");
+          }
+        '
+        until mongosh --host mongodb:27017 --quiet --eval "try { rs.status().members.some((member) => member.stateStr === 'PRIMARY') } catch (error) { false }" | grep -q true; do
+          sleep 1
+        done
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+    restart: unless-stopped
+    depends_on:
+      mongodb-init:
+        condition: service_completed_successfully
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_ENV: development
+      DATABASE_URL: mongodb://mongodb:27017/academic_portfolio_dev?replicaSet=rs0
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env before starting Compose}
+      AUTH_TRUST_HOST: ${AUTH_TRUST_HOST:-true}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      LOCAL_STORAGE_ROOT: /app/storage
+    volumes:
+      - app_storage:/app/storage
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/login').then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+
+  db-setup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: tooling
+    profiles:
+      - setup
+    restart: "no"
+    depends_on:
+      mongodb-init:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_ENV: development
+      DATABASE_URL: mongodb://mongodb:27017/academic_portfolio_dev?replicaSet=rs0
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env before running database setup}
+      AUTH_TRUST_HOST: ${AUTH_TRUST_HOST:-true}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      LOCAL_STORAGE_ROOT: /app/storage
+    command: ["pnpm", "db:push"]
+
+  db-seed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: tooling
+    profiles:
+      - seed
+    restart: "no"
+    depends_on:
+      mongodb-init:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_ENV: development
+      DATABASE_URL: mongodb://mongodb:27017/academic_portfolio_dev?replicaSet=rs0
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env before running the seed}
+      AUTH_TRUST_HOST: ${AUTH_TRUST_HOST:-true}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      LOCAL_STORAGE_ROOT: /app/storage
+      ADMIN_SEED_PASSWORD: ${ADMIN_SEED_PASSWORD:?Set ADMIN_SEED_PASSWORD in .env before running the seed}
+      SEED_DATABASE_CONFIRMATION: ${SEED_DATABASE_CONFIRMATION:?Set SEED_DATABASE_CONFIRMATION=YES before running the seed}
+    command: ["pnpm", "db:seed"]
+
+volumes:
+  mongodb_data:
+  app_storage:

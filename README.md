@@ -340,6 +340,71 @@ The local filesystem volume is suitable only for development or a single durable
 production or multiple replicas, replace the local storage provider with the documented
 S3-compatible adapter and keep the container filesystem disposable.
 
+## Docker Compose local stack
+
+`docker-compose.yml` provides a production-style local stack with:
+
+- MongoDB 7 running as a single-node replica set, which supports the transactions used by the
+  application.
+- The standalone Next.js application on `http://localhost:3000`.
+- Named volumes for MongoDB data and local uploaded-file storage.
+- One-shot `setup` and `seed` profiles for Prisma schema synchronization and development data.
+
+Prepare local environment values before starting the stack:
+
+```bash
+cp .env.example .env
+openssl rand -base64 32
+# Put the generated value in AUTH_SECRET in .env.
+```
+
+Start MongoDB and initialize its replica set:
+
+```bash
+docker compose up -d mongodb mongodb-init
+```
+
+Synchronize the Prisma schema against the Compose database. This uses the `tooling` Docker stage,
+so Prisma CLI and the generated client are available without adding development dependencies to
+the production application image:
+
+```bash
+docker compose --profile setup run --build --rm db-setup
+```
+
+Seed fake development-only records when needed. The seed is guarded and targets the
+`academic_portfolio_dev` database inside the Compose MongoDB service:
+
+```bash
+read -s ADMIN_SEED_PASSWORD
+export ADMIN_SEED_PASSWORD
+export SEED_DATABASE_CONFIRMATION=YES
+docker compose --profile seed run --build --rm db-seed
+unset ADMIN_SEED_PASSWORD SEED_DATABASE_CONFIRMATION
+```
+
+Start the application:
+
+```bash
+docker compose up -d app
+docker compose logs -f app
+```
+
+The application connects to MongoDB through the internal hostname
+`mongodb://mongodb:27017/academic_portfolio_dev?replicaSet=rs0`. MongoDB is also exposed on
+`localhost:27018` for read-only inspection or host-side tooling. The Compose app image is
+production-style and does not hot-reload source changes; use `pnpm dev` for the local hot-reload
+workflow.
+
+Stop the stack while preserving named volumes:
+
+```bash
+docker compose down
+```
+
+To remove the local database and uploaded-file volumes as well, use `docker compose down -v`
+only when the development data is intentionally disposable.
+
 ## Storage configuration and S3-compatible replacement
 
 The default `LocalStorageProvider` stores file bytes beneath `LOCAL_STORAGE_ROOT` and is suitable

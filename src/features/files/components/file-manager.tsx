@@ -115,15 +115,15 @@ export function FileManager({
       } | null;
 
       if (!response.ok || !payload?.file) {
-        setUploadError(payload ?? { message: "Upload failed." });
+        setUploadError(payload ?? { message: "بارگذاری ناموفق بود." });
         return;
       }
 
       setFiles((current) => [payload.file!, ...current]);
       form.reset();
-      setUploadMessage("File uploaded.");
+      setUploadMessage("فایل بارگذاری شد.");
     } catch {
-      setUploadError({ message: "The upload request could not be completed." });
+      setUploadError({ message: "درخواست بارگذاری انجام نشد." });
     } finally {
       setUploading(false);
     }
@@ -163,7 +163,7 @@ export function FileManager({
         setRowMessages((current) => ({
           ...current,
           [fileId]: {
-            message: payload?.message ?? "The metadata could not be saved.",
+            message: payload?.message ?? "ذخیره فراداده ممکن نشد.",
             tone: "error",
           },
         }));
@@ -173,13 +173,13 @@ export function FileManager({
       setFiles((current) => current.map((file) => (file.id === fileId ? payload.file! : file)));
       setRowMessages((current) => ({
         ...current,
-        [fileId]: { message: "Metadata saved.", tone: "success" },
+        [fileId]: { message: "فراداده ذخیره شد.", tone: "success" },
       }));
     } catch {
       setRowMessages((current) => ({
         ...current,
         [fileId]: {
-          message: "The metadata request could not be completed.",
+          message: "درخواست فراداده انجام نشد.",
           tone: "error",
         },
       }));
@@ -219,7 +219,7 @@ export function FileManager({
       setRowMessages((current) => ({
         ...current,
         [file.id]: {
-          message: "The delete request could not be completed.",
+          message: "درخواست حذف انجام نشد.",
           tone: "error",
         },
       }));
@@ -232,7 +232,7 @@ export function FileManager({
     <div className="space-y-8">
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
         <div className="border-b border-slate-200 pb-4">
-          <h2 className="text-xl font-semibold tracking-tight text-slate-950">Upload a file</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-950">بارگذاری فایل</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
             PDF, plain text, PNG, JPEG, and WebP files up to 10 MiB are accepted. Files are stored
             outside MongoDB; only metadata and an opaque storage key are persisted.
@@ -246,7 +246,7 @@ export function FileManager({
         >
           <div className="sm:col-span-2">
             <label htmlFor="file-upload" className="block text-sm font-semibold text-slate-900">
-              File
+              فایل
             </label>
             <input
               id="file-upload"
@@ -271,7 +271,7 @@ export function FileManager({
               name="displayName"
               required
               maxLength={120}
-              placeholder="Research methods handout"
+              placeholder="جزوه روش‌های پژوهش"
               className="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
             />
             <FieldError message={firstError(uploadError, "displayName")} />
@@ -279,7 +279,7 @@ export function FileManager({
 
           <div>
             <label htmlFor="file-category" className="block text-sm font-semibold text-slate-900">
-              Category
+              دسته‌بندی
             </label>
             <select
               id="file-category"
@@ -301,7 +301,7 @@ export function FileManager({
               htmlFor="file-description"
               className="block text-sm font-semibold text-slate-900"
             >
-              Description
+              توضیح
             </label>
             <textarea
               id="file-description"
@@ -315,7 +315,7 @@ export function FileManager({
 
           <div>
             <label htmlFor="file-visibility" className="block text-sm font-semibold text-slate-900">
-              Visibility
+              وضعیت دسترسی
             </label>
             <select
               id="file-visibility"
@@ -323,15 +323,15 @@ export function FileManager({
               defaultValue={FILE_VISIBILITY.PRIVATE}
               className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
             >
-              <option value={FILE_VISIBILITY.PRIVATE}>Private</option>
-              <option value={FILE_VISIBILITY.PUBLIC}>Public download</option>
-              <option value={FILE_VISIBILITY.PASSWORD_PROTECTED}>Password protected</option>
+              <option value={FILE_VISIBILITY.PRIVATE}>خصوصی</option>
+              <option value={FILE_VISIBILITY.PUBLIC}>دانلود عمومی</option>
+              <option value={FILE_VISIBILITY.PASSWORD_PROTECTED}>دارای گذرواژه</option>
             </select>
           </div>
 
           <div>
             <label htmlFor="file-password" className="block text-sm font-semibold text-slate-900">
-              Download password
+              گذرواژه دریافت
             </label>
             <input
               id="file-password"
@@ -340,12 +340,11 @@ export function FileManager({
               minLength={12}
               maxLength={128}
               autoComplete="new-password"
-              placeholder="At least 12 characters"
+              placeholder="حداقل ۱۲ نویسه"
               className="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
             />
             <p className="mt-1 text-xs leading-5 text-slate-500">
-              Required when Password protected is selected. The password is never stored in
-              plaintext.
+              هنگام انتخاب «دارای گذرواژه» الزامی است. گذرواژه هرگز به‌صورت متن ساده ذخیره نمی‌شود.
             </p>
             <FieldError message={firstError(uploadError, "password")} />
           </div>
@@ -356,7 +355,7 @@ export function FileManager({
               disabled={uploading}
               className="min-h-11 rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {uploading ? "Uploading…" : "Upload file"}
+              {uploading ? "در حال بارگذاری…" : "بارگذاری فایل"}
             </button>
           </div>
         </form>
@@ -369,13 +368,12 @@ export function FileManager({
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-slate-200 pb-4">
           <div>
-            <h2 className="text-xl font-semibold tracking-tight text-slate-950">File records</h2>
-            <p className="mt-1 text-sm text-slate-600">
-              {files.length} {files.length === 1 ? "file" : "files"} in the workspace.
-            </p>
+            <h2 className="text-xl font-semibold tracking-tight text-slate-950">سوابق فایل‌ها</h2>
+            <p className="mt-1 text-sm text-slate-600">{files.length} فایل در فضای مدیریت.</p>
           </div>
           <p className="text-xs text-slate-500">
-            Passwords are hashed; private files never receive public download links.
+            گذرواژه‌ها به‌صورت امن درهم‌سازی می‌شوند؛ فایل‌های خصوصی هیچ‌گاه پیوند دریافت عمومی
+            ندارند.
           </p>
         </div>
 
@@ -393,7 +391,7 @@ export function FileManager({
                       {file.safeOriginalName} · {file.fileType} · {formatBytes(file.sizeBytes)}
                     </p>
                     <p className="mt-1 text-xs text-slate-500">
-                      Uploaded {formatDate(file.uploadedAt)} by {file.uploaderName}
+                      بارگذاری‌شده در {formatDate(file.uploadedAt)} توسط {file.uploaderName}
                     </p>
                     {file.checksum ? (
                       <p className="mt-1 break-all text-xs text-slate-400">
@@ -412,14 +410,14 @@ export function FileManager({
                       }`}
                     >
                       {file.visibility === FILE_VISIBILITY.PUBLIC
-                        ? "Public"
+                        ? "عمومی"
                         : file.visibility === FILE_VISIBILITY.PASSWORD_PROTECTED
-                          ? "Password protected"
-                          : "Private"}
+                          ? "دارای گذرواژه"
+                          : "خصوصی"}
                     </span>
                     {file.hasPassword ? (
                       <span className="rounded-full bg-slate-100 px-2.5 py-1 text-slate-700">
-                        Password set
+                        گذرواژه تنظیم شده است
                       </span>
                     ) : null}
                     {file.downloadUrl ? (
@@ -427,14 +425,14 @@ export function FileManager({
                         href={file.downloadUrl}
                         className="rounded-lg border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                       >
-                        Download
+                        دریافت
                       </a>
                     ) : (
                       <a
                         href={file.adminDownloadUrl}
                         className="rounded-lg border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                       >
-                        Secure download
+                        دریافت امن
                       </a>
                     )}
                   </div>
@@ -446,7 +444,7 @@ export function FileManager({
                       htmlFor={`display-${file.id}`}
                       className="block text-sm font-semibold text-slate-900"
                     >
-                      Display name
+                      نام نمایشی
                     </label>
                     <input
                       id={`display-${file.id}`}
@@ -462,7 +460,7 @@ export function FileManager({
                       htmlFor={`category-${file.id}`}
                       className="block text-sm font-semibold text-slate-900"
                     >
-                      Category
+                      دسته‌بندی
                     </label>
                     <select
                       id={`category-${file.id}`}
@@ -482,7 +480,7 @@ export function FileManager({
                       htmlFor={`visibility-${file.id}`}
                       className="block text-sm font-semibold text-slate-900"
                     >
-                      Visibility
+                      وضعیت دسترسی
                     </label>
                     <select
                       id={`visibility-${file.id}`}
@@ -490,9 +488,9 @@ export function FileManager({
                       defaultValue={file.visibility}
                       className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
                     >
-                      <option value={FILE_VISIBILITY.PRIVATE}>Private</option>
-                      <option value={FILE_VISIBILITY.PUBLIC}>Public download</option>
-                      <option value={FILE_VISIBILITY.PASSWORD_PROTECTED}>Password protected</option>
+                      <option value={FILE_VISIBILITY.PRIVATE}>خصوصی</option>
+                      <option value={FILE_VISIBILITY.PUBLIC}>دانلود عمومی</option>
+                      <option value={FILE_VISIBILITY.PASSWORD_PROTECTED}>دارای گذرواژه</option>
                     </select>
                   </div>
                   <div>
@@ -500,7 +498,7 @@ export function FileManager({
                       htmlFor={`description-${file.id}`}
                       className="block text-sm font-semibold text-slate-900"
                     >
-                      Description
+                      توضیح
                     </label>
                     <textarea
                       id={`description-${file.id}`}
@@ -516,7 +514,7 @@ export function FileManager({
                       htmlFor={`password-${file.id}`}
                       className="block text-sm font-semibold text-slate-900"
                     >
-                      New download password
+                      گذرواژه جدید دریافت
                     </label>
                     <input
                       id={`password-${file.id}`}
@@ -526,15 +524,13 @@ export function FileManager({
                       maxLength={128}
                       autoComplete="new-password"
                       placeholder={
-                        file.hasPassword
-                          ? "Leave blank to keep the current password"
-                          : "At least 12 characters"
+                        file.hasPassword ? "برای حفظ گذرواژه فعلی خالی بگذارید" : "حداقل ۱۲ نویسه"
                       }
                       className="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
                     />
                     <p className="mt-1 text-xs leading-5 text-slate-500">
-                      Enter a value to set or replace the password. Choosing Public or Private
-                      removes password protection.
+                      برای تنظیم یا جایگزینی گذرواژه مقدار وارد کنید. انتخاب وضعیت عمومی یا خصوصی،
+                      حفاظت با گذرواژه را حذف می‌کند.
                     </p>
                     <label className="mt-2 inline-flex items-center gap-2 text-sm text-slate-700">
                       <input
@@ -543,7 +539,7 @@ export function FileManager({
                         value="true"
                         className="h-4 w-4 rounded border-slate-300 text-accent focus:ring-accent"
                       />
-                      Confirm removal when changing away from password protection
+                      حذف گذرواژه هنگام تغییر وضعیت را تأیید می‌کنم
                     </label>
                   </div>
                 </div>
@@ -554,7 +550,7 @@ export function FileManager({
                     disabled={busyId === file.id}
                     className="min-h-10 rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {busyId === file.id ? "Saving…" : "Save metadata"}
+                    {busyId === file.id ? "در حال ذخیره…" : "ذخیره فراداده"}
                   </button>
                   <button
                     type="button"
@@ -562,7 +558,7 @@ export function FileManager({
                     onClick={() => removeFile(file)}
                     className="min-h-10 rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    Delete
+                    حذف
                   </button>
                   <StatusMessage tone={rowMessages[file.id]?.tone ?? "success"}>
                     {rowMessages[file.id]?.message || null}
@@ -573,9 +569,9 @@ export function FileManager({
           </div>
         ) : (
           <div className="mt-6 rounded-xl border border-dashed border-slate-300 px-5 py-10 text-center">
-            <h3 className="text-lg font-semibold text-slate-950">No files yet.</h3>
+            <h3 className="text-lg font-semibold text-slate-950">هنوز فایلی وجود ندارد.</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              Upload a verified document or image to create the first file record.
+              برای ایجاد نخستین رکورد، یک سند یا تصویر تأییدشده بارگذاری کنید.
             </p>
           </div>
         )}

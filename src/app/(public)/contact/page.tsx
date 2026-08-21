@@ -8,12 +8,11 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { profile, settings } = await getPublicPortfolioContent();
-  const siteName = settings?.siteName ?? "Academic Portfolio";
+  const siteName = settings?.siteName ?? "پرتفولیوی دانشگاهی";
 
   return createPublicMetadata({
-    title: "Contact",
-    description:
-      profile?.shortBio ?? settings?.siteDescription ?? "Contact details and academic links.",
+    title: "تماس",
+    description: profile?.shortBio ?? settings?.siteDescription ?? "اطلاعات تماس و پیوندهای علمی.",
     path: "/contact",
     siteName,
   });

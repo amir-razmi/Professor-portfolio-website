@@ -22,8 +22,8 @@ export async function POST(request: Request, context: RouteContext) {
     return Response.json(
       {
         error: "INVALID_INPUT",
-        message: "The password could not unlock this file.",
-        fieldErrors: { password: ["The password is incorrect."] },
+        message: "باز کردن دسترسی این فایل با گذرواژه ممکن نشد.",
+        fieldErrors: { password: ["گذرواژه نادرست است."] },
       },
       { status: 400, headers: { "Cache-Control": "no-store" } },
     );

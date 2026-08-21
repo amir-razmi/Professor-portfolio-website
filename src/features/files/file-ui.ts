@@ -17,9 +17,9 @@ export const FILE_VISIBILITY = {
 export type FileVisibilityValue = (typeof FILE_VISIBILITY)[keyof typeof FILE_VISIBILITY];
 
 export const FILE_CATEGORY_LABELS: Record<FileCategoryValue, string> = {
-  PROFILE_IMAGE: "Profile image",
-  PUBLICATION_PDF: "Publication PDF",
-  BLOG_ASSET: "Blog asset",
-  DOCUMENT: "Document",
-  OTHER: "Other",
+  PROFILE_IMAGE: "تصویر پروفایل",
+  PUBLICATION_PDF: "PDF انتشارات",
+  BLOG_ASSET: "دارایی یادداشت",
+  DOCUMENT: "سند",
+  OTHER: "سایر",
 };

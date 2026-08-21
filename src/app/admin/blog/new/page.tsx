@@ -10,7 +10,7 @@ import { getAdminBlogTaxonomy } from "@/features/blog/server/blog-service";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "New blog post",
+  title: "یادداشت جدید",
 };
 
 export default async function NewBlogPostPage() {
@@ -21,9 +21,9 @@ export default async function NewBlogPostPage() {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-5xl space-y-8">
         <AdminPageHeader
-          eyebrow="New blog post"
-          title="Start a new academic note."
-          description="Save a draft first, then publish when the content, links, and categorization are ready."
+          eyebrow="یادداشت جدید"
+          title="یک یادداشت دانشگاهی تازه آغاز کنید."
+          description="ابتدا پیش‌نویس را ذخیره کنید و پس از آماده‌شدن محتوا، پیوندها و دسته‌بندی آن را منتشر کنید."
         />
         <BlogPostForm
           initialPost={null}

@@ -10,8 +10,8 @@ import { createPublicMetadata } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = createPublicMetadata({
-  title: "Files & downloads",
-  description: "Academic documents and resources shared through the professor's website.",
+  title: "فایل‌ها و دانلودها",
+  description: "اسناد و منابع دانشگاهی به‌اشتراک‌گذاشته‌شده در سایت استاد.",
   path: "/files",
 });
 
@@ -21,9 +21,9 @@ export default async function PublicFilesPage() {
   return (
     <>
       <PublicPageHeader
-        eyebrow="Resources"
-        title="Files and downloads."
-        description="Browse academic documents and resources. Public files can be downloaded directly; restricted records are listed for transparency but remain available only to administrators."
+        eyebrow="منابع"
+        title="فایل‌ها و دانلودها."
+        description="اسناد و منابع دانشگاهی را مرور کنید. فایل‌های عمومی مستقیماً قابل دانلود هستند و فایل‌های محدود برای شفافیت فهرست می‌شوند."
       />
       <Container className="py-12 sm:py-16 lg:py-20">
         <section aria-labelledby="public-files-heading">
@@ -32,11 +32,9 @@ export default async function PublicFilesPage() {
               id="public-files-heading"
               className="text-2xl font-semibold tracking-tight text-slate-950"
             >
-              Available resources
+              منابع موجود
             </h2>
-            <p className="text-sm text-muted">
-              {files.length} {files.length === 1 ? "file" : "files"}
-            </p>
+            <p className="text-sm text-muted">{files.length} فایل</p>
           </div>
 
           {files.length ? (
@@ -49,8 +47,8 @@ export default async function PublicFilesPage() {
             <div className="mt-6">
               <PublicEmptyState
                 headingLevel="h3"
-                title="No files are available yet."
-                description="Academic documents and downloadable resources will appear here when they are published."
+                title="هنوز فایلی در دسترس نیست."
+                description="اسناد و منابع قابل دانلود پس از انتشار در اینجا نمایش داده می‌شوند."
               />
             </div>
           )}

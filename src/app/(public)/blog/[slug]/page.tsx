@@ -17,8 +17,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
   if (!post) {
     return {
-      title: "Article not found",
-      description: "The requested published article could not be found.",
+      title: "یادداشت پیدا نشد",
+      description: "یادداشت منتشرشده موردنظر پیدا نشد.",
       robots: {
         index: false,
         follow: false,
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
   const metadata = createPublicMetadata({
     title: post.title,
-    description: post.excerpt ?? "Academic notes and updates.",
+    description: post.excerpt ?? "یادداشت‌ها و تازه‌های دانشگاهی.",
     path: `/blog/${post.slug}`,
     type: "article",
   });

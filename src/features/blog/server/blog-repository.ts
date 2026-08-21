@@ -122,7 +122,7 @@ function mapTag(tag: TagPayload): BlogTagRecord {
 function duplicateSlugError(resource: "post" | "category" | "tag"): ContentValidationError {
   const label = resource === "post" ? "post" : resource;
   return new ContentValidationError(`A ${label} with this slug already exists.`, {
-    slug: ["Choose a unique slug."],
+    slug: ["یک شناسه نشانی یکتا انتخاب کنید."],
   });
 }
 
@@ -333,13 +333,13 @@ async function assertActiveTaxonomy(
 
   if (categories.length !== input.categoryIds.length) {
     throw new ContentValidationError("Select only active blog categories.", {
-      categoryIds: ["One or more selected categories are unavailable."],
+      categoryIds: ["یک یا چند دسته‌بندی انتخاب‌شده در دسترس نیست."],
     });
   }
 
   if (tags.length !== input.tagIds.length) {
     throw new ContentValidationError("Select only active blog tags.", {
-      tagIds: ["One or more selected tags are unavailable."],
+      tagIds: ["یک یا چند برچسب انتخاب‌شده در دسترس نیست."],
     });
   }
 }

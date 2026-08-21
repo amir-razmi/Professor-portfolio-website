@@ -10,7 +10,7 @@ function formatPublishedDate(date: Date | null): string {
     return "";
   }
 
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat("fa-IR", {
     dateStyle: "long",
   }).format(date);
 }
@@ -28,7 +28,7 @@ export function BlogArticle({
             href="/blog"
             className="text-sm font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
           >
-            ← Back to blog
+            ← بازگشت به یادداشت‌ها
           </Link>
           <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold uppercase tracking-[0.14em] text-accent">
             <time dateTime={post.publishedAt?.toISOString()}>

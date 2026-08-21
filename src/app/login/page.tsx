@@ -5,8 +5,8 @@ import { Surface } from "@/components/ui/surface";
 import { LoginForm } from "@/features/auth/components/login-form";
 
 export const metadata: Metadata = {
-  title: "Administrator sign in",
-  description: "Sign in to the academic portfolio administration workspace.",
+  title: "ورود مدیر",
+  description: "ورود به محیط مدیریت پرتفولیوی دانشگاهی.",
 };
 
 export default function LoginPage() {
@@ -14,14 +14,12 @@ export default function LoginPage() {
     <main className="min-h-screen bg-slate-100 py-16 lg:py-24">
       <Container className="max-w-lg">
         <Surface className="bg-white p-7 sm:p-9">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-            Administration
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">مدیریت</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
-            Sign in to continue
+            برای ادامه وارد شوید
           </h1>
           <p className="mt-3 text-sm leading-6 text-muted">
-            Use an administrator account provisioned by the site owner.
+            از حساب مدیری استفاده کنید که توسط مالک سایت ایجاد شده است.
           </p>
           <LoginForm />
         </Surface>

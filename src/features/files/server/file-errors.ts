@@ -38,7 +38,7 @@ export function fileErrorResponse(error: unknown): {
   return {
     code: "INTERNAL_ERROR",
     fieldErrors: {},
-    message: "The file request could not be completed.",
+    message: "درخواست فایل انجام نشد.",
     status: 500,
   };
 }

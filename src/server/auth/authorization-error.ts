@@ -26,14 +26,14 @@ export class AuthorizationError extends Error {
 
 export class UnauthorizedError extends AuthorizationError {
   constructor() {
-    super(AuthorizationErrorCode.UNAUTHORIZED, "Authentication required.", 401);
+    super(AuthorizationErrorCode.UNAUTHORIZED, "برای ادامه باید وارد شوید.", 401);
     this.name = "UnauthorizedError";
   }
 }
 
 export class ForbiddenError extends AuthorizationError {
   constructor() {
-    super(AuthorizationErrorCode.FORBIDDEN, "Insufficient permissions.", 403);
+    super(AuthorizationErrorCode.FORBIDDEN, "دسترسی کافی ندارید.", 403);
     this.name = "ForbiddenError";
   }
 }

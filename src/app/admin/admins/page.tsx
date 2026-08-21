@@ -18,15 +18,15 @@ import { requirePageRole } from "@/server/auth/page-authorization";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Administrator management",
+  title: "مدیریت مدیران",
 };
 
 function formatDate(date: Date | null): string {
   if (!date) {
-    return "Never";
+    return "هرگز";
   }
 
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat("fa-IR", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);
@@ -43,15 +43,15 @@ export default async function AdministratorsPage() {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <AdminPageHeader
-          eyebrow="Administrators"
-          title="Manage trusted workspace access."
-          description="Create and maintain administrator accounts. Password hashes and other authentication secrets are never displayed here."
+          eyebrow="مدیران"
+          title="دسترسی امن فضای مدیریت را کنترل کنید."
+          description="حساب‌های مدیران را ایجاد و مدیریت کنید. هش گذرواژه و دیگر اطلاعات محرمانه احراز هویت هرگز نمایش داده نمی‌شوند."
           actions={
             <Link
               href="/admin/admins/new"
               className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              New administrator
+              مدیر جدید
             </Link>
           }
         />
@@ -66,36 +66,35 @@ export default async function AdministratorsPage() {
                 id="administrator-list-heading"
                 className="text-xl font-semibold tracking-tight text-slate-950"
               >
-                Accounts
+                حساب‌ها
               </h2>
               <p className="mt-1 text-sm text-slate-600">
-                {administrators.length}{" "}
-                {administrators.length === 1 ? "administrator" : "administrators"} in the workspace.
+                {administrators.length} مدیر در فضای مدیریت.
               </p>
             </div>
             <p className="text-sm text-slate-600">
-              Active SUPER_ADMIN accounts:{" "}
+              مدیران ارشد فعال:{" "}
               <span className="font-semibold text-slate-950">{activeSuperAdminCount}</span>
             </p>
           </div>
 
           {administrators.length ? (
             <div className="mt-5 overflow-x-auto">
-              <table className="w-full min-w-[50rem] border-separate border-spacing-0 text-left">
+              <table className="w-full min-w-[50rem] border-separate border-spacing-0 text-right">
                 <caption className="sr-only">Administrator accounts</caption>
                 <thead>
                   <tr className="text-xs uppercase tracking-[0.12em] text-slate-500">
                     <th scope="col" className="border-b border-slate-200 px-3 py-3 font-semibold">
-                      Administrator
+                      مدیر
                     </th>
                     <th scope="col" className="border-b border-slate-200 px-3 py-3 font-semibold">
-                      Role
+                      نقش
                     </th>
                     <th scope="col" className="border-b border-slate-200 px-3 py-3 font-semibold">
-                      Status
+                      وضعیت
                     </th>
                     <th scope="col" className="border-b border-slate-200 px-3 py-3 font-semibold">
-                      Last sign-in
+                      آخرین ورود
                     </th>
                     <th scope="col" className="border-b border-slate-200 px-3 py-3 font-semibold">
                       <span className="sr-only">Actions</span>
@@ -128,7 +127,7 @@ export default async function AdministratorsPage() {
                           href={`/admin/admins/${administrator.id}/edit`}
                           className="text-sm font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                         >
-                          Manage
+                          مدیریت
                         </Link>
                       </td>
                     </tr>
@@ -138,17 +137,17 @@ export default async function AdministratorsPage() {
             </div>
           ) : (
             <div className="mt-5 rounded-xl border border-dashed border-slate-300 px-5 py-10 text-center">
-              <h3 className="font-semibold text-slate-950">No administrator accounts yet</h3>
+              <h3 className="font-semibold text-slate-950">هنوز حساب مدیری ایجاد نشده است</h3>
               <p className="mt-2 text-sm text-slate-600">
-                Create the first account to grant trusted access to the workspace.
+                برای اعطای دسترسی امن به فضای مدیریت، نخستین حساب را ایجاد کنید.
               </p>
             </div>
           )}
         </section>
 
         <p className="text-xs leading-5 text-slate-500">
-          Account-management actions are recorded in the audit log without storing passwords,
-          hashes, or other secrets.
+          عملیات مدیریت حساب‌ها در گزارش فعالیت ثبت می‌شوند، بدون آن‌که گذرواژه، هش یا اطلاعات
+          محرمانه ذخیره شود.
         </p>
       </div>
     </div>

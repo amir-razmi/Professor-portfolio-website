@@ -9,7 +9,7 @@ import { requirePageRole } from "@/server/auth/page-authorization";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "New administrator",
+  title: "مدیر جدید",
 };
 
 export default async function NewAdministratorPage() {
@@ -19,9 +19,9 @@ export default async function NewAdministratorPage() {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-4xl space-y-8">
         <AdminPageHeader
-          eyebrow="New administrator"
-          title="Create a trusted account."
-          description="Set a role, account status, and initial password. The account can sign in only when it is active."
+          eyebrow="مدیر جدید"
+          title="یک حساب مورد اعتماد ایجاد کنید."
+          description="نقش، وضعیت حساب و گذرواژه اولیه را تعیین کنید. ورود فقط برای حساب فعال امکان‌پذیر است."
           actions={
             <Link
               href="/admin/admins"

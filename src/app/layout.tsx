@@ -8,24 +8,24 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase,
   title: {
-    default: "Academic Portfolio",
-    template: "%s | Academic Portfolio",
+    default: "پرتفولیوی دانشگاهی",
+    template: "%s | پرتفولیوی دانشگاهی",
   },
-  description: "A focused foundation for presenting research, teaching, and academic work.",
+  description: "مرجعی برای معرفی پژوهش، آموزش و فعالیت‌های دانشگاهی.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
-    siteName: "Academic Portfolio",
-    title: "Academic Portfolio",
-    description: "A focused foundation for presenting research, teaching, and academic work.",
+    siteName: "پرتفولیوی دانشگاهی",
+    title: "پرتفولیوی دانشگاهی",
+    description: "مرجعی برای معرفی پژوهش، آموزش و فعالیت‌های دانشگاهی.",
     url: "/",
   },
   twitter: {
     card: "summary",
-    title: "Academic Portfolio",
-    description: "A focused foundation for presenting research, teaching, and academic work.",
+    title: "پرتفولیوی دانشگاهی",
+    description: "مرجعی برای معرفی پژوهش، آموزش و فعالیت‌های دانشگاهی.",
   },
 };
 
@@ -35,7 +35,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="fa" dir="rtl">
       <body>{children}</body>
     </html>
   );

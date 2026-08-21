@@ -16,11 +16,11 @@ import { requirePagePermission } from "@/server/auth/page-authorization";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Audit log",
+  title: "گزارش فعالیت",
 };
 
 function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat("fa-IR", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);
@@ -56,9 +56,9 @@ export default async function AuditLogsPage({
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <AdminPageHeader
-          eyebrow="Audit log"
-          title="Review important workspace activity."
-          description="Events are recorded with safe summaries and metadata only. Passwords, hashes, tokens, sessions, and secrets are never shown here."
+          eyebrow="گزارش فعالیت"
+          title="فعالیت‌های مهم فضای مدیریت را بررسی کنید."
+          description="رویدادها فقط با خلاصه و فراداده امن ثبت می‌شوند؛ گذرواژه، هش، توکن، نشست و اطلاعات محرمانه هرگز نمایش داده نمی‌شود."
         />
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
@@ -68,7 +68,7 @@ export default async function AuditLogsPage({
           >
             <div>
               <label htmlFor="audit-action" className="text-xs font-semibold text-slate-700">
-                Action
+                عملیات
               </label>
               <select
                 id="audit-action"
@@ -76,7 +76,7 @@ export default async function AuditLogsPage({
                 defaultValue={query.action ?? ""}
                 className="mt-1 min-h-10 rounded-lg border border-slate-300 px-3 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
               >
-                <option value="">All actions</option>
+                <option value="">همه عملیات</option>
                 {Object.values(AuditAction).map((action) => (
                   <option key={action} value={action}>
                     {action}
@@ -86,7 +86,7 @@ export default async function AuditLogsPage({
             </div>
             <div>
               <label htmlFor="audit-resource" className="text-xs font-semibold text-slate-700">
-                Resource
+                منبع
               </label>
               <select
                 id="audit-resource"
@@ -94,7 +94,7 @@ export default async function AuditLogsPage({
                 defaultValue={query.targetResource ?? ""}
                 className="mt-1 min-h-10 rounded-lg border border-slate-300 px-3 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
               >
-                <option value="">All resources</option>
+                <option value="">همه منابع</option>
                 {auditTargetResources.map((resource) => (
                   <option key={resource} value={resource}>
                     {resource}
@@ -106,39 +106,37 @@ export default async function AuditLogsPage({
               type="submit"
               className="min-h-10 rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              Filter
+              اعمال فیلتر
             </button>
           </form>
 
           <div className="mt-5 flex items-center justify-between gap-4">
-            <p className="text-sm text-slate-600">
-              {logs.total} {logs.total === 1 ? "event" : "events"}
-            </p>
+            <p className="text-sm text-slate-600">{logs.total} رویداد</p>
             <p className="text-xs text-slate-500">
-              Page {logs.page} of {logs.totalPages || 1}
+              صفحه {logs.page} از {logs.totalPages || 1}
             </p>
           </div>
 
           {logs.items.length ? (
             <div className="mt-4 overflow-x-auto">
-              <table className="w-full min-w-[58rem] border-separate border-spacing-0 text-left">
+              <table className="w-full min-w-[58rem] border-separate border-spacing-0 text-right">
                 <caption className="sr-only">Administrative audit events</caption>
                 <thead>
                   <tr className="text-xs uppercase tracking-[0.12em] text-slate-500">
                     <th scope="col" className="border-b border-slate-200 px-3 py-3 font-semibold">
-                      When
+                      زمان
                     </th>
                     <th scope="col" className="border-b border-slate-200 px-3 py-3 font-semibold">
-                      Actor
+                      عامل
                     </th>
                     <th scope="col" className="border-b border-slate-200 px-3 py-3 font-semibold">
-                      Action
+                      عملیات
                     </th>
                     <th scope="col" className="border-b border-slate-200 px-3 py-3 font-semibold">
-                      Resource
+                      منبع
                     </th>
                     <th scope="col" className="border-b border-slate-200 px-3 py-3 font-semibold">
-                      Details
+                      جزئیات
                     </th>
                   </tr>
                 </thead>
@@ -166,7 +164,7 @@ export default async function AuditLogsPage({
                         ) : null}
                       </td>
                       <td className="max-w-md border-b border-slate-100 px-3 py-4 text-sm text-slate-600">
-                        <p>{log.summary ?? "Activity recorded."}</p>
+                        <p>{log.summary ?? "فعالیت ثبت شد."}</p>
                         {metadataLabel(log) ? (
                           <code className="mt-2 block break-words text-xs text-slate-500">
                             {metadataLabel(log)}
@@ -180,9 +178,9 @@ export default async function AuditLogsPage({
             </div>
           ) : (
             <div className="mt-5 rounded-xl border border-dashed border-slate-300 px-5 py-10 text-center">
-              <h2 className="font-semibold text-slate-950">No audit events found.</h2>
+              <h2 className="font-semibold text-slate-950">رویدادی پیدا نشد.</h2>
               <p className="mt-2 text-sm text-slate-600">
-                Try a different filter or return after an administrative action has been completed.
+                فیلتر دیگری را امتحان کنید یا پس از انجام یک عملیات مدیریتی دوباره بازگردید.
               </p>
             </div>
           )}
@@ -190,14 +188,14 @@ export default async function AuditLogsPage({
           {logs.totalPages > 1 ? (
             <nav
               className="mt-5 flex items-center justify-between border-t border-slate-200 pt-5 text-sm"
-              aria-label="Audit log pagination"
+              aria-label="صفحه‌بندی گزارش فعالیت"
             >
               {logs.page > 1 ? (
                 <a
                   href={pageHref(logs.page - 1, query.action, query.targetResource)}
                   className="font-semibold text-accent underline underline-offset-4"
                 >
-                  Previous
+                  قبلی
                 </a>
               ) : (
                 <span />
@@ -207,7 +205,7 @@ export default async function AuditLogsPage({
                   href={pageHref(logs.page + 1, query.action, query.targetResource)}
                   className="font-semibold text-accent underline underline-offset-4"
                 >
-                  Next
+                  بعدی
                 </a>
               ) : (
                 <span />

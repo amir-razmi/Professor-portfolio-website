@@ -15,7 +15,7 @@ export function ContactDetails({
   if (!profile) {
     return (
       <p className="text-sm leading-7 text-muted">
-        Contact details will appear here after a public professor profile is published.
+        اطلاعات تماس پس از انتشار پروفایل عمومی استاد در اینجا نمایش داده می‌شود.
       </p>
     );
   }
@@ -29,7 +29,7 @@ export function ContactDetails({
         <dl className="grid gap-5 sm:grid-cols-2">
           {email ? (
             <div>
-              <dt className="text-sm font-semibold text-slate-950">Email</dt>
+              <dt className="text-sm font-semibold text-slate-950">ایمیل</dt>
               <dd className="mt-1">
                 <a
                   href={`mailto:${email}`}
@@ -42,19 +42,19 @@ export function ContactDetails({
           ) : null}
           {profile.phone ? (
             <div>
-              <dt className="text-sm font-semibold text-slate-950">Phone</dt>
+              <dt className="text-sm font-semibold text-slate-950">تلفن</dt>
               <dd className="mt-1 text-sm leading-6 text-muted">{profile.phone}</dd>
             </div>
           ) : null}
           {profile.office ? (
             <div className="sm:col-span-2">
-              <dt className="text-sm font-semibold text-slate-950">Office</dt>
+              <dt className="text-sm font-semibold text-slate-950">دفتر</dt>
               <dd className="mt-1 text-sm leading-6 text-muted">{profile.office}</dd>
             </div>
           ) : null}
         </dl>
       ) : (
-        <p className="text-sm leading-7 text-muted">Contact details have not been published yet.</p>
+        <p className="text-sm leading-7 text-muted">اطلاعات تماس هنوز منتشر نشده است.</p>
       )}
       {showLinks ? <AcademicLinks profile={profile} /> : null}
     </div>

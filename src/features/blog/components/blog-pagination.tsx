@@ -30,7 +30,7 @@ export function BlogPagination({
 
   return (
     <nav
-      aria-label="Blog pagination"
+      aria-label="صفحه‌بندی یادداشت‌ها"
       className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6"
     >
       {previousPage ? (
@@ -38,20 +38,20 @@ export function BlogPagination({
           href={pageHref(query, previousPage)}
           className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
-          ← Newer articles
+          ← مقاله‌های جدیدتر
         </Link>
       ) : (
         <span />
       )}
       <p className="text-sm text-muted">
-        Page {query.page} of {totalPages}
+        صفحه {query.page} از {totalPages}
       </p>
       {nextPage ? (
         <Link
           href={pageHref(query, nextPage)}
           className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
-          Older articles →
+          مقاله‌های قدیمی‌تر →
         </Link>
       ) : (
         <span />

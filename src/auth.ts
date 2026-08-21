@@ -25,7 +25,7 @@ const authConfig = (): NextAuthConfig => ({
           autoComplete: "email",
         },
         password: {
-          label: "Password",
+          label: "گذرواژه",
           type: "password",
           autoComplete: "current-password",
         },

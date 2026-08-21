@@ -20,7 +20,7 @@ export default async function HomeFeaturePage() {
   const siteName = settings?.siteName ?? siteConfig.name;
   const profileImageUrl = safeExternalUrl(profile?.profileImageUrl);
   const identityLine =
-    [profile?.title, profile?.department].filter(Boolean).join(" · ") || "Academic portfolio";
+    [profile?.title, profile?.department].filter(Boolean).join(" · ") || "پرتفولیوی دانشگاهی";
 
   return (
     <>
@@ -35,26 +35,26 @@ export default async function HomeFeaturePage() {
               {profile?.institution ?? siteName}
             </p>
             <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-              {profile?.fullName ?? "Academic profile"}
+              {profile?.fullName ?? "پروفایل دانشگاهی"}
             </h1>
             <p className="mt-5 text-xl text-orange-100">{identityLine}</p>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
               {profile?.shortBio ??
                 profile?.biography ??
-                "Research, teaching, and academic work presented in one clear public portfolio."}
+                "پژوهش، آموزش و فعالیت‌های دانشگاهی در یک پرتفولیوی روشن و منسجم."}
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
                 href="/research"
                 className="rounded-full bg-orange-200 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-orange-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-200"
               >
-                Explore research
+                مشاهده پژوهش‌ها
               </Link>
               <Link
                 href="/contact"
                 className="rounded-full border border-slate-700 px-5 py-3 text-sm font-semibold text-white transition hover:border-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-200"
               >
-                Contact
+                تماس
               </Link>
             </div>
           </div>
@@ -63,7 +63,7 @@ export default async function HomeFeaturePage() {
             {profileImageUrl && profile ? (
               <Image
                 src={profileImageUrl}
-                alt={`${profile.fullName} profile`}
+                alt={`تصویر پروفایل ${profile.fullName}`}
                 width={256}
                 height={256}
                 sizes="(max-width: 1024px) 224px, 256px"
@@ -74,7 +74,7 @@ export default async function HomeFeaturePage() {
               />
             ) : (
               <div className="flex size-56 items-center justify-center rounded-3xl border border-white/15 bg-white/10 p-6 text-center text-sm font-semibold text-orange-100 sm:size-64">
-                Public academic portfolio
+                پرتفولیوی دانشگاهی عمومی
               </div>
             )}
           </div>
@@ -84,9 +84,9 @@ export default async function HomeFeaturePage() {
       <section id="about" className="scroll-mt-24 py-20 lg:py-24">
         <Container className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:items-start">
           <SectionHeading
-            eyebrow="About"
-            title="A clear account of the work."
-            description="Read the biography, academic record, and areas of interest maintained in the public profile."
+            eyebrow="درباره"
+            title="روایتی روشن از فعالیت‌ها"
+            description="زندگی‌نامه، سوابق دانشگاهی و حوزه‌های علاقه‌مندی درج‌شده در پروفایل عمومی را بخوانید."
           />
           <div className="space-y-5">
             {profile ? (
@@ -94,19 +94,19 @@ export default async function HomeFeaturePage() {
                 <p className="whitespace-pre-line text-base leading-8 text-muted">
                   {profile.biography ??
                     profile.shortBio ??
-                    "Biography information is not available yet."}
+                    "اطلاعات زندگی‌نامه هنوز در دسترس نیست."}
                 </p>
                 <Link
                   href="/about"
                   className="mt-6 inline-flex rounded-lg text-sm font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                 >
-                  Read the full profile
+                  مطالعه پروفایل کامل
                 </Link>
               </Surface>
             ) : (
               <PublicEmptyState
-                title="The public profile is being prepared."
-                description="Biography and academic record information will appear here after an administrator publishes the profile."
+                title="پروفایل عمومی در حال آماده‌سازی است."
+                description="پس از انتشار پروفایل توسط مدیر، زندگی‌نامه و سوابق دانشگاهی در این بخش نمایش داده می‌شود."
               />
             )}
           </div>
@@ -117,25 +117,25 @@ export default async function HomeFeaturePage() {
         <Container className="space-y-10">
           <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:items-start">
             <SectionHeading
-              eyebrow="Research"
-              title="Questions, methods, and areas of inquiry."
-              description="Research interests and selected public projects are presented as concise, readable themes."
+              eyebrow="پژوهش"
+              title="پرسش‌ها، روش‌ها و حوزه‌های تحقیق"
+              description="علایق پژوهشی و پروژه‌های عمومی منتخب در قالب موضوعاتی روشن و خوانا ارائه می‌شوند."
             />
             <InterestList
               items={profile?.researchInterests ?? []}
-              emptyMessage="Research interests will be added soon."
+              emptyMessage="علایق پژوهشی به‌زودی اضافه می‌شوند."
             />
           </div>
           <div>
             <div className="flex flex-wrap items-end justify-between gap-4">
               <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-                Selected research
+                پژوهش‌های منتخب
               </h2>
               <Link
                 href="/research"
                 className="text-sm font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
               >
-                View all research
+                مشاهده همه پژوهش‌ها
               </Link>
             </div>
             {researchItems.length ? (
@@ -148,8 +148,8 @@ export default async function HomeFeaturePage() {
               <div className="mt-5">
                 <PublicEmptyState
                   headingLevel="h3"
-                  title="Research projects are being prepared."
-                  description="Public research records will appear here when they are published."
+                  title="پروژه‌های پژوهشی در حال آماده‌سازی هستند."
+                  description="رکوردهای پژوهشی پس از انتشار در این بخش نمایش داده می‌شوند."
                 />
               </div>
             )}
@@ -161,12 +161,12 @@ export default async function HomeFeaturePage() {
         <Container className="grid gap-10 lg:grid-cols-[1.3fr_0.7fr] lg:items-start">
           <InterestList
             items={profile?.teachingInterests ?? []}
-            emptyMessage="Teaching interests will be added soon."
+            emptyMessage="علایق آموزشی به‌زودی اضافه می‌شوند."
           />
           <SectionHeading
-            eyebrow="Teaching"
-            title="Learning grounded in thoughtful practice."
-            description="Teaching interests and experience are maintained alongside the academic profile."
+            eyebrow="آموزش"
+            title="یادگیری بر پایه تجربه و اندیشه"
+            description="علایق و تجربه آموزشی در کنار پروفایل دانشگاهی نگهداری می‌شوند."
           />
         </Container>
       </section>
@@ -178,15 +178,15 @@ export default async function HomeFeaturePage() {
         <Container className="space-y-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <SectionHeading
-              eyebrow="Publications"
-              title="Selected scholarly work."
-              description="A small selection of published work, with the complete public record available on the publications page."
+              eyebrow="انتشارات"
+              title="آثار علمی منتخب"
+              description="گزیده‌ای از آثار منتشرشده؛ فهرست کامل در صفحه انتشارات در دسترس است."
             />
             <Link
               href="/publications"
               className="text-sm font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
             >
-              View all publications
+              مشاهده همه انتشارات
             </Link>
           </div>
           {publications.length ? (
@@ -198,8 +198,8 @@ export default async function HomeFeaturePage() {
           ) : (
             <PublicEmptyState
               headingLevel="h3"
-              title="Publications are being prepared."
-              description="Published articles, chapters, and other scholarly records will appear here when they are ready."
+              title="آثار علمی در حال آماده‌سازی هستند."
+              description="مقاله‌ها، فصل‌ها و دیگر آثار علمی پس از آماده‌شدن در این بخش نمایش داده می‌شوند."
             />
           )}
         </Container>
@@ -208,23 +208,23 @@ export default async function HomeFeaturePage() {
       <section id="experience" className="scroll-mt-24 py-20 lg:py-24">
         <Container>
           <SectionHeading
-            eyebrow="Academic record"
-            title="Education, positions, experience, and recognition."
-            description="These records are intentionally simple to maintain and easy to scan."
+            eyebrow="سوابق دانشگاهی"
+            title="تحصیلات، سمت‌ها، تجربه و افتخارات"
+            description="این سوابق ساده و قابل مرور نگهداری می‌شوند."
           />
           {profile ? (
             <div className="mt-10 grid gap-5 md:grid-cols-2">
-              <AcademicRecordList title="Education" items={profile.education} />
-              <AcademicRecordList title="Academic positions" items={profile.academicPositions} />
-              <AcademicRecordList title="Experience" items={profile.experience} />
-              <AcademicRecordList title="Awards" items={profile.awards} />
+              <AcademicRecordList title="تحصیلات" items={profile.education} />
+              <AcademicRecordList title="سمت‌های دانشگاهی" items={profile.academicPositions} />
+              <AcademicRecordList title="تجربه" items={profile.experience} />
+              <AcademicRecordList title="افتخارات" items={profile.awards} />
             </div>
           ) : (
             <div className="mt-10">
               <PublicEmptyState
                 headingLevel="h3"
-                title="Academic record is being prepared."
-                description="Education, positions, experience, and awards will appear here after the public profile is published."
+                title="سوابق دانشگاهی در حال آماده‌سازی است."
+                description="پس از انتشار پروفایل عمومی، تحصیلات، سمت‌ها، تجربه و افتخارات در این بخش نمایش داده می‌شوند."
               />
             </div>
           )}
@@ -234,9 +234,9 @@ export default async function HomeFeaturePage() {
       <section id="contact" className="scroll-mt-24 border-t border-line bg-white py-20 lg:py-24">
         <Container className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:items-start">
           <SectionHeading
-            eyebrow="Contact"
-            title="A professional point of connection."
-            description="Use the contact details and academic links below for collaboration, teaching, and scholarly exchange."
+            eyebrow="تماس"
+            title="راهی برای ارتباط حرفه‌ای"
+            description="برای همکاری، آموزش و تبادل علمی از اطلاعات تماس و پیوندهای علمی زیر استفاده کنید."
           />
           <Surface className="bg-white">
             <ContactDetails profile={profile} settings={settings} />

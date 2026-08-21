@@ -34,11 +34,11 @@ export function SettingsForm({ settings }: SettingsFormProps) {
       <FormStatusMessage message={state.message} status={state.status} />
 
       <FormSection
-        title="Site identity"
-        description="These values identify the public website and provide its default description."
+        title="هویت سایت"
+        description="این مقادیر هویت سایت عمومی و توضیح پیش‌فرض آن را تعیین می‌کنند."
       >
         <FormField>
-          <FormLabel htmlFor="siteName">Site name</FormLabel>
+          <FormLabel htmlFor="siteName">نام سایت</FormLabel>
           <input
             id="siteName"
             name="siteName"
@@ -54,7 +54,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="contactEmail">General contact email</FormLabel>
+          <FormLabel htmlFor="contactEmail">ایمیل تماس عمومی</FormLabel>
           <input
             id="contactEmail"
             name="contactEmail"
@@ -70,7 +70,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
         </FormField>
 
         <FormField className="sm:col-span-2">
-          <FormLabel htmlFor="siteDescription">Site description</FormLabel>
+          <FormLabel htmlFor="siteDescription">توضیح سایت</FormLabel>
           <textarea
             id="siteDescription"
             name="siteDescription"
@@ -87,7 +87,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
         </FormField>
 
         <FormField className="sm:col-span-2">
-          <FormLabel htmlFor="footerText">Footer text</FormLabel>
+          <FormLabel htmlFor="footerText">متن پابرگ</FormLabel>
           <input
             id="footerText"
             name="footerText"
@@ -103,12 +103,12 @@ export function SettingsForm({ settings }: SettingsFormProps) {
       </FormSection>
 
       <FormSection
-        title="Regional defaults"
-        description="Locale and timezone values support consistent formatting across future content features."
+        title="تنظیمات منطقه‌ای"
+        description="زبان و منطقه زمانی، نمایش یکدست تاریخ‌ها و اعداد را در بخش‌های مختلف فراهم می‌کنند."
       >
         <FormField>
-          <FormLabel htmlFor="defaultLocale">Default locale</FormLabel>
-          <FormHint id="defaultLocale-hint">Examples: en, en-US, fa-IR.</FormHint>
+          <FormLabel htmlFor="defaultLocale">زبان پیش‌فرض</FormLabel>
+          <FormHint id="defaultLocale-hint">نمونه: fa یا fa-IR.</FormHint>
           <input
             id="defaultLocale"
             name="defaultLocale"
@@ -126,8 +126,8 @@ export function SettingsForm({ settings }: SettingsFormProps) {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="timezone">Timezone</FormLabel>
-          <FormHint id="timezone-hint">Use an IANA timezone such as UTC or Asia/Tehran.</FormHint>
+          <FormLabel htmlFor="timezone">منطقه زمانی</FormLabel>
+          <FormHint id="timezone-hint">یک منطقه زمانی IANA مانند Asia/Tehran وارد کنید.</FormHint>
           <input
             id="timezone"
             name="timezone"
@@ -144,11 +144,11 @@ export function SettingsForm({ settings }: SettingsFormProps) {
       </FormSection>
 
       <FormSection
-        title="Sharing image"
-        description="Use an image URL until file-asset selection is connected to this setting."
+        title="تصویر اشتراک‌گذاری"
+        description="تا زمان اتصال انتخاب دارایی فایل به این تنظیم، از نشانی تصویر استفاده کنید."
       >
         <FormField className="sm:col-span-2">
-          <FormLabel htmlFor="defaultOgImageUrl">Default social sharing image URL</FormLabel>
+          <FormLabel htmlFor="defaultOgImageUrl">نشانی تصویر پیش‌فرض اشتراک‌گذاری</FormLabel>
           <FormHint id="defaultOgImageUrl-hint">
             This field stores only a URL; it does not upload or copy the image.
           </FormHint>
@@ -179,7 +179,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
             className="mt-0.5 size-4 rounded border-slate-300 text-accent focus:ring-accent"
           />
           <span>
-            <span className="block text-sm font-semibold text-slate-950">Maintenance notice</span>
+            <span className="block text-sm font-semibold text-slate-950">پیام تعمیر و نگهداری</span>
             <span className="mt-1 block text-xs leading-5 text-slate-500">
               Show a concise maintenance notice on the public website.
             </span>
@@ -191,7 +191,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
           disabled={isPending}
           className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPending ? "Saving settings…" : "Save settings"}
+          {isPending ? "در حال ذخیره تنظیمات…" : "ذخیره تنظیمات"}
         </button>
       </div>
     </form>

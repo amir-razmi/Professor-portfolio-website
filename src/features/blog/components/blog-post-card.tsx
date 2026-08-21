@@ -7,7 +7,7 @@ function formatPublishedDate(date: Date | null): string {
     return "";
   }
 
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat("fa-IR", {
     dateStyle: "medium",
   }).format(date);
 }
@@ -74,7 +74,7 @@ export function BlogPostCard({
           href={`/blog/${post.slug}`}
           className="text-sm font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
         >
-          Read article <span aria-hidden="true">→</span>
+          مطالعه مقاله <span aria-hidden="true">←</span>
         </Link>
       </div>
     </article>

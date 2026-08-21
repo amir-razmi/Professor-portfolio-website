@@ -67,16 +67,16 @@ export function AdministratorCreateForm() {
 
       {state.status === "success" && state.adminId ? (
         <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-          The account is ready. Open its management page from the administrator list.
+          حساب آماده است. صفحه مدیریت آن را از فهرست مدیران باز کنید.
         </p>
       ) : null}
 
       <FormSection
-        title="Account details"
-        description="Use a university email address and a name the administrator will recognize. Passwords are hashed before they reach the database."
+        title="جزئیات حساب"
+        description="از نشانی ایمیل دانشگاهی و نامی قابل تشخیص استفاده کنید. گذرواژه پیش از ذخیره در پایگاه داده به‌صورت امن درهم‌سازی می‌شود."
       >
         <FormField>
-          <FormLabel htmlFor="admin-display-name">Display name</FormLabel>
+          <FormLabel htmlFor="admin-display-name">نام نمایشی</FormLabel>
           <input
             id="admin-display-name"
             name="displayName"
@@ -94,7 +94,7 @@ export function AdministratorCreateForm() {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="admin-email">Email address</FormLabel>
+          <FormLabel htmlFor="admin-email">نشانی ایمیل</FormLabel>
           <input
             id="admin-email"
             name="email"
@@ -109,7 +109,7 @@ export function AdministratorCreateForm() {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="admin-role">Role</FormLabel>
+          <FormLabel htmlFor="admin-role">نقش</FormLabel>
           <select
             id="admin-role"
             name="role"
@@ -127,7 +127,7 @@ export function AdministratorCreateForm() {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="admin-status">Initial account status</FormLabel>
+          <FormLabel htmlFor="admin-status">وضعیت اولیه حساب</FormLabel>
           <select
             id="admin-status"
             name="status"
@@ -142,18 +142,18 @@ export function AdministratorCreateForm() {
             ))}
           </select>
           <FormHint id="admin-status-hint">
-            Only an ACTIVE account can sign in. Other statuses keep the account disabled.
+            فقط حساب فعال می‌تواند وارد شود؛ وضعیت‌های دیگر حساب را غیرفعال نگه می‌دارند.
           </FormHint>
           <FormFieldError id="admin-status-error" errors={fieldErrors(state, "status")} />
         </FormField>
       </FormSection>
 
       <FormSection
-        title="Initial password"
-        description="Use at least 12 characters. Share the temporary password through a secure university channel."
+        title="گذرواژه اولیه"
+        description="حداقل ۱۲ نویسه استفاده کنید و گذرواژه موقت را از یک کانال امن دانشگاهی به اشتراک بگذارید."
       >
         <FormField>
-          <FormLabel htmlFor="admin-password">Password</FormLabel>
+          <FormLabel htmlFor="admin-password">گذرواژه</FormLabel>
           <input
             id="admin-password"
             name="password"
@@ -169,7 +169,7 @@ export function AdministratorCreateForm() {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="admin-password-confirmation">Confirm password</FormLabel>
+          <FormLabel htmlFor="admin-password-confirmation">تکرار گذرواژه</FormLabel>
           <input
             id="admin-password-confirmation"
             name="passwordConfirmation"
@@ -193,7 +193,7 @@ export function AdministratorCreateForm() {
         disabled={isPending}
         className="min-h-11 rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isPending ? "Creating account…" : "Create administrator"}
+        {isPending ? "در حال ایجاد حساب…" : "ایجاد مدیر"}
       </button>
     </form>
   );
@@ -214,7 +214,7 @@ export function AdministratorDetailsForm({
       <input type="hidden" name="targetAdminId" value={administrator.id} />
       <FormStatusMessage message={state.message} status={state.status} />
       <FormField>
-        <FormLabel htmlFor="edit-admin-display-name">Display name</FormLabel>
+        <FormLabel htmlFor="edit-admin-display-name">نام نمایشی</FormLabel>
         <input
           id="edit-admin-display-name"
           name="displayName"
@@ -232,7 +232,7 @@ export function AdministratorDetailsForm({
         />
       </FormField>
       <FormField>
-        <FormLabel htmlFor="edit-admin-email">Email address</FormLabel>
+        <FormLabel htmlFor="edit-admin-email">نشانی ایمیل</FormLabel>
         <input
           id="edit-admin-email"
           name="email"
@@ -251,7 +251,7 @@ export function AdministratorDetailsForm({
         disabled={isPending}
         className="min-h-10 rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isPending ? "Saving…" : "Save details"}
+        {isPending ? "در حال ذخیره…" : "ذخیره جزئیات"}
       </button>
     </form>
   );
@@ -290,7 +290,7 @@ export function AdministratorRoleForm({
       <input type="hidden" name="targetAdminId" value={administrator.id} />
       <div>
         <label htmlFor="edit-admin-role" className="block text-sm font-semibold text-slate-900">
-          Role
+          نقش
         </label>
         <select
           id="edit-admin-role"
@@ -310,7 +310,7 @@ export function AdministratorRoleForm({
           role="status"
           className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
         >
-          Role saved.
+          نقش ذخیره شد.
         </p>
       ) : state.message ? (
         <p
@@ -325,7 +325,7 @@ export function AdministratorRoleForm({
         disabled={isPending}
         className="min-h-10 rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isPending ? "Saving…" : "Save role"}
+        {isPending ? "در حال ذخیره…" : "ذخیره نقش"}
       </button>
     </form>
   );
@@ -352,13 +352,13 @@ export function AdministratorStatusActions({
       <div className="flex items-center gap-3">
         <AdminStatusBadge status={administrator.status} isActive={administrator.isActive} />
         {administrator.id === currentAdminId ? (
-          <span className="text-xs text-slate-500">This is your account.</span>
+          <span className="text-xs text-slate-500">این حساب شماست.</span>
         ) : null}
       </div>
       <form
         action={formAction}
         onSubmit={(event) => {
-          if (canDeactivate && !window.confirm("Deactivate this administrator account?")) {
+          if (canDeactivate && !window.confirm("آیا از غیرفعال‌کردن این حساب مدیر مطمئن هستید؟")) {
             event.preventDefault();
           }
         }}
@@ -381,16 +381,16 @@ export function AdministratorStatusActions({
           }
         >
           {isPending
-            ? "Saving…"
+            ? "در حال ذخیره…"
             : administrator.isActive
-              ? "Deactivate account"
-              : "Reactivate account"}
+              ? "غیرفعال‌کردن حساب"
+              : "فعال‌کردن دوباره حساب"}
         </button>
       </form>
       <FormStatusMessage message={state.message} status={state.status} />
       {isLastActiveSuperAdmin ? (
         <p className="text-xs leading-5 text-slate-500">
-          This account is the last active SUPER_ADMIN and cannot be deactivated.
+          این حساب آخرین مدیر ارشد فعال است و نمی‌توان آن را غیرفعال کرد.
         </p>
       ) : null}
     </div>
@@ -412,9 +412,9 @@ export function AdministratorPasswordResetForm({
       <input type="hidden" name="targetAdminId" value={administrator.id} />
       <FormStatusMessage message={state.message} status={state.status} />
       <FormField>
-        <FormLabel htmlFor="reset-admin-password">New password</FormLabel>
+        <FormLabel htmlFor="reset-admin-password">گذرواژه جدید</FormLabel>
         <FormHint id="reset-admin-password-hint">
-          At least 12 characters. The existing password is never displayed.
+          حداقل ۱۲ نویسه؛ گذرواژه فعلی هرگز نمایش داده نمی‌شود.
         </FormHint>
         <input
           id="reset-admin-password"
@@ -431,7 +431,7 @@ export function AdministratorPasswordResetForm({
         <FormFieldError id="reset-admin-password-error" errors={fieldErrors(state, "password")} />
       </FormField>
       <FormField>
-        <FormLabel htmlFor="reset-admin-password-confirmation">Confirm new password</FormLabel>
+        <FormLabel htmlFor="reset-admin-password-confirmation">تکرار گذرواژه جدید</FormLabel>
         <input
           id="reset-admin-password-confirmation"
           name="passwordConfirmation"
@@ -453,7 +453,7 @@ export function AdministratorPasswordResetForm({
         disabled={isPending}
         className="min-h-10 rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isPending ? "Resetting…" : "Reset password"}
+        {isPending ? "در حال بازنشانی…" : "بازنشانی گذرواژه"}
       </button>
     </form>
   );

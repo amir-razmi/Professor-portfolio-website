@@ -59,7 +59,7 @@ function mapAuditLog(log: AuditLogPayload): AuditLogRecord {
     summary: log.summary,
     metadata: log.metadata,
     actorId: log.actorId,
-    actorName: log.actor?.displayName ?? "Unknown administrator",
+    actorName: log.actor?.displayName ?? "مدیر ناشناس",
     actorEmail: log.actor?.email ?? null,
     createdAt: log.createdAt,
   };

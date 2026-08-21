@@ -299,6 +299,6 @@ test("protected create action does not call mutation dependencies when authoriza
   );
 
   assert.equal(state.status, "error");
-  assert.equal(state.message, "Authentication required.");
+  assert.equal(state.message, "برای ادامه باید وارد شوید.");
   assert.equal(createCalls, 0);
 });

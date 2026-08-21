@@ -213,12 +213,12 @@ test("protected server action handler returns unauthorized and forbidden states 
   assert.deepEqual(unauthorized, {
     ok: false,
     code: "UNAUTHORIZED",
-    message: "Authentication required.",
+    message: "برای ادامه باید وارد شوید.",
   });
   assert.deepEqual(forbidden, {
     ok: false,
     code: "FORBIDDEN",
-    message: "Insufficient permissions.",
+    message: "دسترسی کافی ندارید.",
   });
   assert.equal(changeCalls, 0);
 });

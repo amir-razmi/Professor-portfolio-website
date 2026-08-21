@@ -75,7 +75,7 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
             href={`/admin/blog/${state.postId}/edit`}
             className="font-semibold underline underline-offset-4"
           >
-            Continue editing this post
+            ادامه ویرایش یادداشت
           </Link>
           .
         </p>
@@ -84,11 +84,11 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
       <input type="hidden" name="postId" value={initialPost?.id ?? ""} />
 
       <FormSection
-        title="Article details"
-        description="Use a clear title and a stable lowercase slug. Blog content is stored as plain text in this stage; HTML and Markdown are not interpreted."
+        title="جزئیات یادداشت"
+        description="عنوانی روشن و یک شناسه نشانی انگلیسی، کوتاه و ثابت انتخاب کنید. محتوای یادداشت در این مرحله به‌صورت متن ساده ذخیره می‌شود و HTML یا Markdown تفسیر نمی‌شود."
       >
         <FormField className="sm:col-span-2">
-          <FormLabel htmlFor="title">Title</FormLabel>
+          <FormLabel htmlFor="title">عنوان</FormLabel>
           <input
             id="title"
             name="title"
@@ -104,8 +104,8 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="slug">Slug</FormLabel>
-          <FormHint id="slug-hint">Example: field-notes-on-research-design</FormHint>
+          <FormLabel htmlFor="slug">شناسه نشانی (Slug)</FormLabel>
+          <FormHint id="slug-hint">نمونه: field-notes-on-research-design</FormHint>
           <input
             id="slug"
             name="slug"
@@ -121,7 +121,7 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="status">Publication state</FormLabel>
+          <FormLabel htmlFor="status">وضعیت انتشار</FormLabel>
           {canPublish ? (
             <>
               <select
@@ -132,9 +132,9 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
                 aria-describedby={fieldError("status")?.length ? "status-error" : undefined}
                 className={formControlClassName}
               >
-                <option value={BLOG_POST_STATUS.DRAFT}>Draft</option>
-                <option value={BLOG_POST_STATUS.PUBLISHED}>Published</option>
-                <option value={BLOG_POST_STATUS.ARCHIVED}>Archived</option>
+                <option value={BLOG_POST_STATUS.DRAFT}>پیش‌نویس</option>
+                <option value={BLOG_POST_STATUS.PUBLISHED}>منتشرشده</option>
+                <option value={BLOG_POST_STATUS.ARCHIVED}>بایگانی‌شده</option>
               </select>
               <FormFieldError id="status-error" errors={fieldError("status")} />
             </>
@@ -143,19 +143,19 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
               <input type="hidden" name="status" value={nonPublishingStatus} />
               <p className="mt-2 rounded-xl bg-slate-100 px-3.5 py-2.5 text-sm text-slate-700">
                 {nonPublishingStatus === BLOG_POST_STATUS.PUBLISHED
-                  ? "Published (state changes require publishing permission)"
+                  ? "منتشرشده (تغییر وضعیت به مجوز انتشار نیاز دارد)"
                   : nonPublishingStatus === BLOG_POST_STATUS.ARCHIVED
-                    ? "Archived (state changes require publishing permission)"
-                    : "Draft"}
+                    ? "بایگانی‌شده (تغییر وضعیت به مجوز انتشار نیاز دارد)"
+                    : "پیش‌نویس"}
               </p>
             </>
           )}
         </FormField>
 
         <FormField className="sm:col-span-2">
-          <FormLabel htmlFor="excerpt">Excerpt</FormLabel>
+          <FormLabel htmlFor="excerpt">خلاصه</FormLabel>
           <FormHint id="excerpt-hint">
-            A short summary used on the public listing and social previews.
+            خلاصه‌ای کوتاه برای نمایش در فهرست عمومی و پیش‌نمایش شبکه‌های اجتماعی.
           </FormHint>
           <textarea
             id="excerpt"
@@ -171,9 +171,10 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
         </FormField>
 
         <FormField className="sm:col-span-2">
-          <FormLabel htmlFor="content">Content</FormLabel>
+          <FormLabel htmlFor="content">محتوا</FormLabel>
           <FormHint id="content-hint">
-            Plain text only. Separate paragraphs with a blank line; unsafe HTML is never rendered.
+            فقط متن ساده وارد کنید. پاراگراف‌ها را با یک خط خالی جدا کنید؛ HTML ناامن هرگز نمایش
+            داده نمی‌شود.
           </FormHint>
           <textarea
             id="content"
@@ -191,11 +192,11 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
       </FormSection>
 
       <FormSection
-        title="Publishing details"
-        description="Publication dates are stored in UTC. Published posts are the only records exposed through public pages and metadata."
+        title="جزئیات انتشار"
+        description="تاریخ‌ها در پایگاه داده بر اساس UTC ذخیره می‌شوند. فقط یادداشت‌های منتشرشده در صفحات عمومی و فراداده‌ها نمایش داده می‌شوند."
       >
         <FormField>
-          <FormLabel htmlFor="publishedAt">Publication date</FormLabel>
+          <FormLabel htmlFor="publishedAt">تاریخ انتشار</FormLabel>
           {canPublish ? (
             <>
               <input
@@ -217,7 +218,7 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
         </FormField>
 
         <FormField>
-          <span className="block text-sm font-semibold text-slate-900">Featured placement</span>
+          <span className="block text-sm font-semibold text-slate-900">نمایش منتخب</span>
           {canPublish ? (
             <label className="mt-3 flex items-start gap-3 text-sm text-slate-700">
               <input
@@ -226,7 +227,7 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
                 defaultChecked={initialPost?.isFeatured ?? false}
                 className="mt-0.5 size-4 rounded border-slate-300 text-accent focus:ring-accent"
               />
-              <span>Highlight this post in future featured sections.</span>
+              <span>این یادداشت در بخش‌های منتخب آینده برجسته شود.</span>
             </label>
           ) : (
             <>
@@ -236,7 +237,7 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
                 value={initialPost?.isFeatured ? "on" : "off"}
               />
               <p className="mt-3 text-sm leading-6 text-slate-600">
-                Featured placement is controlled by publishing-capable administrators.
+                نمایش منتخب فقط در اختیار مدیرانی است که مجوز انتشار دارند.
               </p>
             </>
           )}
@@ -244,11 +245,11 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
       </FormSection>
 
       <FormSection
-        title="Categories and tags"
-        description="Use a small, consistent vocabulary so readers can browse related academic notes."
+        title="دسته‌بندی و برچسب‌ها"
+        description="از واژگانی محدود و منسجم استفاده کنید تا خوانندگان بتوانند یادداشت‌های مرتبط را پیدا کنند."
       >
         <FormField className="sm:col-span-2">
-          <span className="block text-sm font-semibold text-slate-900">Categories</span>
+          <span className="block text-sm font-semibold text-slate-900">دسته‌بندی‌ها</span>
           {categories.length ? (
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {categories.map((category) => (
@@ -266,20 +267,20 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
                   <span>
                     <span className="block font-medium text-slate-900">{category.name}</span>
                     {!category.isActive ? (
-                      <span className="text-xs text-amber-700">Inactive</span>
+                      <span className="text-xs text-amber-700">غیرفعال</span>
                     ) : null}
                   </span>
                 </label>
               ))}
             </div>
           ) : (
-            <p className="mt-3 text-sm text-slate-600">No categories have been created yet.</p>
+            <p className="mt-3 text-sm text-slate-600">هنوز دسته‌بندی‌ای ایجاد نشده است.</p>
           )}
           <FormFieldError id="categoryIds-error" errors={fieldError("categoryIds")} />
         </FormField>
 
         <FormField className="sm:col-span-2">
-          <span className="block text-sm font-semibold text-slate-900">Tags</span>
+          <span className="block text-sm font-semibold text-slate-900">برچسب‌ها</span>
           {tags.length ? (
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {tags.map((tag) => (
@@ -296,15 +297,13 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
                   />
                   <span>
                     <span className="block font-medium text-slate-900">{tag.name}</span>
-                    {!tag.isActive ? (
-                      <span className="text-xs text-amber-700">Inactive</span>
-                    ) : null}
+                    {!tag.isActive ? <span className="text-xs text-amber-700">غیرفعال</span> : null}
                   </span>
                 </label>
               ))}
             </div>
           ) : (
-            <p className="mt-3 text-sm text-slate-600">No tags have been created yet.</p>
+            <p className="mt-3 text-sm text-slate-600">هنوز برچسبی ایجاد نشده است.</p>
           )}
           <FormFieldError id="tagIds-error" errors={fieldError("tagIds")} />
         </FormField>
@@ -319,7 +318,7 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
           disabled={isPending}
           className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPending ? "Saving post…" : initialPost ? "Save changes" : "Save post"}
+          {isPending ? "در حال ذخیره…" : initialPost ? "ذخیره تغییرات" : "ذخیره یادداشت"}
         </button>
       </div>
     </form>

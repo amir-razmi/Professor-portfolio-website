@@ -1,13 +1,13 @@
 export const siteConfig = {
-  name: "Academic Portfolio",
-  description: "A focused foundation for presenting research, teaching, and academic work.",
+  name: "پرتفولیوی دانشگاهی",
+  description: "مرجعی برای معرفی پژوهش، آموزش و فعالیت‌های دانشگاهی.",
   navigation: [
-    { label: "Home", href: "/" },
-    { label: "About", href: "/about" },
-    { label: "Research", href: "/research" },
-    { label: "Publications", href: "/publications" },
-    { label: "Blog", href: "/blog" },
-    { label: "Files", href: "/files" },
-    { label: "Contact", href: "/contact" },
+    { label: "خانه", href: "/" },
+    { label: "درباره", href: "/about" },
+    { label: "پژوهش", href: "/research" },
+    { label: "انتشارات", href: "/publications" },
+    { label: "یادداشت‌ها", href: "/blog" },
+    { label: "فایل‌ها", href: "/files" },
+    { label: "تماس", href: "/contact" },
   ],
 } as const;

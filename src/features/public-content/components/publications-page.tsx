@@ -17,20 +17,20 @@ export function PublicationsPageContent({
   return (
     <>
       <PublicPageHeader
-        eyebrow="Publications"
-        title="Published scholarly work."
+        eyebrow="انتشارات"
+        title="آثار علمی منتشرشده"
         description={
           profile?.fullName
-            ? `A public record of selected publications by ${profile.fullName}.`
-            : "A public record of selected articles, chapters, and other scholarly work."
+            ? `مروری عمومی بر آثار علمی منتخب ${profile.fullName}.`
+            : "مروری عمومی بر مقاله‌ها، فصل‌ها و دیگر آثار علمی."
         }
       />
       <Container className="py-16 sm:py-20 lg:py-24">
         <section>
           <SectionHeading
-            eyebrow="Bibliography"
-            title="Articles, chapters, and other work."
-            description="Only publication records marked as published are shown. Follow the available DOI, external record, or PDF link for more detail."
+            eyebrow="کتاب‌شناسی"
+            title="مقاله‌ها، فصل‌ها و دیگر آثار"
+            description="فقط آثار منتشرشده نمایش داده می‌شوند. برای جزئیات بیشتر از DOI، رکورد خارجی یا پیوند PDF استفاده کنید."
           />
           {publications.length ? (
             <div id="publications-list" className="mt-10 grid gap-5 lg:grid-cols-2">
@@ -42,8 +42,8 @@ export function PublicationsPageContent({
             <div className="mt-10">
               <PublicEmptyState
                 headingLevel="h3"
-                title="No public publications yet."
-                description="Published scholarly records will appear here when they are ready."
+                title="هنوز اثر علمی عمومی وجود ندارد."
+                description="آثار علمی پس از آماده‌سازی و انتشار در این بخش نمایش داده می‌شوند."
               />
             </div>
           )}

@@ -37,7 +37,7 @@ export function doiUrl(doi: string | null | undefined): string | null {
 
 export function formatYear(date: Date | null | undefined): string | null {
   return date
-    ? new Intl.DateTimeFormat("en", { year: "numeric", timeZone: "UTC" }).format(date)
+    ? new Intl.DateTimeFormat("fa-IR", { year: "numeric", timeZone: "UTC" }).format(date)
     : null;
 }
 
@@ -61,10 +61,10 @@ export function formatDateRange(
 
 export function researchStatusLabel(status: ResearchItemStatus): string {
   const labels: Record<ResearchItemStatus, string> = {
-    PLANNED: "Planned",
-    ACTIVE: "Active",
-    COMPLETED: "Completed",
-    ON_HOLD: "On hold",
+    PLANNED: "برنامه‌ریزی‌شده",
+    ACTIVE: "در حال اجرا",
+    COMPLETED: "تکمیل‌شده",
+    ON_HOLD: "متوقف",
   };
 
   return labels[status];
@@ -72,13 +72,13 @@ export function researchStatusLabel(status: ResearchItemStatus): string {
 
 export function publicationTypeLabel(type: PublicationType): string {
   const labels: Record<PublicationType, string> = {
-    JOURNAL_ARTICLE: "Journal article",
-    CONFERENCE_PAPER: "Conference paper",
-    BOOK: "Book",
-    BOOK_CHAPTER: "Book chapter",
-    THESIS: "Thesis",
-    REPORT: "Report",
-    OTHER: "Publication",
+    JOURNAL_ARTICLE: "مقاله ژورنالی",
+    CONFERENCE_PAPER: "مقاله کنفرانسی",
+    BOOK: "کتاب",
+    BOOK_CHAPTER: "فصل کتاب",
+    THESIS: "پایان‌نامه",
+    REPORT: "گزارش",
+    OTHER: "اثر علمی",
   };
 
   return labels[type];

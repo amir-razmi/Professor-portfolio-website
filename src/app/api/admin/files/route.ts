@@ -61,8 +61,8 @@ export async function POST(request: Request) {
       return Response.json(
         {
           error: "INVALID_INPUT",
-          message: "The upload request is too large.",
-          fieldErrors: { file: ["Files must be 10 MiB or smaller."] },
+          message: "حجم درخواست بارگذاری بیش از حد مجاز است.",
+          fieldErrors: { file: ["حجم فایل باید حداکثر ۱۰ مگابایت باشد."] },
         },
         { status: 413, headers: { "Cache-Control": "no-store" } },
       );
@@ -75,8 +75,8 @@ export async function POST(request: Request) {
       return Response.json(
         {
           error: "INVALID_INPUT",
-          message: "Choose a file to upload.",
-          fieldErrors: { file: ["Choose a file to upload."] },
+          message: "یک فایل برای بارگذاری انتخاب کنید.",
+          fieldErrors: { file: ["یک فایل برای بارگذاری انتخاب کنید."] },
         },
         { status: 400, headers: { "Cache-Control": "no-store" } },
       );

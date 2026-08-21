@@ -8,7 +8,7 @@ export const adminCredentialsSchema = z.object({
   password: z.string().min(12).max(128),
 });
 
-export const invalidCredentialsMessage = "Invalid email or password.";
+export const invalidCredentialsMessage = "ایمیل یا گذرواژه نادرست است.";
 
 export type AdminCredentialRecord = {
   id: string;

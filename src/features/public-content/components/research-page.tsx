@@ -18,31 +18,31 @@ export function ResearchPageContent({
   return (
     <>
       <PublicPageHeader
-        eyebrow="Research"
-        title="Questions, methods, and areas of inquiry."
+        eyebrow="پژوهش"
+        title="پرسش‌ها، روش‌ها و حوزه‌های تحقیق"
         description={
           profile?.shortBio ??
-          "Explore the public research projects and themes presented in this academic portfolio."
+          "پروژه‌ها و موضوعات پژوهشی عمومی این پرتفولیوی دانشگاهی را مرور کنید."
         }
       />
       <Container className="space-y-16 py-16 sm:py-20 lg:space-y-20 lg:py-24">
         <section className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:items-start">
           <SectionHeading
-            eyebrow="Research interests"
-            title="Themes that guide the work."
-            description="Concise areas of inquiry provide context for the projects below."
+            eyebrow="علایق پژوهشی"
+            title="موضوعات محوری فعالیت‌ها"
+            description="حوزه‌های تحقیق، زمینه لازم برای درک پروژه‌های زیر را فراهم می‌کنند."
           />
           <InterestList
             items={profile?.researchInterests ?? []}
-            emptyMessage="Research interests will be added soon."
+            emptyMessage="علایق پژوهشی به‌زودی اضافه می‌شوند."
           />
         </section>
 
         <section>
           <SectionHeading
-            eyebrow="Research portfolio"
-            title="Selected and ongoing projects."
-            description="Only research records marked as public and published are shown."
+            eyebrow="پرتفولیوی پژوهش"
+            title="پروژه‌های منتخب و در حال اجرا"
+            description="فقط رکوردهای پژوهشی عمومی و منتشرشده نمایش داده می‌شوند."
           />
           {researchItems.length ? (
             <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -54,8 +54,8 @@ export function ResearchPageContent({
             <div className="mt-10">
               <PublicEmptyState
                 headingLevel="h3"
-                title="No public research records yet."
-                description="Research projects will appear here after they are published."
+                title="هنوز رکورد پژوهشی عمومی وجود ندارد."
+                description="پس از انتشار پروژه‌های پژوهشی، آن‌ها در این بخش نمایش داده می‌شوند."
               />
             </div>
           )}

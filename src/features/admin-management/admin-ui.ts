@@ -23,10 +23,10 @@ export type AdminAccountStatusValue =
   (typeof ADMIN_ACCOUNT_STATUS)[keyof typeof ADMIN_ACCOUNT_STATUS];
 
 export const ADMIN_ACCOUNT_STATUS_LABELS: Record<AdminAccountStatusValue, string> = {
-  INVITED: "Invited",
-  ACTIVE: "Active",
-  SUSPENDED: "Suspended",
-  DISABLED: "Disabled",
+  INVITED: "دعوت‌شده",
+  ACTIVE: "فعال",
+  SUSPENDED: "معلق",
+  DISABLED: "غیرفعال",
 };
 
 export const ADMIN_ROLE_OPTIONS = [

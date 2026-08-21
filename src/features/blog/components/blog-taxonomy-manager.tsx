@@ -33,7 +33,7 @@ function CategoryForm({
       <input type="hidden" name="id" value={category?.id ?? ""} />
       <div>
         <label htmlFor={`${prefix}-name`} className="text-sm font-semibold text-slate-900">
-          Category name
+          نام دسته‌بندی
         </label>
         <input
           id={`${prefix}-name`}
@@ -44,11 +44,11 @@ function CategoryForm({
           defaultValue={category?.name ?? ""}
           className={formControlClassName}
         />
-        <FormFieldError id={`${prefix}-name-error`} errors={state.fieldErrors.name} />
+        <FormFieldError id={`${prefix}-name-error`} errors={state.fieldErrors?.name} />
       </div>
       <div>
         <label htmlFor={`${prefix}-slug`} className="text-sm font-semibold text-slate-900">
-          Slug
+          شناسه نشانی (Slug)
         </label>
         <input
           id={`${prefix}-slug`}
@@ -63,7 +63,7 @@ function CategoryForm({
       </div>
       <div>
         <label htmlFor={`${prefix}-description`} className="text-sm font-semibold text-slate-900">
-          Description
+          توضیح
         </label>
         <textarea
           id={`${prefix}-description`}
@@ -81,7 +81,7 @@ function CategoryForm({
           defaultChecked={category?.isActive ?? true}
           className="size-4 rounded border-slate-300 text-accent focus:ring-accent"
         />
-        Active for new posts and public filters
+        فعال برای یادداشت‌های جدید و فیلترهای عمومی
       </label>
       {state.message ? <FormStatusMessage message={state.message} status={state.status} /> : null}
       <button
@@ -89,7 +89,7 @@ function CategoryForm({
         disabled={isPending}
         className="min-h-10 rounded-lg bg-slate-950 px-3.5 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isPending ? "Saving…" : category ? "Update category" : "Add category"}
+        {isPending ? "در حال ذخیره…" : category ? "ویرایش دسته‌بندی" : "افزودن دسته‌بندی"}
       </button>
     </form>
   );
@@ -108,7 +108,7 @@ function TagForm({
       <input type="hidden" name="id" value={tag?.id ?? ""} />
       <div>
         <label htmlFor={`${prefix}-name`} className="text-sm font-semibold text-slate-900">
-          Tag name
+          نام برچسب
         </label>
         <input
           id={`${prefix}-name`}
@@ -123,7 +123,7 @@ function TagForm({
       </div>
       <div>
         <label htmlFor={`${prefix}-slug`} className="text-sm font-semibold text-slate-900">
-          Slug
+          شناسه نشانی (Slug)
         </label>
         <input
           id={`${prefix}-slug`}
@@ -143,7 +143,7 @@ function TagForm({
           defaultChecked={tag?.isActive ?? true}
           className="size-4 rounded border-slate-300 text-accent focus:ring-accent"
         />
-        Active for new posts and public filters
+        فعال برای یادداشت‌های جدید و فیلترهای عمومی
       </label>
       {state.message ? <FormStatusMessage message={state.message} status={state.status} /> : null}
       <button
@@ -151,7 +151,7 @@ function TagForm({
         disabled={isPending}
         className="min-h-10 rounded-lg bg-slate-950 px-3.5 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isPending ? "Saving…" : tag ? "Update tag" : "Add tag"}
+        {isPending ? "در حال ذخیره…" : tag ? "ویرایش برچسب" : "افزودن برچسب"}
       </button>
     </form>
   );
@@ -172,7 +172,11 @@ function DeleteTaxonomyButton({
       <form
         action={formAction}
         onSubmit={(event) => {
-          if (!window.confirm(`Delete this ${kind}? This cannot be undone.`)) {
+          if (
+            !window.confirm(
+              `آیا از حذف ${kind === "category" ? "این دسته‌بندی" : "این برچسب"} مطمئن هستید؟ این کار قابل بازگشت نیست.`,
+            )
+          ) {
             event.preventDefault();
           }
         }}
@@ -183,7 +187,7 @@ function DeleteTaxonomyButton({
           disabled={isPending}
           className="text-xs font-semibold text-red-700 underline underline-offset-4 hover:text-red-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:opacity-60"
         >
-          {isPending ? "Deleting…" : `Delete ${kind}`}
+          {isPending ? "در حال حذف…" : kind === "category" ? "حذف دسته‌بندی" : "حذف برچسب"}
         </button>
       </form>
       {state.message ? <FormStatusMessage message={state.message} status={state.status} /> : null}
@@ -204,30 +208,30 @@ export function BlogTaxonomyManager({
       aria-labelledby="taxonomy-heading"
     >
       <div className="border-b border-slate-200 pb-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Taxonomy</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+          دسته‌بندی محتوا
+        </p>
         <h2
           id="taxonomy-heading"
           className="mt-2 text-xl font-semibold tracking-tight text-slate-950"
         >
-          Categories and tags
+          دسته‌بندی‌ها و برچسب‌ها
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-          Keep labels concise and stable. Records assigned to posts cannot be deleted; deactivate
-          them when they should no longer be offered to new content.
+          نام‌ها را کوتاه و ثابت نگه دارید. رکوردهای مرتبط با یادداشت‌ها حذف نمی‌شوند؛ اگر دیگر
+          نباید برای محتوای جدید نمایش داده شوند، آن‌ها را غیرفعال کنید.
         </p>
       </div>
 
       <div className="mt-6 grid gap-8 xl:grid-cols-2">
         <div>
-          <h3 className="text-base font-semibold text-slate-950">Categories</h3>
+          <h3 className="text-base font-semibold text-slate-950">دسته‌بندی‌ها</h3>
           <div className="mt-4 space-y-4">
             <CategoryForm category={null} />
             {categories.map((category) => (
               <div key={category.id}>
                 <CategoryForm category={category} />
-                <p className="mt-2 text-xs text-slate-500">
-                  {category.postCount} {category.postCount === 1 ? "post" : "posts"} assigned
-                </p>
+                <p className="mt-2 text-xs text-slate-500">{category.postCount} یادداشت مرتبط</p>
                 <DeleteTaxonomyButton id={category.id} kind="category" />
               </div>
             ))}
@@ -235,15 +239,13 @@ export function BlogTaxonomyManager({
         </div>
 
         <div>
-          <h3 className="text-base font-semibold text-slate-950">Tags</h3>
+          <h3 className="text-base font-semibold text-slate-950">برچسب‌ها</h3>
           <div className="mt-4 space-y-4">
             <TagForm tag={null} />
             {tags.map((tag) => (
               <div key={tag.id}>
                 <TagForm tag={tag} />
-                <p className="mt-2 text-xs text-slate-500">
-                  {tag.postCount} {tag.postCount === 1 ? "post" : "posts"} assigned
-                </p>
+                <p className="mt-2 text-xs text-slate-500">{tag.postCount} یادداشت مرتبط</p>
                 <DeleteTaxonomyButton id={tag.id} kind="tag" />
               </div>
             ))}

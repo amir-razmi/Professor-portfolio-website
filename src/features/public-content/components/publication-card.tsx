@@ -26,7 +26,7 @@ export function PublicationCard({
         {publicationYear ? <span className="text-slate-400">{publicationYear}</span> : null}
         {publication.isFeatured ? (
           <span className="rounded-full bg-orange-100 px-2.5 py-1 text-[10px] text-orange-900">
-            Selected
+            منتخب
           </span>
         ) : null}
       </div>
@@ -35,7 +35,7 @@ export function PublicationCard({
       </h3>
       {publication.authors.length ? (
         <p className="mt-3 text-sm leading-6 text-slate-700">
-          <span className="font-semibold">Authors:</span> {publication.authors.join(", ")}
+          <span className="font-semibold">نویسندگان:</span> {publication.authors.join("، ")}
         </p>
       ) : null}
       {publication.venue ? (
@@ -73,7 +73,7 @@ export function PublicationCard({
                 rel="noreferrer"
                 className="rounded-lg text-accent underline decoration-accent/40 underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
               >
-                <span>External record</span>
+                <span>رکورد خارجی</span>
                 <span className="sr-only"> ({displayLinkLabel(articleUrl)})</span>
               </Link>
             </li>

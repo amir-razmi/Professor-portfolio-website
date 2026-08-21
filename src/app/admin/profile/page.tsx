@@ -7,7 +7,7 @@ import { getProfessorProfileForAdmin } from "@/features/professor-profile/server
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Professor profile",
+  title: "پروفایل استاد",
 };
 
 export default async function AdminProfilePage() {
@@ -18,15 +18,15 @@ export default async function AdminProfilePage() {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-5xl space-y-8">
         <AdminPageHeader
-          eyebrow="Professor profile"
-          title="Manage the public academic profile."
-          description="Keep the identity, academic background, interests, contact details, and links presented on the public site up to date."
+          eyebrow="پروفایل استاد"
+          title="پروفایل دانشگاهی عمومی را مدیریت کنید."
+          description="هویت، پیشینه دانشگاهی، علایق، اطلاعات تماس و پیوندهای نمایش‌داده‌شده در سایت را به‌روز نگه دارید."
         />
 
         {!profile ? (
           <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 text-sm leading-6 text-blue-900">
-            No profile record exists yet. Complete the form below to create the first public profile
-            record.
+            هنوز رکوردی برای پروفایل وجود ندارد. برای ایجاد نخستین پروفایل عمومی، فرم زیر را تکمیل
+            کنید.
           </div>
         ) : null}
 

@@ -13,7 +13,7 @@ const optionalEmail = z
       value.length === 0 ||
       z.string().email().safeParse(value).success,
     {
-      message: "Enter a valid email address.",
+      message: "یک نشانی ایمیل معتبر وارد کنید.",
     },
   )
   .transform((value) => (typeof value === "string" && value.length > 0 ? value : null));
@@ -34,7 +34,7 @@ const optionalHttpUrl = z
       }
     },
     {
-      message: "Enter a valid HTTP or HTTPS URL.",
+      message: "یک نشانی HTTP یا HTTPS معتبر وارد کنید.",
     },
   )
   .transform((value) => (typeof value === "string" && value.length > 0 ? value : null));
@@ -56,9 +56,9 @@ export const siteSettingsSchema = z
     defaultLocale: z
       .string()
       .trim()
-      .regex(/^[a-z]{2,3}(?:-[A-Z]{2})?$/, "Use a locale such as en or en-US."),
+      .regex(/^[a-z]{2,3}(?:-[A-Z]{2})?$/, "زبان را مانند fa یا fa-IR وارد کنید."),
     timezone: z.string().trim().min(1).max(100).refine(isValidTimezone, {
-      message: "Enter a valid IANA timezone such as UTC or America/New_York.",
+      message: "یک منطقه زمانی IANA معتبر مانند Asia/Tehran وارد کنید.",
     }),
     footerText: optionalText(240),
     defaultOgImageUrl: optionalHttpUrl,

@@ -13,7 +13,7 @@ const optionalEmail = z
       value.length === 0 ||
       z.string().email().safeParse(value).success,
     {
-      message: "Enter a valid email address.",
+      message: "یک نشانی ایمیل معتبر وارد کنید.",
     },
   )
   .transform((value) => (typeof value === "string" && value.length > 0 ? value : null));
@@ -34,7 +34,7 @@ const optionalHttpUrl = z
       }
     },
     {
-      message: "Enter a valid HTTP or HTTPS URL.",
+      message: "یک نشانی HTTP یا HTTPS معتبر وارد کنید.",
     },
   )
   .transform((value) => (typeof value === "string" && value.length > 0 ? value : null));

@@ -52,7 +52,7 @@ export const siteSettingsRepository: SiteSettingsRepository = {
         action: existing ? "UPDATE" : "CREATE",
         targetResource: "SiteSettings",
         targetId: settings.id,
-        summary: existing ? "Site settings updated." : "Site settings created.",
+        summary: existing ? "تنظیمات سایت به‌روزرسانی شد." : "تنظیمات سایت ایجاد شد.",
         actorId,
       });
 

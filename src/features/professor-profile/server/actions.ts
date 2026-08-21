@@ -33,7 +33,7 @@ export async function updateProfessorProfileAction(
 
     return {
       status: "success",
-      message: "Professor profile saved.",
+      message: "پروفایل استاد ذخیره شد.",
       fieldErrors: {},
     };
   } catch (error) {
@@ -51,7 +51,7 @@ export async function updateProfessorProfileAction(
 
     return {
       status: "error",
-      message: "Unable to save the professor profile. Please try again.",
+      message: "ذخیره پروفایل استاد ممکن نشد. دوباره تلاش کنید.",
       fieldErrors: {},
     };
   }

@@ -9,35 +9,35 @@ import { AdminNavigation, type AdminNavigationItem } from "./admin-navigation";
 const navigationItems: readonly (AdminNavigationItem & {
   permission?: (typeof Permission)[keyof typeof Permission];
 })[] = [
-  { href: "/admin/dashboard", label: "Dashboard" },
+  { href: "/admin/dashboard", label: "داشبورد" },
   {
     href: "/admin/profile",
-    label: "Professor profile",
+    label: "پروفایل استاد",
     permission: Permission.MANAGE_PROFESSOR_PROFILE,
   },
   {
     href: "/admin/settings",
-    label: "Site settings",
+    label: "تنظیمات سایت",
     permission: Permission.MANAGE_SITE_SETTINGS,
   },
   {
     href: "/admin/blog",
-    label: "Blog",
+    label: "یادداشت‌ها",
     permission: Permission.MANAGE_BLOG_POSTS,
   },
   {
     href: "/admin/files",
-    label: "Files",
+    label: "فایل‌ها",
     permission: Permission.MANAGE_FILES,
   },
   {
     href: "/admin/admins",
-    label: "Administrators",
+    label: "مدیران",
     permission: Permission.MANAGE_ADMINISTRATORS,
   },
   {
     href: "/admin/audit-logs",
-    label: "Audit log",
+    label: "گزارش فعالیت‌ها",
     permission: Permission.VIEW_AUDIT_LOGS,
   },
 ];
@@ -68,7 +68,7 @@ export function AdminShell({
 
   return (
     <div className="min-h-screen bg-slate-100 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
-      <aside className="hidden border-r border-slate-200 bg-white lg:flex lg:flex-col">
+      <aside className="hidden border-l border-slate-200 bg-white lg:flex lg:flex-col">
         <div className="border-b border-slate-200 px-5 py-5">
           <Link
             href="/admin/dashboard"
@@ -77,12 +77,12 @@ export function AdminShell({
             <span className="mr-3 flex size-9 items-center justify-center rounded-lg bg-slate-950 text-xs font-bold text-orange-200">
               AP
             </span>
-            <span className="self-center">Portfolio admin</span>
+            <span className="self-center">مدیریت پرتفولیو</span>
           </Link>
         </div>
         <div className="flex-1 px-3 py-5">
           <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Workspace
+            محیط مدیریت
           </p>
           <AdminNavigation items={visibleItems} />
         </div>
@@ -91,7 +91,7 @@ export function AdminShell({
             href="/"
             className="flex min-h-10 items-center rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            View public site
+            مشاهده سایت عمومی
           </Link>
         </div>
       </aside>
@@ -105,24 +105,24 @@ export function AdminShell({
                   <span aria-hidden="true" className="mr-2 text-base">
                     ☰
                   </span>
-                  Menu
+                  منو
                 </summary>
-                <div className="absolute left-0 top-12 z-30 w-64 rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
+                <div className="absolute right-0 top-12 z-30 w-64 rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
                   <AdminNavigation items={visibleItems} />
                   <Link
                     href="/"
                     className="mt-3 block rounded-lg border-t border-slate-200 px-3 pt-3 text-sm font-medium text-slate-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   >
-                    View public site
+                    مشاهده سایت عمومی
                   </Link>
                 </div>
               </details>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-                  Administration
+                  مدیریت
                 </p>
                 <p className="hidden text-sm font-medium text-slate-950 sm:block">
-                  Academic portfolio workspace
+                  محیط مدیریت پرتفولیوی دانشگاهی
                 </p>
               </div>
             </div>
@@ -132,7 +132,7 @@ export function AdminShell({
                 <span className="flex size-8 items-center justify-center rounded-full bg-slate-950 text-xs font-bold text-orange-200">
                   {initials || "A"}
                 </span>
-                <span className="hidden text-left sm:block">
+                <span className="hidden text-right sm:block">
                   <span className="block max-w-40 truncate text-sm font-semibold text-slate-950">
                     {admin.displayName}
                   </span>
@@ -140,7 +140,7 @@ export function AdminShell({
                     {admin.role.replace("_", " ")}
                   </span>
                 </span>
-                <span className="sr-only">Open account menu</span>
+                <span className="sr-only">باز کردن منوی حساب کاربری</span>
                 <span aria-hidden="true" className="text-xs text-slate-500">
                   ▾
                 </span>
@@ -154,14 +154,14 @@ export function AdminShell({
                   href="/"
                   className="mt-2 block rounded-lg px-2 py-2 text-sm text-slate-600 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                 >
-                  Return to public site
+                  بازگشت به سایت عمومی
                 </Link>
                 <form action={logoutAction} className="mt-1">
                   <button
                     type="submit"
-                    className="w-full rounded-lg px-2 py-2 text-left text-sm font-medium text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                    className="w-full rounded-lg px-2 py-2 text-right text-sm font-medium text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
                   >
-                    Sign out
+                    خروج
                   </button>
                 </form>
               </div>

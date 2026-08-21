@@ -5,14 +5,14 @@ const BCRYPT_COST = 12;
 
 export const adminPasswordSchema = z
   .string()
-  .min(12, "Administrator passwords must be at least 12 characters.")
-  .max(128, "Administrator passwords must be 128 characters or fewer.");
+  .min(12, "گذرواژه مدیر باید حداقل ۱۲ نویسه داشته باشد.")
+  .max(128, "گذرواژه مدیر باید حداکثر ۱۲۸ نویسه داشته باشد.");
 
 export async function hashPassword(password: string): Promise<string> {
   const result = adminPasswordSchema.safeParse(password);
 
   if (!result.success) {
-    throw new Error("Administrator password does not meet the minimum requirements.");
+    throw new Error("گذرواژه مدیر شرایط لازم را ندارد.");
   }
 
   return bcrypt.hash(result.data, BCRYPT_COST);

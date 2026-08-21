@@ -44,7 +44,7 @@ function failureState(failure: ReturnType<typeof getContentMutationFailure>): Bl
   if (!failure) {
     return {
       status: "error",
-      message: "The request could not be completed. Please try again.",
+      message: "درخواست انجام نشد. دوباره تلاش کنید.",
       fieldErrors: {},
       postId: null,
     };
@@ -79,7 +79,7 @@ export async function saveBlogPostAction(
 
     return {
       status: "success",
-      message: "Blog post saved.",
+      message: "یادداشت ذخیره شد.",
       fieldErrors: {},
       postId: post.id,
     };
@@ -125,7 +125,7 @@ export async function publishBlogPostAction(
 
     return {
       status: "success",
-      message: "Blog post published.",
+      message: "یادداشت منتشر شد.",
       fieldErrors: {},
       postId: post.id,
     };
@@ -170,7 +170,7 @@ export async function unpublishBlogPostAction(
 
     return {
       status: "success",
-      message: "Blog post unpublished and saved as a draft.",
+      message: "انتشار یادداشت لغو و به‌صورت پیش‌نویس ذخیره شد.",
       fieldErrors: {},
       postId: post.id,
     };
@@ -213,7 +213,7 @@ export async function deleteBlogPostAction(
 
     return {
       status: "success",
-      message: "Blog post deleted.",
+      message: "یادداشت حذف شد.",
       fieldErrors: {},
       postId,
     };

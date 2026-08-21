@@ -15,7 +15,7 @@ export function LoginForm() {
     <form action={formAction} className="mt-8 space-y-5" noValidate>
       <div>
         <label htmlFor="email" className="text-sm font-semibold text-foreground">
-          Email address
+          نشانی ایمیل
         </label>
         <input
           id="email"
@@ -29,7 +29,7 @@ export function LoginForm() {
 
       <div>
         <label htmlFor="password" className="text-sm font-semibold text-foreground">
-          Password
+          گذرواژه
         </label>
         <input
           id="password"
@@ -52,7 +52,7 @@ export function LoginForm() {
         disabled={isPending}
         className="w-full rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:bg-accent-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isPending ? "Signing in…" : "Sign in"}
+        {isPending ? "در حال ورود…" : "ورود"}
       </button>
     </form>
   );

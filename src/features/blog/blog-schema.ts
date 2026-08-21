@@ -4,7 +4,7 @@ import { z } from "zod";
 const objectIdPattern = /^[a-f\d]{24}$/i;
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-export const objectIdSchema = z.string().regex(objectIdPattern, "Enter a valid record id.");
+export const objectIdSchema = z.string().regex(objectIdPattern, "شناسه رکورد معتبر نیست.");
 
 export function normalizeBlogSlug(value: string): string {
   return value
@@ -20,11 +20,11 @@ export function normalizeBlogSlug(value: string): string {
 const slugSchema = z
   .string()
   .trim()
-  .min(1, "Enter a slug.")
-  .max(160, "Use 160 characters or fewer.")
+  .min(1, "شناسه نشانی را وارد کنید.")
+  .max(160, "حداکثر ۱۶۰ نویسه وارد کنید.")
   .transform(normalizeBlogSlug)
   .refine((value) => slugPattern.test(value), {
-    message: "Use lowercase letters, numbers, and single hyphens only.",
+    message: "فقط از حروف کوچک لاتین، عدد و خط تیره تکی استفاده کنید.",
   });
 
 const optionalText = (maximumLength: number) =>
@@ -44,7 +44,7 @@ const optionalDate = z
     if (Number.isNaN(date.getTime())) {
       context.addIssue({
         code: "custom",
-        message: "Enter a valid publication date.",
+        message: "تاریخ انتشار معتبر نیست.",
       });
       return z.NEVER;
     }
@@ -71,14 +71,14 @@ export const blogPostSchema = z
     id: z
       .union([objectIdSchema, z.null(), z.undefined()])
       .transform((value) => (typeof value === "string" ? value : null)),
-    title: z.string().trim().min(3, "Title must contain at least 3 characters.").max(180),
+    title: z.string().trim().min(3, "عنوان باید حداقل ۳ نویسه داشته باشد.").max(180),
     slug: slugSchema,
     excerpt: optionalText(500),
     content: z
       .string()
       .trim()
-      .min(1, "Add the post content.")
-      .max(100_000, "Use 100,000 characters or fewer."),
+      .min(1, "محتوای یادداشت را وارد کنید.")
+      .max(100_000, "حداکثر ۱۰۰٬۰۰۰ نویسه وارد کنید."),
     status: blogStatusSchema,
     publishedAt: optionalDate,
     categoryIds: idListSchema,
@@ -91,7 +91,7 @@ export const blogPostSchema = z
       context.addIssue({
         code: "custom",
         path: ["publishedAt"],
-        message: "Published posts require a publication date.",
+        message: "یادداشت‌های منتشرشده به تاریخ انتشار نیاز دارند.",
       });
     }
   });
@@ -122,8 +122,8 @@ export function blogPostFormDataToInput(formData: FormData): unknown {
 const taxonomyNameSchema = z
   .string()
   .trim()
-  .min(2, "Name must contain at least 2 characters.")
-  .max(80, "Use 80 characters or fewer.");
+  .min(2, "نام باید حداقل ۲ نویسه داشته باشد.")
+  .max(80, "حداکثر ۸۰ نویسه وارد کنید.");
 
 const taxonomySlugSchema = z
   .union([z.string().trim().max(120), z.null(), z.undefined()])
@@ -145,7 +145,7 @@ export const blogCategorySchema = z
       context.addIssue({
         code: "custom",
         path: ["slug"],
-        message: "Use lowercase letters, numbers, and single hyphens only.",
+        message: "فقط از حروف کوچک لاتین، عدد و خط تیره تکی استفاده کنید.",
       });
     }
   });
@@ -167,7 +167,7 @@ export const blogTagSchema = z
       context.addIssue({
         code: "custom",
         path: ["slug"],
-        message: "Use lowercase letters, numbers, and single hyphens only.",
+        message: "فقط از حروف کوچک لاتین، عدد و خط تیره تکی استفاده کنید.",
       });
     }
   });

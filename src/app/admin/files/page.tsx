@@ -10,7 +10,7 @@ import { requirePagePermission } from "@/server/auth/page-authorization";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "File management",
+  title: "مدیریت فایل‌ها",
 };
 
 export default async function AdminFilesPage() {
@@ -23,9 +23,9 @@ export default async function AdminFilesPage() {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <AdminPageHeader
-          eyebrow="Files"
-          title="Manage documents and media safely."
-          description="Upload verified files, keep private assets off public URLs, and maintain metadata without storing binary content in MongoDB."
+          eyebrow="فایل‌ها"
+          title="اسناد و رسانه‌ها را ایمن مدیریت کنید."
+          description="فایل‌های تأییدشده را بارگذاری کنید، دارایی‌های خصوصی را از نشانی‌های عمومی دور نگه دارید و فراداده را بدون ذخیره محتوای باینری در MongoDB مدیریت کنید."
         />
         <FileManager initialFiles={initialFiles} />
       </div>

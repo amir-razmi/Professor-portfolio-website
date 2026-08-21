@@ -9,10 +9,10 @@ export const dynamic = "force-dynamic";
 
 function formatDate(date: Date | null, timezone: string): string {
   if (!date) {
-    return "Not created yet";
+    return "هنوز ایجاد نشده است";
   }
 
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat("fa-IR", {
     dateStyle: "medium",
     timeStyle: "short",
     timeZone: timezone,
@@ -29,64 +29,64 @@ export default async function AdminDashboardPage() {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-6xl space-y-8">
         <AdminPageHeader
-          eyebrow="Dashboard"
-          title={`Welcome back, ${summary.admin.displayName}.`}
-          description="Use this workspace to keep the public academic profile and site-wide presentation accurate."
+          eyebrow="داشبورد"
+          title={`خوش آمدید، ${summary.admin.displayName}.`}
+          description="از این فضای مدیریت برای به‌روز نگه‌داشتن پروفایل دانشگاهی و محتوای عمومی سایت استفاده کنید."
         />
 
         <section aria-labelledby="status-heading">
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 id="status-heading" className="text-lg font-semibold text-slate-950">
-                Content status
+                وضعیت محتوا
               </h2>
               <p className="mt-1 text-sm text-slate-600">
-                A quick view of the records that shape the public site.
+                نمایی سریع از رکوردهایی که محتوای سایت عمومی را شکل می‌دهند.
               </p>
             </div>
             <Link
               href="/"
               className="hidden text-sm font-semibold text-accent underline underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:inline"
             >
-              Open public site
+              مشاهده سایت عمومی
             </Link>
           </div>
 
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <StatusCard
-              title="Professor profile"
+              title="پروفایل استاد"
               status={
                 !summary.profile.exists
-                  ? "Not created"
+                  ? "ایجاد نشده"
                   : summary.profile.isPublished
-                    ? "Published"
-                    : "Draft"
+                    ? "منتشرشده"
+                    : "پیش‌نویس"
               }
-              detail={`Last updated ${formatDate(summary.profile.updatedAt, timezone)}`}
+              detail={`آخرین به‌روزرسانی: ${formatDate(summary.profile.updatedAt, timezone)}`}
               action={
                 canManageProfile ? (
                   <Link
                     href="/admin/profile"
                     className="text-sm font-semibold text-accent underline underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                   >
-                    Manage profile
+                    مدیریت پروفایل
                   </Link>
                 ) : null
               }
             />
             <StatusCard
-              title="Site settings"
+              title="تنظیمات سایت"
               status={
                 !summary.settings.exists
-                  ? "Not created"
+                  ? "ایجاد نشده"
                   : summary.settings.maintenanceMode
-                    ? "Maintenance notice on"
-                    : "Active"
+                    ? "حالت تعمیر و نگهداری فعال"
+                    : "فعال"
               }
               detail={
                 summary.settings.siteName
-                  ? `${summary.settings.siteName} · updated ${formatDate(summary.settings.updatedAt, timezone)}`
-                  : `Last updated ${formatDate(summary.settings.updatedAt, timezone)}`
+                  ? `${summary.settings.siteName} · به‌روزرسانی ${formatDate(summary.settings.updatedAt, timezone)}`
+                  : `آخرین به‌روزرسانی: ${formatDate(summary.settings.updatedAt, timezone)}`
               }
               action={
                 canManageSettings ? (
@@ -94,7 +94,7 @@ export default async function AdminDashboardPage() {
                     href="/admin/settings"
                     className="text-sm font-semibold text-accent underline underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                   >
-                    Manage settings
+                    مدیریت تنظیمات
                   </Link>
                 ) : null
               }
@@ -103,24 +103,24 @@ export default async function AdminDashboardPage() {
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-          <h2 className="text-lg font-semibold text-slate-950">Your access</h2>
+          <h2 className="text-lg font-semibold text-slate-950">دسترسی شما</h2>
           <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-3">
             <div>
-              <dt className="text-slate-500">Account</dt>
+              <dt className="text-slate-500">حساب کاربری</dt>
               <dd className="mt-1 break-all font-medium text-slate-950">{summary.admin.email}</dd>
             </div>
             <div>
-              <dt className="text-slate-500">Role</dt>
+              <dt className="text-slate-500">نقش</dt>
               <dd className="mt-1 font-medium text-slate-950">
                 {summary.admin.role.replace("_", " ")}
               </dd>
             </div>
             <div>
-              <dt className="text-slate-500">Next step</dt>
+              <dt className="text-slate-500">گام بعدی</dt>
               <dd className="mt-1 font-medium text-slate-950">
                 {canManageProfile || canManageSettings
-                  ? "Review public content"
-                  : "Use the workspace available to your role"}
+                  ? "بازبینی محتوای عمومی"
+                  : "از امکانات متناسب با نقش خود استفاده کنید"}
               </dd>
             </div>
           </dl>

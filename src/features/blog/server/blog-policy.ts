@@ -86,8 +86,8 @@ function parseObjectId(value: unknown, fieldName: string): string {
   const parsed = objectIdSchema.safeParse(value);
 
   if (!parsed.success) {
-    validationError("The requested blog record is invalid.", {
-      [fieldName]: ["Enter a valid record id."],
+    validationError("رکورد یادداشت معتبر نیست.", {
+      [fieldName]: ["شناسه رکورد معتبر نیست."],
     });
   }
 
@@ -99,7 +99,7 @@ function parseBlogPostInput(input: unknown): BlogPostInput {
 
   if (!parsed.success) {
     throw new ContentValidationError(
-      "Review the highlighted blog post fields.",
+      "فیلدهای مشخص‌شده یادداشت را بررسی کنید.",
       parsed.error.flatten().fieldErrors,
     );
   }
@@ -112,7 +112,7 @@ function parseCategoryInput(input: unknown): BlogCategoryInput {
 
   if (!parsed.success) {
     throw new ContentValidationError(
-      "Review the highlighted category fields.",
+      "فیلدهای مشخص‌شده دسته‌بندی را بررسی کنید.",
       parsed.error.flatten().fieldErrors,
     );
   }
@@ -125,7 +125,7 @@ function parseTagInput(input: unknown): BlogTagInput {
 
   if (!parsed.success) {
     throw new ContentValidationError(
-      "Review the highlighted tag fields.",
+      "فیلدهای مشخص‌شده برچسب را بررسی کنید.",
       parsed.error.flatten().fieldErrors,
     );
   }
@@ -135,7 +135,7 @@ function parseTagInput(input: unknown): BlogTagInput {
 
 function assertExistingPost(
   post: BlogPostRecord | null,
-  message = "The blog post could not be found.",
+  message = "یادداشت پیدا نشد.",
 ): BlogPostRecord {
   if (!post) {
     validationError(message);

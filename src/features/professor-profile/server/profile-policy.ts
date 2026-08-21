@@ -33,7 +33,7 @@ export async function updateProfessorProfileForActor(
 
   if (!parsed.success) {
     throw new ContentValidationError(
-      "Review the highlighted profile fields.",
+      "فیلدهای مشخص‌شده پروفایل را بررسی کنید.",
       parsed.error.flatten().fieldErrors,
     );
   }

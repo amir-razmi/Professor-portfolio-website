@@ -35,7 +35,7 @@ function failureState(error: unknown): AdminManagementActionState {
   if (!failure) {
     return {
       status: "error",
-      message: "The administrator request could not be completed. Please try again.",
+      message: "درخواست مدیریت مدیر انجام نشد. دوباره تلاش کنید.",
       fieldErrors: {},
       adminId: null,
     };
@@ -76,7 +76,7 @@ export async function executeCreateAdministratorAction(
       passwordConfirmation: getString(formData, "passwordConfirmation"),
     });
 
-    return successState("Administrator account created.", admin);
+    return successState("حساب مدیر ایجاد شد.", admin);
   } catch (error) {
     return failureState(error);
   }
@@ -97,7 +97,7 @@ export async function executeUpdateAdministratorDetailsAction(
       displayName: getString(formData, "displayName"),
     });
 
-    return successState("Administrator details saved.", admin);
+    return successState("جزئیات مدیر ذخیره شد.", admin);
   } catch (error) {
     return failureState(error);
   }
@@ -120,9 +120,9 @@ export async function executeSetAdministratorStatusAction(
     return successState(
       admin.changed
         ? admin.isActive
-          ? "Administrator account reactivated."
-          : "Administrator account deactivated."
-        : "Administrator account already has that status.",
+          ? "حساب مدیر دوباره فعال شد."
+          : "حساب مدیر غیرفعال شد."
+        : "حساب مدیر از قبل همین وضعیت را دارد.",
       admin,
     );
   } catch (error) {
@@ -145,7 +145,7 @@ export async function executeResetAdministratorPasswordAction(
       passwordConfirmation: getString(formData, "passwordConfirmation"),
     });
 
-    return successState("Administrator password reset.", admin);
+    return successState("گذرواژه مدیر بازنشانی شد.", admin);
   } catch (error) {
     return failureState(error);
   }

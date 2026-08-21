@@ -18,7 +18,7 @@ export function AdminNavigation({
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Administration navigation">
+    <nav aria-label="ناوبری مدیریت">
       <ul className="space-y-1">
         {items.map((item) => {
           const isActive =

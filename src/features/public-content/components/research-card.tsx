@@ -35,7 +35,7 @@ export function ResearchCard({
             rel="noreferrer"
             className="inline-flex max-w-full items-center gap-2 rounded-lg text-sm font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
           >
-            <span className="truncate">Project details</span>
+            <span className="truncate">جزئیات پروژه</span>
             <span className="sr-only"> ({displayLinkLabel(externalUrl)})</span>
             <span aria-hidden="true">↗</span>
           </Link>

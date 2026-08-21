@@ -19,21 +19,21 @@ export function BlogFilters({
     >
       <div>
         <label htmlFor="blog-search" className="text-sm font-semibold text-slate-900">
-          Search articles
+          جست‌وجوی مقاله‌ها
         </label>
         <input
           id="blog-search"
           name="q"
           type="search"
           defaultValue={current.q ?? ""}
-          placeholder="Search by title or excerpt"
+          placeholder="جست‌وجو بر اساس عنوان یا خلاصه"
           className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-950 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
         />
       </div>
 
       <div>
         <label htmlFor="blog-category" className="text-sm font-semibold text-slate-900">
-          Category
+          دسته‌بندی
         </label>
         <select
           id="blog-category"
@@ -41,7 +41,7 @@ export function BlogFilters({
           defaultValue={current.category ?? ""}
           className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-950 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
         >
-          <option value="">All categories</option>
+          <option value="">همه دسته‌بندی‌ها</option>
           {categories.map((category) => (
             <option key={category.id} value={category.slug}>
               {category.name}
@@ -52,7 +52,7 @@ export function BlogFilters({
 
       <div>
         <label htmlFor="blog-tag" className="text-sm font-semibold text-slate-900">
-          Tag
+          برچسب
         </label>
         <select
           id="blog-tag"
@@ -60,7 +60,7 @@ export function BlogFilters({
           defaultValue={current.tag ?? ""}
           className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-950 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
         >
-          <option value="">All tags</option>
+          <option value="">همه برچسب‌ها</option>
           {tags.map((tag) => (
             <option key={tag.id} value={tag.slug}>
               {tag.name}
@@ -74,14 +74,14 @@ export function BlogFilters({
           type="submit"
           className="min-h-11 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
-          Filter
+          اعمال فیلتر
         </button>
         {current.q || current.category || current.tag ? (
           <Link
             href="/blog"
             className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            Clear
+            پاک کردن
           </Link>
         ) : null}
       </div>

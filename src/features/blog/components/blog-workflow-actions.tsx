@@ -45,7 +45,7 @@ export function BlogWorkflowActions({
               disabled={publishPending}
               className="min-h-10 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {publishPending ? "Publishing…" : "Publish"}
+              {publishPending ? "در حال انتشار…" : "انتشار"}
             </button>
           </form>
         ) : null}
@@ -58,7 +58,7 @@ export function BlogWorkflowActions({
               disabled={unpublishPending}
               className="min-h-10 rounded-lg border border-amber-300 px-4 py-2 text-sm font-semibold text-amber-900 hover:bg-amber-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {unpublishPending ? "Unpublishing…" : "Unpublish"}
+              {unpublishPending ? "در حال لغو انتشار…" : "لغو انتشار"}
             </button>
           </form>
         ) : null}
@@ -66,7 +66,7 @@ export function BlogWorkflowActions({
         <form
           action={deleteAction}
           onSubmit={(event) => {
-            if (!window.confirm("Delete this blog post? This action cannot be undone.")) {
+            if (!window.confirm("این یادداشت حذف شود؟ این عملیات قابل بازگشت نیست.")) {
               event.preventDefault();
             }
           }}
@@ -77,7 +77,7 @@ export function BlogWorkflowActions({
             disabled={deletePending}
             className="min-h-10 rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {deletePending ? "Deleting…" : "Delete"}
+            {deletePending ? "در حال حذف…" : "حذف"}
           </button>
         </form>
       </div>
@@ -98,10 +98,10 @@ export function BlogWorkflowActions({
 export function BlogStatusBadge({ status }: Readonly<{ status: BlogPostStatusValue }>) {
   const label =
     status === BLOG_POST_STATUS.PUBLISHED
-      ? "Published"
+      ? "منتشرشده"
       : status === BLOG_POST_STATUS.ARCHIVED
-        ? "Archived"
-        : "Draft";
+        ? "بایگانی‌شده"
+        : "پیش‌نویس";
   const styles =
     status === BLOG_POST_STATUS.PUBLISHED
       ? "bg-emerald-50 text-emerald-800"

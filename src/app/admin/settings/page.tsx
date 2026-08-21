@@ -7,7 +7,7 @@ import { requirePagePermission } from "@/server/auth/page-authorization";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Site settings",
+  title: "تنظیمات سایت",
 };
 
 export default async function AdminSettingsPage() {
@@ -18,15 +18,15 @@ export default async function AdminSettingsPage() {
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-5xl space-y-8">
         <AdminPageHeader
-          eyebrow="Site settings"
-          title="Control the public site's presentation."
-          description="Manage the public name, description, regional defaults, sharing image placeholder, and maintenance notice."
+          eyebrow="تنظیمات سایت"
+          title="نحوه ارائه سایت عمومی را تنظیم کنید."
+          description="نام عمومی، توضیح، تنظیمات منطقه‌ای، تصویر اشتراک‌گذاری و پیام تعمیر و نگهداری را مدیریت کنید."
         />
 
         {!settings ? (
           <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 text-sm leading-6 text-blue-900">
-            No site settings record exists yet. Saving this form will create the default settings
-            record.
+            هنوز رکوردی برای تنظیمات سایت وجود ندارد. با ذخیره این فرم، تنظیمات پیش‌فرض ایجاد
+            می‌شود.
           </div>
         ) : null}
 

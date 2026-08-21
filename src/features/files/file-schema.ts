@@ -25,8 +25,8 @@ export const fileVisibilitySchema = z.enum(allowedVisibilityValues);
 export const filePasswordSchema = z
   .string()
   .trim()
-  .min(12, "File passwords must be at least 12 characters.")
-  .max(128, "File passwords must be 128 characters or fewer.");
+  .min(12, "گذرواژه فایل باید حداقل ۱۲ نویسه داشته باشد.")
+  .max(128, "گذرواژه فایل باید حداکثر ۱۲۸ نویسه داشته باشد.");
 export const fileUnlockSchema = z
   .object({
     password: filePasswordSchema,
@@ -46,8 +46,8 @@ export const fileMetadataSchema = z
     displayName: z
       .string()
       .trim()
-      .min(1, "Enter a display name.")
-      .max(120, "Use 120 characters or fewer."),
+      .min(1, "نام نمایشی را وارد کنید.")
+      .max(120, "حداکثر ۱۲۰ نویسه وارد کنید."),
     category: fileCategorySchema,
     description: z
       .union([z.string().trim().max(500), z.null(), z.undefined()])
@@ -70,7 +70,7 @@ export function parseFileMetadataInput(input: unknown): FileMetadataInput {
   const parsed = fileMetadataSchema.safeParse(input);
 
   if (!parsed.success) {
-    throw new Error("Review the file metadata fields.");
+    throw new Error("فیلدهای فراداده فایل را بررسی کنید.");
   }
 
   return parsed.data;
@@ -133,7 +133,7 @@ function normalizedExtension(filename: string): string {
 
 export function sanitizeOriginalFilename(filename: string): string {
   if (filename.includes("/") || filename.includes("\\") || filename.includes("\0")) {
-    throw new Error("Path separators are not allowed in uploaded filenames.");
+    throw new Error("استفاده از جداکننده‌های مسیر در نام فایل مجاز نیست.");
   }
 
   const basename = path.basename(filename.replaceAll("\\", "/"));
@@ -145,13 +145,13 @@ export function sanitizeOriginalFilename(filename: string): string {
     .replace(/^\.+$/, "");
 
   if (!safe || safe === "." || safe === "..") {
-    throw new Error("The uploaded filename is not safe.");
+    throw new Error("نام فایل بارگذاری‌شده ایمن نیست.");
   }
 
   const extension = normalizedExtension(safe);
 
   if (!extension || executableExtensions.has(extension) || extension.length > 10) {
-    throw new Error("This file extension is not allowed.");
+    throw new Error("پسوند این فایل مجاز نیست.");
   }
 
   const stem = safe.slice(0, safe.length - extension.length - 1).slice(0, 170);
@@ -217,11 +217,11 @@ function detectFileType(bytes: Uint8Array): string | null {
 
 export function assertCategoryMatchesType(category: FileCategory, fileType: string): void {
   if (category === FileCategory.PROFILE_IMAGE && !fileType.startsWith("image/")) {
-    throw new Error("Profile images must be image files.");
+    throw new Error("تصویر پروفایل باید از نوع تصویر باشد.");
   }
 
   if (category === FileCategory.PUBLICATION_PDF && fileType !== "application/pdf") {
-    throw new Error("Publication files must be PDFs.");
+    throw new Error("فایل انتشارات باید PDF باشد.");
   }
 }
 
@@ -253,11 +253,11 @@ export async function validateUpload(file: File, metadataInput: unknown): Promis
   }
 
   if (metadata.visibility === FileVisibility.PASSWORD_PROTECTED && !metadata.password) {
-    throw new Error("Enter a password for password-protected files.");
+    throw new Error("برای فایل دارای گذرواژه، یک گذرواژه وارد کنید.");
   }
 
   if (metadata.visibility !== FileVisibility.PASSWORD_PROTECTED && metadata.password) {
-    throw new Error("Choose password-protected visibility before adding a file password.");
+    throw new Error("پیش از افزودن گذرواژه، وضعیت «دارای گذرواژه» را انتخاب کنید.");
   }
 
   if (file.size <= 0 || file.size > MAX_FILE_SIZE_BYTES) {
@@ -268,23 +268,23 @@ export async function validateUpload(file: File, metadataInput: unknown): Promis
   const bytes = new Uint8Array(await file.arrayBuffer());
 
   if (bytes.byteLength !== file.size) {
-    throw new Error("The uploaded file could not be read safely.");
+    throw new Error("خواندن ایمن فایل بارگذاری‌شده ممکن نشد.");
   }
 
   const fileType = detectFileType(bytes);
 
   if (!fileType || !isSafeFileType(fileType)) {
-    throw new Error("This file type is not allowed or could not be verified.");
+    throw new Error("نوع فایل مجاز نیست یا امکان تأیید آن وجود ندارد.");
   }
 
   const extension = normalizedExtension(safeOriginalName);
 
   if (!mimeExtensions[fileType]?.includes(extension)) {
-    throw new Error("The filename extension does not match the file contents.");
+    throw new Error("پسوند نام فایل با محتوای آن سازگار نیست.");
   }
 
   if (file.type && file.type !== "application/octet-stream" && file.type !== fileType) {
-    throw new Error("The declared MIME type does not match the file contents.");
+    throw new Error("نوع MIME اعلام‌شده با محتوای فایل سازگار نیست.");
   }
 
   assertCategoryMatchesType(metadata.category, fileType);

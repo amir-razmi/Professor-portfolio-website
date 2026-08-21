@@ -40,7 +40,7 @@ export const createAdministratorInputSchema = z
       context.addIssue({
         code: "custom",
         path: ["passwordConfirmation"],
-        message: "Passwords do not match.",
+        message: "گذرواژه‌ها یکسان نیستند.",
       });
     }
   });
@@ -67,7 +67,7 @@ export const resetAdministratorPasswordInputSchema = z
       context.addIssue({
         code: "custom",
         path: ["passwordConfirmation"],
-        message: "Passwords do not match.",
+        message: "گذرواژه‌ها یکسان نیستند.",
       });
     }
   });
@@ -239,7 +239,7 @@ async function assertCanDeactivateSuperAdmin(
   if (activeSuperAdminCount <= 1) {
     throw new AdminManagementError(
       AdminManagementErrorCode.LAST_SUPER_ADMIN,
-      "The last active SUPER_ADMIN cannot be deactivated.",
+      "آخرین مدیر ارشد فعال را نمی‌توان غیرفعال کرد.",
       403,
     );
   }

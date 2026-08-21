@@ -12,7 +12,7 @@ import { getAdminBlogPost, getAdminBlogTaxonomy } from "@/features/blog/server/b
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Edit blog post",
+  title: "ویرایش یادداشت",
 };
 
 export default async function EditBlogPostPage({
@@ -38,7 +38,7 @@ export default async function EditBlogPostPage({
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-5xl space-y-8">
         <AdminPageHeader
-          eyebrow="Edit blog post"
+          eyebrow="ویرایش یادداشت"
           title={post.title}
           description={`Keep the article content and publication state current. The public URL is /blog/${post.slug}.`}
           actions={

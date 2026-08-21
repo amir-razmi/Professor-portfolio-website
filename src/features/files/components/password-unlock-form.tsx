@@ -37,16 +37,16 @@ export function PasswordUnlockForm({
 
       if (!response.ok || !payload?.downloadUrl) {
         setMessage(
-          payload?.fieldErrors?.password?.[0] ?? payload?.message ?? "The password is incorrect.",
+          payload?.fieldErrors?.password?.[0] ?? payload?.message ?? "گذرواژه نادرست است.",
         );
         return;
       }
 
       setPassword("");
       setUnlocked(true);
-      setMessage("File unlocked. You can download it now.");
+      setMessage("دسترسی فایل باز شد؛ اکنون می‌توانید آن را دریافت کنید.");
     } catch {
-      setMessage("The file could not be unlocked. Please try again.");
+      setMessage("باز کردن دسترسی فایل ممکن نشد. دوباره تلاش کنید.");
     } finally {
       setBusy(false);
     }
@@ -63,7 +63,7 @@ export function PasswordUnlockForm({
           download
           className="inline-flex items-center gap-2 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
-          Download file <span aria-hidden="true">↓</span>
+          دریافت فایل <span aria-hidden="true">↓</span>
         </a>
       </div>
     );
@@ -72,7 +72,7 @@ export function PasswordUnlockForm({
   return (
     <form onSubmit={unlock} className="space-y-3">
       <label htmlFor={`unlock-${unlockUrl}`} className="block text-sm font-semibold text-slate-900">
-        Enter password to download
+        برای دریافت فایل، گذرواژه را وارد کنید
       </label>
       <div className="flex flex-col gap-2 sm:flex-row">
         <input
@@ -92,7 +92,7 @@ export function PasswordUnlockForm({
           disabled={busy}
           className="min-h-11 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {busy ? "Checking…" : "Unlock"}
+          {busy ? "در حال بررسی…" : "باز کردن دسترسی"}
         </button>
       </div>
       {message ? (
@@ -101,7 +101,7 @@ export function PasswordUnlockForm({
         </p>
       ) : null}
       <p className="text-xs leading-5 text-muted">
-        This short-lived access applies only to “{fileName}” on this browser.
+        این دسترسی کوتاه‌مدت فقط برای «{fileName}» در همین مرورگر معتبر است.
       </p>
     </form>
   );

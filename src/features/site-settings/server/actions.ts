@@ -33,7 +33,7 @@ export async function updateSiteSettingsAction(
 
     return {
       status: "success",
-      message: "Site settings saved.",
+      message: "تنظیمات سایت ذخیره شد.",
       fieldErrors: {},
     };
   } catch (error) {
@@ -51,7 +51,7 @@ export async function updateSiteSettingsAction(
 
     return {
       status: "error",
-      message: "Unable to save site settings. Please try again.",
+      message: "ذخیره تنظیمات سایت ممکن نشد. دوباره تلاش کنید.",
       fieldErrors: {},
     };
   }

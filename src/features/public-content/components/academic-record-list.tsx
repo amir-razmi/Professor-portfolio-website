@@ -1,7 +1,7 @@
 import { Surface } from "@/components/ui/surface";
 
 export function AcademicRecordList({
-  emptyMessage = "No entries published yet.",
+  emptyMessage = "هنوز موردی منتشر نشده است.",
   items,
   title,
 }: Readonly<{
@@ -17,7 +17,7 @@ export function AcademicRecordList({
           {items.map((item) => (
             <li
               key={item}
-              className="border-l-2 border-accent/50 pl-4 text-sm leading-6 text-muted"
+              className="border-r-2 border-accent/50 pr-4 text-sm leading-6 text-muted"
             >
               {item}
             </li>

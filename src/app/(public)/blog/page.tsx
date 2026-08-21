@@ -14,8 +14,8 @@ import { createPublicMetadata } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = createPublicMetadata({
-  title: "Blog",
-  description: "Academic notes, research updates, and reflections.",
+  title: "یادداشت‌ها",
+  description: "یادداشت‌های دانشگاهی، تازه‌های پژوهش و دیدگاه‌ها.",
   path: "/blog",
 });
 
@@ -30,9 +30,9 @@ export default async function PublicBlogPage({
   return (
     <>
       <PublicPageHeader
-        eyebrow="Blog"
-        title="Academic notes and updates."
-        description="Published reflections on research, teaching, and the work behind an academic portfolio."
+        eyebrow="یادداشت‌ها"
+        title="یادداشت‌ها و تازه‌های دانشگاهی."
+        description="دیدگاه‌های منتشرشده درباره پژوهش، آموزش و فعالیت‌های دانشگاهی."
       />
       <Container className="py-12 sm:py-16 lg:py-20">
         <div className="space-y-8">
@@ -44,11 +44,9 @@ export default async function PublicBlogPage({
                 id="public-blog-list-heading"
                 className="text-2xl font-semibold tracking-tight text-slate-950"
               >
-                Published articles
+                مقاله‌های منتشرشده
               </h2>
-              <p className="text-sm text-muted">
-                {result.total} {result.total === 1 ? "article" : "articles"}
-              </p>
+              <p className="text-sm text-muted">{result.total} مقاله</p>
             </div>
 
             {result.items.length ? (
@@ -61,11 +59,11 @@ export default async function PublicBlogPage({
               <div className="mt-6">
                 <PublicEmptyState
                   headingLevel="h3"
-                  title="No published articles match this view."
+                  title="مقاله منتشرشده‌ای با این فیلتر پیدا نشد."
                   description={
                     query.q || query.category || query.tag
-                      ? "Try clearing a filter or searching for a different phrase."
-                      : "Published academic notes will appear here when they are ready."
+                      ? "فیلتر را پاک کنید یا عبارت دیگری را جست‌وجو کنید."
+                      : "یادداشت‌های دانشگاهی پس از آماده‌سازی در اینجا نمایش داده می‌شوند."
                   }
                 />
               </div>

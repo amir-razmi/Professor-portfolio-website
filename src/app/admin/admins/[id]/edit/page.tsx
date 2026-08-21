@@ -17,7 +17,7 @@ import { requirePageRole } from "@/server/auth/page-authorization";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Edit administrator",
+  title: "ویرایش مدیر",
 };
 
 export default async function EditAdministratorPage({
@@ -50,7 +50,7 @@ export default async function EditAdministratorPage({
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-5xl space-y-8">
         <AdminPageHeader
-          eyebrow="Administrator account"
+          eyebrow="حساب مدیر"
           title={administrator.displayName}
           description={`Manage account details and access for ${administrator.email}. Authentication secrets are never displayed.`}
           actions={
@@ -151,13 +151,13 @@ export default async function EditAdministratorPage({
 
             <dl className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm">
               <div className="flex justify-between gap-4 border-b border-slate-200 pb-3">
-                <dt className="text-slate-500">Created</dt>
+                <dt className="text-slate-500">ایجاد شده</dt>
                 <dd className="text-right font-medium text-slate-800">
                   {administrator.createdAt.toLocaleDateString("en")}
                 </dd>
               </div>
               <div className="flex justify-between gap-4 pt-3">
-                <dt className="text-slate-500">Last updated</dt>
+                <dt className="text-slate-500">آخرین به‌روزرسانی</dt>
                 <dd className="text-right font-medium text-slate-800">
                   {administrator.updatedAt.toLocaleDateString("en")}
                 </dd>

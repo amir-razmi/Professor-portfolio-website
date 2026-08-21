@@ -77,8 +77,8 @@ export const professorProfileRepository: ProfessorProfileRepository = {
         targetResource: "ProfessorProfile",
         targetId: profile.id,
         summary: existing
-          ? "Professor profile content updated."
-          : "Professor profile content created.",
+          ? "محتوای پروفایل استاد به‌روزرسانی شد."
+          : "محتوای پروفایل استاد ایجاد شد.",
         actorId,
       });
 

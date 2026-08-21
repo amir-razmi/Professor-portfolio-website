@@ -12,7 +12,7 @@ export function SiteFooter({
   return (
     <footer className="border-t border-line bg-white">
       <Container className="flex flex-col gap-3 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-        <p>{footerText ?? `${siteName} · Academic portfolio`}</p>
+        <p>{footerText ?? `${siteName} · پرتفولیوی دانشگاهی`}</p>
         {contactEmail ? (
           <a
             href={`mailto:${contactEmail}`}
@@ -21,7 +21,7 @@ export function SiteFooter({
             {contactEmail}
           </a>
         ) : (
-          <p>Built for thoughtful scholarship and clear communication.</p>
+          <p>برای ارائه روشن و دقیق فعالیت‌های علمی.</p>
         )}
       </Container>
     </footer>

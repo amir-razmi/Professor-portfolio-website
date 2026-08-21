@@ -32,7 +32,7 @@ export async function updateSiteSettingsForActor(
 
   if (!parsed.success) {
     throw new ContentValidationError(
-      "Review the highlighted site settings.",
+      "تنظیمات مشخص‌شده را بررسی کنید.",
       parsed.error.flatten().fieldErrors,
     );
   }

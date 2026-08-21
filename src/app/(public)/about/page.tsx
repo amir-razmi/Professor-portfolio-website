@@ -9,19 +9,19 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { profile, settings } = await getPublicPortfolioContent();
-  const siteName = settings?.siteName ?? "Academic Portfolio";
-  const title = profile?.fullName ? `About ${profile.fullName}` : "About the academic profile";
+  const siteName = settings?.siteName ?? "پرتفولیوی دانشگاهی";
+  const title = profile?.fullName ? `درباره ${profile.fullName}` : "درباره پروفایل دانشگاهی";
 
   return createPublicMetadata({
     title,
     description:
       profile?.shortBio ??
       settings?.siteDescription ??
-      "Biography, academic background, interests, and experience.",
+      "زندگی‌نامه، پیشینه دانشگاهی، علایق و تجربه‌های علمی.",
     path: "/about",
     siteName,
     imageUrl: safeExternalUrl(profile?.profileImageUrl ?? settings?.defaultOgImageUrl),
-    imageAlt: profile?.fullName ? `${profile.fullName} profile` : title,
+    imageAlt: profile?.fullName ? `پروفایل ${profile.fullName}` : title,
   });
 }
 

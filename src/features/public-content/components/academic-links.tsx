@@ -5,10 +5,10 @@ import type { ProfessorProfileRecord } from "@/features/professor-profile/server
 import { displayLinkLabel, safeExternalUrl } from "./public-content-utils";
 
 const linkFields = [
-  ["Website", "websiteUrl"],
+  ["وب‌سایت", "websiteUrl"],
   ["ORCID", "orcid"],
-  ["Google Scholar", "googleScholarUrl"],
-  ["ResearchGate", "researchGateUrl"],
+  ["گوگل اسکالر", "googleScholarUrl"],
+  ["ریسرچ‌گیت", "researchGateUrl"],
   ["LinkedIn", "linkedinUrl"],
   ["GitHub", "githubUrl"],
 ] as const;
@@ -24,12 +24,12 @@ export function AcademicLinks({
   });
 
   if (!links.length) {
-    return <p className="text-sm leading-7 text-muted">Academic links will be added soon.</p>;
+    return <p className="text-sm leading-7 text-muted">پیوندهای علمی به‌زودی افزوده می‌شوند.</p>;
   }
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-slate-950">Academic and social links</h3>
+      <h3 className="text-lg font-semibold text-slate-950">پیوندهای علمی و اجتماعی</h3>
       <ul className="mt-4 flex flex-wrap gap-3">
         {links.map((link) => (
           <li key={link.url}>

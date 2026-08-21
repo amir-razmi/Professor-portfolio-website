@@ -43,11 +43,11 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       <FormStatusMessage message={state.message} status={state.status} />
 
       <FormSection
-        title="Academic identity"
-        description="The primary identity and affiliation shown at the top of the public portfolio."
+        title="هویت دانشگاهی"
+        description="هویت و وابستگی دانشگاهی اصلی که در بالای پرتفولیوی عمومی نمایش داده می‌شود."
       >
         <FormField>
-          <FormLabel htmlFor="fullName">Name</FormLabel>
+          <FormLabel htmlFor="fullName">نام</FormLabel>
           <input
             id="fullName"
             name="fullName"
@@ -64,7 +64,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="title">Academic title</FormLabel>
+          <FormLabel htmlFor="title">عنوان دانشگاهی</FormLabel>
           <input
             id="title"
             name="title"
@@ -79,7 +79,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="department">Department</FormLabel>
+          <FormLabel htmlFor="department">گروه آموزشی</FormLabel>
           <input
             id="department"
             name="department"
@@ -94,7 +94,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="institution">University</FormLabel>
+          <FormLabel htmlFor="institution">دانشگاه</FormLabel>
           <input
             id="institution"
             name="institution"
@@ -109,7 +109,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </FormField>
 
         <FormField className="sm:col-span-2">
-          <FormLabel htmlFor="profileImageUrl">Profile image URL</FormLabel>
+          <FormLabel htmlFor="profileImageUrl">نشانی تصویر پروفایل</FormLabel>
           <FormHint id="profileImageUrl-hint">
             Use an HTTP or HTTPS image URL. Uploaded assets can be managed from the Files area;
             asset selection will be connected to this field in a later stage.
@@ -131,11 +131,11 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </FormSection>
 
       <FormSection
-        title="Biography"
-        description="Use the short biography for introductions and the full biography for the public about section."
+        title="زندگی‌نامه"
+        description="از زندگی‌نامه کوتاه برای معرفی و از متن کامل در صفحه درباره استفاده کنید."
       >
         <FormField className="sm:col-span-2">
-          <FormLabel htmlFor="shortBio">Short biography</FormLabel>
+          <FormLabel htmlFor="shortBio">زندگی‌نامه کوتاه</FormLabel>
           <textarea
             id="shortBio"
             name="shortBio"
@@ -150,7 +150,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </FormField>
 
         <FormField className="sm:col-span-2">
-          <FormLabel htmlFor="biography">Biography</FormLabel>
+          <FormLabel htmlFor="biography">زندگی‌نامه</FormLabel>
           <textarea
             id="biography"
             name="biography"
@@ -166,33 +166,33 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </FormSection>
 
       <FormSection
-        title="Academic background"
-        description="Enter one item per line. Blank lines are ignored and duplicate entries are removed."
+        title="پیشینه دانشگاهی"
+        description="هر مورد را در یک خط وارد کنید. خطوط خالی نادیده گرفته و موارد تکراری حذف می‌شوند."
       >
         <ListField
           name="education"
-          label="Education"
+          label="تحصیلات"
           rows={6}
           value={profile?.education}
           errors={error("education")}
         />
         <ListField
           name="academicPositions"
-          label="Academic positions"
+          label="سمت‌های دانشگاهی"
           rows={6}
           value={profile?.academicPositions}
           errors={error("academicPositions")}
         />
         <ListField
           name="experience"
-          label="Experience"
+          label="تجربه"
           rows={6}
           value={profile?.experience}
           errors={error("experience")}
         />
         <ListField
           name="awards"
-          label="Awards"
+          label="افتخارات"
           rows={6}
           value={profile?.awards}
           errors={error("awards")}
@@ -200,19 +200,19 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </FormSection>
 
       <FormSection
-        title="Academic interests"
-        description="These concise lists help visitors quickly understand current research and teaching areas."
+        title="علایق دانشگاهی"
+        description="این فهرست‌های کوتاه به بازدیدکنندگان کمک می‌کنند حوزه‌های پژوهش و آموزش را سریع‌تر بشناسند."
       >
         <ListField
           name="researchInterests"
-          label="Research interests"
+          label="علایق پژوهشی"
           rows={7}
           value={profile?.researchInterests}
           errors={error("researchInterests")}
         />
         <ListField
           name="teachingInterests"
-          label="Teaching interests"
+          label="علایق آموزشی"
           rows={7}
           value={profile?.teachingInterests}
           errors={error("teachingInterests")}
@@ -220,11 +220,11 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </FormSection>
 
       <FormSection
-        title="Contact information"
-        description="Professional contact details published in the contact section."
+        title="اطلاعات تماس"
+        description="اطلاعات تماس حرفه‌ای که در بخش تماس عمومی منتشر می‌شوند."
       >
         <FormField>
-          <FormLabel htmlFor="email">Email address</FormLabel>
+          <FormLabel htmlFor="email">نشانی ایمیل</FormLabel>
           <input
             id="email"
             name="email"
@@ -241,7 +241,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </FormField>
 
         <FormField>
-          <FormLabel htmlFor="phone">Phone</FormLabel>
+          <FormLabel htmlFor="phone">تلفن</FormLabel>
           <input
             id="phone"
             name="phone"
@@ -257,7 +257,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </FormField>
 
         <FormField className="sm:col-span-2">
-          <FormLabel htmlFor="office">Office</FormLabel>
+          <FormLabel htmlFor="office">دفتر</FormLabel>
           <input
             id="office"
             name="office"
@@ -274,12 +274,12 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </FormSection>
 
       <FormSection
-        title="Academic and social links"
-        description="Only validated HTTP or HTTPS links are accepted."
+        title="پیوندهای علمی و اجتماعی"
+        description="فقط پیوندهای معتبر HTTP یا HTTPS پذیرفته می‌شوند."
       >
         <UrlField
           name="websiteUrl"
-          label="Personal or university website"
+          label="وب‌سایت شخصی یا دانشگاهی"
           value={profile?.websiteUrl}
           errors={error("websiteUrl")}
         />
@@ -319,7 +319,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             className="mt-0.5 size-4 rounded border-slate-300 text-accent focus:ring-accent"
           />
           <span>
-            <span className="block text-sm font-semibold text-slate-950">Publish this profile</span>
+            <span className="block text-sm font-semibold text-slate-950">انتشار این پروفایل</span>
             <span className="mt-1 block text-xs leading-5 text-slate-500">
               Unpublished profiles remain available only in administration.
             </span>
@@ -331,7 +331,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           disabled={isPending}
           className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isPending ? "Saving profile…" : "Save profile"}
+          {isPending ? "در حال ذخیره پروفایل…" : "ذخیره پروفایل"}
         </button>
       </div>
     </form>
@@ -354,7 +354,7 @@ function ListField({
   return (
     <FormField>
       <FormLabel htmlFor={name}>{label}</FormLabel>
-      <FormHint id={`${name}-hint`}>One entry per line, up to 40 entries.</FormHint>
+      <FormHint id={`${name}-hint`}>هر مورد در یک خط، حداکثر ۴۰ مورد.</FormHint>
       <textarea
         id={name}
         name={name}

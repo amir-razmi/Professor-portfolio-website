@@ -137,8 +137,8 @@ function memoryStorage(initial: Record<string, Uint8Array> = {}): FileStorage & 
 }
 
 test("safe filenames reject path traversal and executable extensions", () => {
-  assert.throws(() => sanitizeOriginalFilename("../../secret.pdf"), /Path separators/);
-  assert.throws(() => sanitizeOriginalFilename("run.sh"), /extension is not allowed/);
+  assert.throws(() => sanitizeOriginalFilename("../../secret.pdf"), /جداکننده‌های مسیر/);
+  assert.throws(() => sanitizeOriginalFilename("run.sh"), /پسوند.*مجاز نیست/);
   assert.equal(sanitizeOriginalFilename("résumé final.pdf"), "résumé final.pdf");
   assert.throws(() => assertSafeStorageKey("../escape.pdf"), /Unsafe storage key/);
   assert.throws(
@@ -161,11 +161,11 @@ test("upload validation checks actual signatures, MIME agreement, size, and cate
         makeFile("paper.pdf", new TextEncoder().encode("not a pdf"), "application/pdf"),
         metadata(),
       ),
-    /file type is not allowed|contents/,
+    /نوع فایل مجاز نیست|پسوند نام فایل|contents/,
   );
   await assert.rejects(
     () => validateUpload(pdf, metadata({ category: FileCategory.PROFILE_IMAGE })),
-    /Profile images/,
+    /تصویر پروفایل/,
   );
   await assert.rejects(
     () =>
@@ -173,7 +173,7 @@ test("upload validation checks actual signatures, MIME agreement, size, and cate
         makeFile("paper.pdf", new TextEncoder().encode("%PDF-1.7\n"), "image/png"),
         metadata(),
       ),
-    /MIME type/,
+    /نوع MIME/,
   );
   await assert.rejects(
     () =>
@@ -189,7 +189,7 @@ test("upload validation checks actual signatures, MIME agreement, size, and cate
         makeFile("script.txt", new TextEncoder().encode("#!/bin/sh\necho unsafe"), "text/plain"),
         metadata(),
       ),
-    /file type is not allowed/,
+    /نوع فایل مجاز نیست/,
   );
 });
 
@@ -291,7 +291,7 @@ test("metadata updates cannot assign an incompatible file category", async () =>
         metadata({ category: FileCategory.PROFILE_IMAGE }),
         repository({ findById: async () => file }),
       ),
-    /Profile images/,
+    /تصویر پروفایل/,
   );
 });
 

@@ -5,7 +5,7 @@ import type { PublicFileRecord } from "../server/public-file-policy";
 import { PasswordUnlockForm } from "./password-unlock-form";
 
 function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(date);
+  return new Intl.DateTimeFormat("fa-IR", { dateStyle: "medium" }).format(date);
 }
 
 function formatFileType(fileType: string): string {
@@ -44,23 +44,23 @@ export function PublicFileCard({
         </span>
         {file.isPasswordProtected ? (
           <span
-            aria-label="Password-protected file"
+            aria-label="فایل دارای گذرواژه"
             className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
           >
             <LockIcon />
-            Password protected
+            دارای گذرواژه
           </span>
         ) : file.isRestricted ? (
           <span
-            aria-label="Restricted file"
+            aria-label="فایل محدود"
             className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
           >
             <LockIcon />
-            Restricted
+            محدود
           </span>
         ) : (
           <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
-            Public
+            عمومی
           </span>
         )}
       </div>
@@ -73,16 +73,16 @@ export function PublicFileCard({
           {file.description}
         </p>
       ) : (
-        <p className="mt-3 flex-1 text-sm leading-7 text-muted">Academic resource.</p>
+        <p className="mt-3 flex-1 text-sm leading-7 text-muted">منبع دانشگاهی.</p>
       )}
 
       <dl className="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted">
         <div>
-          <dt className="sr-only">File type</dt>
+          <dt className="sr-only">نوع فایل</dt>
           <dd>{formatFileType(file.fileType)}</dd>
         </div>
         <div>
-          <dt className="sr-only">Uploaded</dt>
+          <dt className="sr-only">تاریخ بارگذاری</dt>
           <dd>
             <time dateTime={file.uploadedAt.toISOString()}>{formatDate(file.uploadedAt)}</time>
           </dd>
@@ -96,7 +96,7 @@ export function PublicFileCard({
             download
             className="inline-flex items-center gap-2 rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            Download file <span aria-hidden="true">↓</span>
+            دانلود فایل <span aria-hidden="true">↓</span>
           </Link>
         ) : file.unlockUrl && file.isPasswordProtected ? (
           <PasswordUnlockForm
@@ -107,7 +107,7 @@ export function PublicFileCard({
         ) : (
           <p className="inline-flex items-center gap-2 text-sm font-medium text-muted">
             <LockIcon />
-            Available to administrators only
+            فقط برای مدیران در دسترس است
           </p>
         )}
       </div>

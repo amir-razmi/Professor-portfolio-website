@@ -17,11 +17,11 @@ import { getAdminBlogPosts, getAdminBlogTaxonomy } from "@/features/blog/server/
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Blog management",
+  title: "مدیریت یادداشت‌ها",
 };
 
 function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat("fa-IR", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);
@@ -46,15 +46,15 @@ export default async function AdminBlogPage({
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <AdminPageHeader
-          eyebrow="Blog"
-          title="Write and publish academic notes."
-          description="Create concise public updates, keep drafts private, and use categories and tags to make the archive easy to browse."
+          eyebrow="یادداشت‌ها"
+          title="یادداشت‌های دانشگاهی را بنویسید و منتشر کنید."
+          description="به‌روزرسانی‌های کوتاه ایجاد کنید، پیش‌نویس‌ها را خصوصی نگه دارید و با دسته‌بندی و برچسب، آرشیو را خواناتر کنید."
           actions={
             <Link
               href="/admin/blog/new"
               className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              New post
+              یادداشت جدید
             </Link>
           }
         />
@@ -69,29 +69,27 @@ export default async function AdminBlogPage({
                 id="blog-list-heading"
                 className="text-xl font-semibold tracking-tight text-slate-950"
               >
-                Posts
+                یادداشت‌ها
               </h2>
-              <p className="mt-1 text-sm text-slate-600">
-                {posts.total} {posts.total === 1 ? "post" : "posts"} in the workspace.
-              </p>
+              <p className="mt-1 text-sm text-slate-600">{posts.total} یادداشت در فضای مدیریت.</p>
             </div>
             <form method="get" className="flex flex-col gap-2 sm:flex-row sm:items-end">
               <div>
                 <label htmlFor="admin-blog-search" className="text-xs font-semibold text-slate-700">
-                  Search
+                  جست‌وجو
                 </label>
                 <input
                   id="admin-blog-search"
                   name="q"
                   type="search"
                   defaultValue={query.q ?? ""}
-                  placeholder="Title or excerpt"
+                  placeholder="عنوان یا خلاصه"
                   className="mt-1 min-h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 sm:w-56"
                 />
               </div>
               <div>
                 <label htmlFor="admin-blog-status" className="text-xs font-semibold text-slate-700">
-                  State
+                  وضعیت
                 </label>
                 <select
                   id="admin-blog-status"
@@ -99,17 +97,17 @@ export default async function AdminBlogPage({
                   defaultValue={query.status ?? ""}
                   className="mt-1 min-h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 sm:w-36"
                 >
-                  <option value="">All states</option>
-                  <option value={BlogPostStatus.DRAFT}>Draft</option>
-                  <option value={BlogPostStatus.PUBLISHED}>Published</option>
-                  <option value={BlogPostStatus.ARCHIVED}>Archived</option>
+                  <option value="">همه وضعیت‌ها</option>
+                  <option value={BlogPostStatus.DRAFT}>پیش‌نویس</option>
+                  <option value={BlogPostStatus.PUBLISHED}>منتشرشده</option>
+                  <option value={BlogPostStatus.ARCHIVED}>بایگانی‌شده</option>
                 </select>
               </div>
               <button
                 type="submit"
                 className="min-h-10 rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
-                Filter
+                اعمال فیلتر
               </button>
             </form>
           </div>
@@ -123,7 +121,7 @@ export default async function AdminBlogPage({
                       <div className="flex flex-wrap items-center gap-3">
                         <BlogStatusBadge status={post.status} />
                         <span className="text-xs text-slate-500">
-                          Updated {formatDate(post.updatedAt)}
+                          به‌روزرسانی: {formatDate(post.updatedAt)}
                         </span>
                       </div>
                       <h3 className="mt-3 text-lg font-semibold text-slate-950">
@@ -166,7 +164,7 @@ export default async function AdminBlogPage({
                         href={`/admin/blog/${post.id}/edit`}
                         className="text-sm font-semibold text-accent underline decoration-accent/40 underline-offset-4 hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
                       >
-                        Edit post
+                        ویرایش یادداشت
                       </Link>
                       <BlogWorkflowActions
                         canPublish={canPublish}
@@ -181,12 +179,14 @@ export default async function AdminBlogPage({
           ) : (
             <div className="mt-5 rounded-xl border border-dashed border-slate-300 px-5 py-10 text-center">
               <h3 className="text-lg font-semibold text-slate-950">
-                {query.q || query.status ? "No matching posts." : "No blog posts yet."}
+                {query.q || query.status
+                  ? "یادداشتی با این مشخصات پیدا نشد."
+                  : "هنوز یادداشتی وجود ندارد."}
               </h3>
               <p className="mt-2 text-sm leading-6 text-slate-600">
                 {query.q || query.status
-                  ? "Try a different search or state filter."
-                  : "Create the first draft when you are ready to publish an update."}
+                  ? "عبارت جست‌وجو یا فیلتر وضعیت دیگری را امتحان کنید."
+                  : "هر زمان برای انتشار آماده بودید، نخستین پیش‌نویس را ایجاد کنید."}
               </p>
             </div>
           )}

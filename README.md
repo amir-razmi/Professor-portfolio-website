@@ -32,10 +32,16 @@ authentication, and centralized role-based authorization:
 - Research status, visibility, and ordering fields plus publication type and PDF-reference fields
 - Accessible loading, empty, success, error, and forbidden states for the initial public/admin
   workflows
+- Complete blog workflow with protected post and taxonomy management, draft/publish transitions,
+  duplicate-slug validation, public search/filtering/pagination, metadata, and a published-only
+  sitemap
+- Centralized blog taxonomy permission (`MANAGE_BLOG_TAXONOMY`) for category/tag administration
+- Plain-text blog content rendering that escapes hostile markup and does not interpret raw HTML or
+  Markdown
 
-Blog/research/publication CRUD, administrator-management screens, and file uploads remain
-intentionally deferred to later stages. Profile images and publication PDFs currently use
-validated URL fields; binary storage is not implemented.
+Research/publication CRUD, administrator-management screens, and file uploads remain intentionally
+deferred to later stages. Profile images, publication PDFs, and blog cover assets currently use
+validated URL/metadata fields; binary storage is not implemented.
 
 ## Local setup
 
@@ -132,6 +138,9 @@ administrator routes are:
 - `/admin/dashboard` — account and content status overview
 - `/admin/profile` — professor profile management
 - `/admin/settings` — site-wide settings management
+- `/admin/blog` — blog post, category, and tag management
+- `/admin/blog/new` — create a draft or (for publishing-capable roles) a published post
+- `/admin/blog/[id]/edit` — edit, publish, unpublish, or delete a post
 
 The public routes are:
 
@@ -140,6 +149,9 @@ The public routes are:
 - `/research` — public research interests and projects
 - `/publications` — published scholarly work
 - `/contact` — published contact details and academic links
+- `/blog` — published blog listing with search, category/tag filters, and pagination
+- `/blog/[slug]` — a published blog article
+- `/sitemap.xml` — static public routes plus published blog slugs only
 
 ## Authentication model
 
@@ -174,6 +186,7 @@ database, so a client-supplied identity or stale session role is not trusted.
 | Manage research and publications | Yes           | Yes     | No       |
 | Create and edit blog posts       | Yes           | Yes     | Yes      |
 | Publish blog posts               | Yes           | Yes     | No       |
+| Manage blog categories/tags      | Yes           | Yes     | No       |
 | Manage files                     | Yes           | Yes     | No       |
 | Manage administrators/roles      | Yes           | No      | No       |
 | Manage authentication settings   | Yes           | No      | No       |
@@ -181,6 +194,10 @@ database, so a client-supplied identity or stale session role is not trusted.
 
 `EDITOR` publishing is deliberately disabled by the current permission matrix. It can be enabled
 later by changing the centralized matrix rather than individual pages or actions.
+
+`MANAGE_BLOG_TAXONOMY` is separate from post editing, so editors can work on posts without changing
+the site's shared category/tag vocabulary. The server-side blog policy also rejects forged
+publication-state changes even when a request bypasses the UI.
 
 The administrator role service rejects self-escalation, attempts to manage a higher-ranked
 administrator, and attempts to assign a role above the actor's own role. Successful role changes
@@ -190,21 +207,21 @@ the permission check as a defense in depth. No administrator-management UI is in
 
 ## Scripts
 
-| Command             | Purpose                                                                 |
-| ------------------- | ----------------------------------------------------------------------- |
-| `pnpm dev`          | Start the development server                                            |
-| `pnpm build`        | Generate Prisma Client and create a production build                    |
-| `pnpm start`        | Serve the production build                                              |
-| `pnpm lint`         | Run ESLint                                                              |
-| `pnpm test`         | Run focused authentication, authorization, and content-management tests |
-| `pnpm typecheck`    | Run the TypeScript compiler without emitting files                      |
-| `pnpm format`       | Format supported files with Prettier                                    |
-| `pnpm format:check` | Check formatting without writing                                        |
-| `pnpm db:generate`  | Generate Prisma Client                                                  |
-| `pnpm db:validate`  | Validate the Prisma schema                                              |
-| `pnpm db:push`      | Synchronize the Prisma schema with MongoDB                              |
-| `pnpm db:check`     | Run a read-only MongoDB ping                                            |
-| `pnpm db:seed`      | Run the guarded development seed                                        |
+| Command             | Purpose                                                                    |
+| ------------------- | -------------------------------------------------------------------------- |
+| `pnpm dev`          | Start the development server                                               |
+| `pnpm build`        | Generate Prisma Client and create a production build                       |
+| `pnpm start`        | Serve the production build                                                 |
+| `pnpm lint`         | Run ESLint                                                                 |
+| `pnpm test`         | Run focused authentication, authorization, content, public, and blog tests |
+| `pnpm typecheck`    | Run the TypeScript compiler without emitting files                         |
+| `pnpm format`       | Format supported files with Prettier                                       |
+| `pnpm format:check` | Check formatting without writing                                           |
+| `pnpm db:generate`  | Generate Prisma Client                                                     |
+| `pnpm db:validate`  | Validate the Prisma schema                                                 |
+| `pnpm db:push`      | Synchronize the Prisma schema with MongoDB                                 |
+| `pnpm db:check`     | Run a read-only MongoDB ping                                               |
+| `pnpm db:seed`      | Run the guarded development seed                                           |
 
 ## Project structure
 
@@ -217,6 +234,7 @@ src/
     admin-dashboard/   Dashboard summaries and protected admin composition
     professor-profile/ Profile schema, repository, service, actions, and form
     public-content/    Public readers, visibility policy, shared cards, and page composition
+    blog/              Blog schemas, repository/service policy, actions, admin UI, and public UI
     site-settings/     Settings schema, repository, service, actions, and form
     home/              Public portfolio page composition
   lib/                 Small shared utilities and environment parsing
@@ -232,6 +250,7 @@ prisma.config.ts       Prisma schema and seed configuration
 tests/auth/             Focused authentication and authorization tests
 tests/content/          Profile/settings validation and authorization tests
 tests/public/           Public visibility, ordering, and empty-collection tests
+tests/blog/              Blog validation, authorization, visibility, and rendering tests
 ```
 
 The data layer currently includes `AdminUser`, `ProfessorProfile`, `SiteSettings`, `BlogPost`,
@@ -241,4 +260,20 @@ server-side and are never placed in reusable presentation components. Profile li
 entered one item per line in the initial management form. `pnpm db:push` is the supported MongoDB
 schema synchronization workflow; MongoDB transactions require a replica set (a local development
 replica set or an appropriately configured hosted cluster). Public research requires both
-`isPublished=true` and `visibility=PUBLIC`; publications require `isPublished=true`.
+`isPublished=true` and `visibility=PUBLIC`; publications require `isPublished=true`; blog readers
+require `status=PUBLISHED` and a non-null `publishedAt`.
+
+## Blog content and safety
+
+Blog posts intentionally use a plain-text content field in this stage. The admin form stores
+paragraph text, and the public article component renders each paragraph as escaped React text.
+There is no Markdown parser, raw HTML support, `dangerouslySetInnerHTML`, or rich-text editor.
+Therefore strings such as `<script>alert("x")</script>` remain visible text and cannot create
+elements or event handlers. If a future stage adds Markdown or rich text, it must introduce an
+explicit, maintained sanitizer and cover the parser with security tests before changing the
+stored format.
+
+Public blog queries apply the published-state predicate in the repository and again in the
+server-side policy. The same published-only reader powers article pages, generated metadata,
+search/filter results, and `sitemap.xml`; draft and archived records are not exposed through those
+paths.

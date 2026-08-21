@@ -20,6 +20,11 @@ const navigationItems: readonly (AdminNavigationItem & {
     label: "Site settings",
     permission: Permission.MANAGE_SITE_SETTINGS,
   },
+  {
+    href: "/admin/blog",
+    label: "Blog",
+    permission: Permission.MANAGE_BLOG_POSTS,
+  },
 ];
 
 function getInitials(displayName: string): string {

@@ -45,6 +45,7 @@ test("ADMIN can manage content and files but not administrators or critical sett
     Permission.MANAGE_PUBLICATIONS,
     Permission.MANAGE_BLOG_POSTS,
     Permission.PUBLISH_BLOG_POSTS,
+    Permission.MANAGE_BLOG_TAXONOMY,
     Permission.MANAGE_FILES,
   ];
   const denied = [
@@ -66,6 +67,7 @@ test("ADMIN can manage content and files but not administrators or critical sett
 test("EDITOR can edit blog posts but cannot publish or manage other resources", () => {
   assert.equal(hasPermission(users.editor, Permission.MANAGE_BLOG_POSTS), true);
   assert.equal(hasPermission(users.editor, Permission.PUBLISH_BLOG_POSTS), false);
+  assert.equal(hasPermission(users.editor, Permission.MANAGE_BLOG_TAXONOMY), false);
 
   for (const permission of Object.values(Permission)) {
     if (permission !== Permission.MANAGE_BLOG_POSTS) {

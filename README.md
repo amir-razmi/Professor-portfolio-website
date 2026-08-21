@@ -297,6 +297,49 @@ pnpm start
 The production build does not require `ADMIN_SEED_PASSWORD` or
 `SEED_DATABASE_CONFIRMATION`; those variables are only for the guarded development seed.
 
+## Docker
+
+The repository includes a multi-stage production [Dockerfile](Dockerfile).
+It uses pnpm with the locked dependency graph, enables Next.js standalone output, copies only the
+standalone runtime, static assets, and pruned production dependency tree into the final image,
+and runs as a non-root `nextjs` user.
+
+Build the image with the public site origin used for canonical URLs and metadata:
+
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_SITE_URL=https://academic.example.edu \
+  -t professor-portfolio:latest .
+```
+
+The Docker build uses a disposable MongoDB URL only for Prisma Client generation. Do not pass
+production database credentials or application secrets as Docker build arguments.
+
+Run the container with runtime configuration supplied by the deployment environment:
+
+```bash
+docker run --rm \
+  --name professor-portfolio \
+  --publish 3000:3000 \
+  --env DATABASE_URL='mongodb+srv://USER:PASSWORD@cluster.example.mongodb.net/academic_portfolio' \
+  --env DATABASE_ENV=production \
+  --env AUTH_SECRET='replace-with-a-secret-at-least-32-characters-long' \
+  --env AUTH_TRUST_HOST=true \
+  --env NEXT_PUBLIC_SITE_URL=https://academic.example.edu \
+  --env LOCAL_STORAGE_ROOT=/app/storage \
+  --volume professor-portfolio-storage:/app/storage \
+  professor-portfolio:latest
+```
+
+Use a secret manager or orchestrator environment configuration instead of putting real values in
+shell history. The container listens on `0.0.0.0:3000` and starts the generated standalone
+server with `node server.js`. MongoDB and object storage are external services; they are not
+started by this image.
+
+The local filesystem volume is suitable only for development or a single durable host. For
+production or multiple replicas, replace the local storage provider with the documented
+S3-compatible adapter and keep the container filesystem disposable.
+
 ## Storage configuration and S3-compatible replacement
 
 The default `LocalStorageProvider` stores file bytes beneath `LOCAL_STORAGE_ROOT` and is suitable

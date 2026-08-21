@@ -1,0 +1,257 @@
+import { createHash, randomUUID } from "node:crypto";
+import path from "node:path";
+
+import { FileCategory, FileVisibility } from "@prisma/client";
+import { z } from "zod";
+
+export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+
+const allowedCategoryValues = [
+  FileCategory.PROFILE_IMAGE,
+  FileCategory.PUBLICATION_PDF,
+  FileCategory.BLOG_ASSET,
+  FileCategory.DOCUMENT,
+  FileCategory.OTHER,
+] as const;
+
+const allowedVisibilityValues = [FileVisibility.PUBLIC, FileVisibility.PRIVATE] as const;
+
+export const fileCategorySchema = z.enum(allowedCategoryValues);
+export const fileVisibilitySchema = z.enum(allowedVisibilityValues);
+
+export const fileMetadataSchema = z
+  .object({
+    displayName: z
+      .string()
+      .trim()
+      .min(1, "Enter a display name.")
+      .max(120, "Use 120 characters or fewer."),
+    category: fileCategorySchema,
+    description: z
+      .union([z.string().trim().max(500), z.null(), z.undefined()])
+      .transform((value) => (typeof value === "string" && value ? value : null)),
+    visibility: fileVisibilitySchema,
+  })
+  .strict();
+
+export type FileMetadataInput = z.output<typeof fileMetadataSchema>;
+
+export function parseFileMetadataInput(input: unknown): FileMetadataInput {
+  const parsed = fileMetadataSchema.safeParse(input);
+
+  if (!parsed.success) {
+    throw new Error("Review the file metadata fields.");
+  }
+
+  return parsed.data;
+}
+
+export function fileMetadataFormDataToInput(formData: FormData): unknown {
+  return {
+    displayName: formData.get("displayName"),
+    category: formData.get("category"),
+    description: formData.get("description"),
+    visibility: formData.get("visibility"),
+  };
+}
+
+const executableExtensions = new Set([
+  "apk",
+  "app",
+  "bat",
+  "bin",
+  "cgi",
+  "cmd",
+  "com",
+  "cpl",
+  "dll",
+  "dmg",
+  "exe",
+  "jar",
+  "js",
+  "mjs",
+  "cjs",
+  "msi",
+  "php",
+  "ps1",
+  "py",
+  "rb",
+  "sh",
+  "so",
+  "wasm",
+]);
+
+const mimeExtensions: Record<string, readonly string[]> = {
+  "application/pdf": ["pdf"],
+  "image/jpeg": ["jpg", "jpeg"],
+  "image/png": ["png"],
+  "image/webp": ["webp"],
+  "text/plain": ["txt"],
+};
+
+const safeFileTypeSet = new Set(Object.keys(mimeExtensions));
+
+export function isSafeFileType(fileType: string): boolean {
+  return safeFileTypeSet.has(fileType);
+}
+
+function normalizedExtension(filename: string): string {
+  return path.extname(filename).slice(1).toLowerCase();
+}
+
+export function sanitizeOriginalFilename(filename: string): string {
+  if (filename.includes("/") || filename.includes("\\") || filename.includes("\0")) {
+    throw new Error("Path separators are not allowed in uploaded filenames.");
+  }
+
+  const basename = path.basename(filename.replaceAll("\\", "/"));
+  const normalized = basename.normalize("NFKC").replace(/[\u0000-\u001f\u007f]/g, "");
+  const safe = normalized
+    .replace(/[^\p{L}\p{N}._ -]+/gu, "_")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^\.+$/, "");
+
+  if (!safe || safe === "." || safe === "..") {
+    throw new Error("The uploaded filename is not safe.");
+  }
+
+  const extension = normalizedExtension(safe);
+
+  if (!extension || executableExtensions.has(extension) || extension.length > 10) {
+    throw new Error("This file extension is not allowed.");
+  }
+
+  const stem = safe.slice(0, safe.length - extension.length - 1).slice(0, 170);
+  return `${stem || "uploaded-file"}.${extension}`;
+}
+
+function isPdf(bytes: Uint8Array): boolean {
+  return new TextDecoder().decode(bytes.slice(0, 5)) === "%PDF-";
+}
+
+function isPng(bytes: Uint8Array): boolean {
+  return (
+    bytes.length >= 8 &&
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4e &&
+    bytes[3] === 0x47 &&
+    bytes[4] === 0x0d &&
+    bytes[5] === 0x0a &&
+    bytes[6] === 0x1a &&
+    bytes[7] === 0x0a
+  );
+}
+
+function isJpeg(bytes: Uint8Array): boolean {
+  return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+}
+
+function isWebp(bytes: Uint8Array): boolean {
+  return (
+    bytes.length >= 12 &&
+    new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" &&
+    new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP"
+  );
+}
+
+function decodePlainText(bytes: Uint8Array): string | null {
+  if (bytes.includes(0)) {
+    return null;
+  }
+
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+  } catch {
+    return null;
+  }
+}
+
+function detectFileType(bytes: Uint8Array): string | null {
+  if (isPdf(bytes)) return "application/pdf";
+  if (isPng(bytes)) return "image/png";
+  if (isJpeg(bytes)) return "image/jpeg";
+  if (isWebp(bytes)) return "image/webp";
+
+  const text = decodePlainText(bytes);
+
+  if (text && !/^\s*(?:#!|<\?php|<script\b|@echo\b|using\s+System\b|import\s+os\b)/i.test(text)) {
+    return "text/plain";
+  }
+
+  return null;
+}
+
+export function assertCategoryMatchesType(category: FileCategory, fileType: string): void {
+  if (category === FileCategory.PROFILE_IMAGE && !fileType.startsWith("image/")) {
+    throw new Error("Profile images must be image files.");
+  }
+
+  if (category === FileCategory.PUBLICATION_PDF && fileType !== "application/pdf") {
+    throw new Error("Publication files must be PDFs.");
+  }
+}
+
+export type ValidatedUpload = FileMetadataInput & {
+  bytes: Uint8Array;
+  checksum: string;
+  fileType: string;
+  safeOriginalName: string;
+  sizeBytes: number;
+  storageKey: string;
+};
+
+export async function validateUpload(file: File, metadataInput: unknown): Promise<ValidatedUpload> {
+  const metadata = parseFileMetadataInput(metadataInput);
+
+  if (file.size <= 0 || file.size > MAX_FILE_SIZE_BYTES) {
+    throw new Error(`Files must be between 1 byte and ${MAX_FILE_SIZE_BYTES} bytes.`);
+  }
+
+  const safeOriginalName = sanitizeOriginalFilename(file.name);
+  const bytes = new Uint8Array(await file.arrayBuffer());
+
+  if (bytes.byteLength !== file.size) {
+    throw new Error("The uploaded file could not be read safely.");
+  }
+
+  const fileType = detectFileType(bytes);
+
+  if (!fileType || !isSafeFileType(fileType)) {
+    throw new Error("This file type is not allowed or could not be verified.");
+  }
+
+  const extension = normalizedExtension(safeOriginalName);
+
+  if (!mimeExtensions[fileType]?.includes(extension)) {
+    throw new Error("The filename extension does not match the file contents.");
+  }
+
+  if (file.type && file.type !== "application/octet-stream" && file.type !== fileType) {
+    throw new Error("The declared MIME type does not match the file contents.");
+  }
+
+  assertCategoryMatchesType(metadata.category, fileType);
+
+  const displayName =
+    metadata.displayName ||
+    safeOriginalName.slice(0, Math.max(1, safeOriginalName.length - extension.length - 1));
+  const checksum = createHash("sha256").update(bytes).digest("hex");
+  const storageKey = `${metadata.category.toLowerCase()}/${randomUUID()}.${extension}`;
+
+  return {
+    ...metadata,
+    bytes,
+    checksum,
+    displayName,
+    fileType,
+    safeOriginalName,
+    sizeBytes: bytes.byteLength,
+    storageKey,
+  };
+}
+
+export function objectIdIsSafe(value: string): boolean {
+  return /^[a-f\d]{24}$/i.test(value);
+}

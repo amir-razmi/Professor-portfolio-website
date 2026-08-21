@@ -6,7 +6,6 @@ import {
   AuditAction,
   BlogPostStatus,
   ContentVisibility,
-  FileVisibility,
   PublicationType,
   PrismaClient,
   ResearchItemStatus,
@@ -78,29 +77,10 @@ async function main() {
     },
   });
 
-  const fileAsset = await prisma.fileAsset.upsert({
+  // Remove the placeholder asset created by the pre-storage seed. It never had a
+  // corresponding binary and is safe to remove because the seed is development-only.
+  await prisma.fileAsset.deleteMany({
     where: { storageKey: "seed/academic-portfolio-placeholder.txt" },
-    update: {
-      originalName: "academic-portfolio-placeholder.txt",
-      mimeType: "text/plain",
-      sizeBytes: BigInt(0),
-      visibility: FileVisibility.PUBLIC,
-      uploadedById: admin.id,
-      updatedById: admin.id,
-      updatedAt: seedTimestamp,
-    },
-    create: {
-      storageKey: "seed/academic-portfolio-placeholder.txt",
-      originalName: "academic-portfolio-placeholder.txt",
-      mimeType: "text/plain",
-      sizeBytes: BigInt(0),
-      visibility: FileVisibility.PUBLIC,
-      uploadedById: admin.id,
-      createdById: admin.id,
-      updatedById: admin.id,
-      createdAt: seedTimestamp,
-      updatedAt: seedTimestamp,
-    },
   });
 
   await prisma.professorProfile.upsert({
@@ -126,7 +106,7 @@ async function main() {
       orcid: "https://orcid.org/0000-0000-0000-0000",
       googleScholarUrl: "https://scholar.google.com",
       linkedinUrl: "https://www.linkedin.com",
-      profileImageAssetId: fileAsset.id,
+      profileImageAssetId: null,
       isPublished: true,
       updatedById: admin.id,
       updatedAt: seedTimestamp,
@@ -153,7 +133,7 @@ async function main() {
       orcid: "https://orcid.org/0000-0000-0000-0000",
       googleScholarUrl: "https://scholar.google.com",
       linkedinUrl: "https://www.linkedin.com",
-      profileImageAssetId: fileAsset.id,
+      profileImageAssetId: null,
       isPublished: true,
       createdById: admin.id,
       updatedById: admin.id,
@@ -172,7 +152,7 @@ async function main() {
       timezone: "UTC",
       maintenanceMode: false,
       footerText: "Development academic portfolio.",
-      defaultOgImageId: fileAsset.id,
+      defaultOgImageId: null,
       updatedById: admin.id,
       updatedAt: seedTimestamp,
     },
@@ -185,7 +165,7 @@ async function main() {
       timezone: "UTC",
       maintenanceMode: false,
       footerText: "Development academic portfolio.",
-      defaultOgImageId: fileAsset.id,
+      defaultOgImageId: null,
       createdById: admin.id,
       updatedById: admin.id,
       createdAt: seedTimestamp,
@@ -247,7 +227,7 @@ async function main() {
       authorId: admin.id,
       categoryIds: [category.id],
       tagIds: [tag.id],
-      coverAssetId: fileAsset.id,
+      coverAssetId: null,
       updatedById: admin.id,
       updatedAt: seedTimestamp,
     },
@@ -262,7 +242,7 @@ async function main() {
       authorId: admin.id,
       categoryIds: [category.id],
       tagIds: [tag.id],
-      coverAssetId: fileAsset.id,
+      coverAssetId: null,
       createdById: admin.id,
       updatedById: admin.id,
       createdAt: seedTimestamp,

@@ -1,4 +1,5 @@
-import { Permission, requirePermission } from "@/server/auth/authorization";
+import { AdminRole } from "@prisma/client";
+import { requireRole } from "@/server/auth/authorization";
 import {
   getAdminRoleChangeFailure,
   type AdminRoleChangeFailure,
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const actor = await requirePermission(Permission.MANAGE_ADMINISTRATORS, {
+    const actor = await requireRole(AdminRole.SUPER_ADMIN, {
       onUnauthenticated: "throw",
     });
     const admin = await changeAdminRoleAs(actor, input);

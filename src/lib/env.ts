@@ -1,5 +1,6 @@
 import "server-only";
 
+import path from "node:path";
 import { z } from "zod";
 
 const serverEnvSchema = z.object({
@@ -13,6 +14,7 @@ const serverEnvSchema = z.object({
     ),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  LOCAL_STORAGE_ROOT: z.string().trim().min(1).optional(),
 });
 
 const authSecretSchema = z.string().trim().min(32);
@@ -24,6 +26,7 @@ export function getServerEnv(): ServerEnv {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     DATABASE_ENV: process.env.DATABASE_ENV,
+    LOCAL_STORAGE_ROOT: process.env.LOCAL_STORAGE_ROOT,
   });
 
   if (!result.success) {
@@ -34,6 +37,11 @@ export function getServerEnv(): ServerEnv {
   }
 
   return result.data;
+}
+
+export function getLocalStorageRoot(): string {
+  const configured = getServerEnv().LOCAL_STORAGE_ROOT;
+  return configured ? path.resolve(configured) : path.join(process.cwd(), "storage");
 }
 
 export function getAuthSecret(): string {

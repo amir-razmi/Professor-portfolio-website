@@ -31,6 +31,14 @@ enum FileVisibility {
   PRIVATE
 }
 
+enum FileCategory {
+  PROFILE_IMAGE
+  PUBLICATION_PDF
+  BLOG_ASSET
+  DOCUMENT
+  OTHER
+}
+
 enum ContentVisibility {
   PUBLIC
   PRIVATE
@@ -201,10 +209,16 @@ model BlogTag {
 
 model FileAsset {
   id                     String             @id @default(auto()) @map("_id") @db.ObjectId
+  displayName            String?
+  safeOriginalName       String?
   storageKey             String             @unique
-  originalName           String
-  mimeType               String
+  fileType               String?
+  // Legacy aliases retained so existing development records remain readable.
+  originalName           String?
+  mimeType               String?
   sizeBytes              BigInt
+  category               FileCategory?
+  description            String?
   visibility             FileVisibility     @default(PRIVATE)
   bucket                 String?
   checksum               String?
@@ -217,11 +231,14 @@ model FileAsset {
   siteSettingsOgImages   SiteSettings[]     @relation("SiteSettingsOgImage")
   createdById            String?            @db.ObjectId
   updatedById            String?            @db.ObjectId
+  uploadedAt             DateTime?
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
 
   @@index([visibility, createdAt])
-  @@index([mimeType])
+  @@index([visibility, category, createdAt])
+  @@index([fileType])
+  @@index([category])
   @@index([uploadedById])
 }
 

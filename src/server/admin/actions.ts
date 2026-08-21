@@ -1,6 +1,8 @@
 "use server";
 
-import { Permission, requirePermission } from "@/server/auth/authorization";
+import { AdminRole } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+import { requireRole } from "@/server/auth/authorization";
 
 import { changeAdminRoleAs } from "./admin-role-service";
 import {
@@ -14,11 +16,19 @@ export async function changeAdminRoleAction(
   previousState: ChangeAdminRoleActionState,
   formData: FormData,
 ): Promise<ChangeAdminRoleActionState> {
-  return executeChangeAdminRoleAction(previousState, formData, {
+  const state = await executeChangeAdminRoleAction(previousState, formData, {
     authorizeActor: () =>
-      requirePermission(Permission.MANAGE_ADMINISTRATORS, {
+      requireRole(AdminRole.SUPER_ADMIN, {
         onUnauthenticated: "throw",
       }),
     changeRole: changeAdminRoleAs,
   });
+
+  if (state.ok) {
+    revalidatePath("/admin/admins");
+    revalidatePath(`/admin/admins/${state.admin.id}/edit`);
+    revalidatePath("/admin/dashboard");
+  }
+
+  return state;
 }

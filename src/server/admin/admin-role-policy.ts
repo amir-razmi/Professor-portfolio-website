@@ -1,7 +1,7 @@
-import { AdminRole } from "@prisma/client";
+import { AdminAccountStatus, AdminRole } from "@prisma/client";
 import { z } from "zod";
 
-import { assertPermission } from "@/server/auth/access-control";
+import { assertPermission, assertRole } from "@/server/auth/access-control";
 import {
   ForbiddenError,
   getAuthorizationFailure,
@@ -26,6 +26,8 @@ export type ChangeAdminRoleInput = z.infer<typeof changeAdminRoleInputSchema>;
 export type AdminRoleRecord = {
   id: string;
   role: AdminRole;
+  isActive?: boolean;
+  status?: AdminAccountStatus;
 };
 
 export type AdminRoleChangeResult = AdminRoleRecord & {
@@ -34,6 +36,7 @@ export type AdminRoleChangeResult = AdminRoleRecord & {
 
 export type AdminRoleChangeStore = {
   findAdminById: (adminId: string) => Promise<AdminRoleRecord | null>;
+  countActiveSuperAdmins?: () => Promise<number>;
   updateAdminRole: (input: {
     actor: AuthorizationPrincipal;
     target: AdminRoleRecord;
@@ -92,7 +95,8 @@ export async function changeAdminRoleForActor(
   input: unknown,
   store: AdminRoleChangeStore,
 ): Promise<AdminRoleChangeResult> {
-  const authorizedActor = assertPermission(actor, Permission.MANAGE_ADMINISTRATORS);
+  const authorizedActor = assertRole(actor, AdminRole.SUPER_ADMIN);
+  assertPermission(authorizedActor, Permission.MANAGE_ADMINISTRATORS);
   assertPermission(authorizedActor, Permission.MANAGE_PERMISSIONS);
 
   const parsed = changeAdminRoleInputSchema.safeParse(input);
@@ -119,6 +123,22 @@ export async function changeAdminRoleForActor(
 
   if (!decision.allowed) {
     throw new ForbiddenError();
+  }
+
+  if (
+    target.role === AdminRole.SUPER_ADMIN &&
+    parsed.data.role !== AdminRole.SUPER_ADMIN &&
+    target.isActive !== false
+  ) {
+    if (!store.countActiveSuperAdmins) {
+      throw new ForbiddenError();
+    }
+
+    const activeSuperAdminCount = await store.countActiveSuperAdmins();
+
+    if (activeSuperAdminCount <= 1) {
+      throw new ForbiddenError();
+    }
   }
 
   if (target.role === parsed.data.role) {

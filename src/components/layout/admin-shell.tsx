@@ -25,6 +25,16 @@ const navigationItems: readonly (AdminNavigationItem & {
     label: "Blog",
     permission: Permission.MANAGE_BLOG_POSTS,
   },
+  {
+    href: "/admin/files",
+    label: "Files",
+    permission: Permission.MANAGE_FILES,
+  },
+  {
+    href: "/admin/admins",
+    label: "Administrators",
+    permission: Permission.MANAGE_ADMINISTRATORS,
+  },
 ];
 
 function getInitials(displayName: string): string {

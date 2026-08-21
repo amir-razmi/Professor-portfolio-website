@@ -74,6 +74,7 @@ export function hasPermission(
 
 export const RoleAssignmentDenialReason = {
   SELF_ESCALATION: "SELF_ESCALATION",
+  SELF_ROLE_CHANGE: "SELF_ROLE_CHANGE",
   MISSING_PERMISSION: "MISSING_PERMISSION",
   TARGET_OUTRANKS_ACTOR: "TARGET_OUTRANKS_ACTOR",
   ROLE_ESCALATION: "ROLE_ESCALATION",
@@ -102,6 +103,13 @@ export function evaluateRoleAssignment(
     return {
       allowed: false,
       reason: RoleAssignmentDenialReason.SELF_ESCALATION,
+    };
+  }
+
+  if (actor.id === target.id && requestedRole !== actor.role) {
+    return {
+      allowed: false,
+      reason: RoleAssignmentDenialReason.SELF_ROLE_CHANGE,
     };
   }
 

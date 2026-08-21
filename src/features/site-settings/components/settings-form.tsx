@@ -145,7 +145,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
 
       <FormSection
         title="Sharing image"
-        description="Use an image URL until the file-storage workflow is implemented."
+        description="Use an image URL until file-asset selection is connected to this setting."
       >
         <FormField className="sm:col-span-2">
           <FormLabel htmlFor="defaultOgImageUrl">Default social sharing image URL</FormLabel>

@@ -111,7 +111,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         <FormField className="sm:col-span-2">
           <FormLabel htmlFor="profileImageUrl">Profile image URL</FormLabel>
           <FormHint id="profileImageUrl-hint">
-            Use an HTTP or HTTPS image URL. File uploads will be added in a later stage.
+            Use an HTTP or HTTPS image URL. Uploaded assets can be managed from the Files area;
+            asset selection will be connected to this field in a later stage.
           </FormHint>
           <input
             id="profileImageUrl"

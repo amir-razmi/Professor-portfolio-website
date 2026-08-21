@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate, test, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # The current test suite is policy/unit based and does not require a live MongoDB service.
+      # These values satisfy server-side configuration validation without containing secrets.
+      DATABASE_URL: mongodb://127.0.0.1:27017/academic_portfolio_ci
+      DATABASE_ENV: test
+      AUTH_SECRET: ci-only-secret-that-is-longer-than-thirty-two-characters
+      AUTH_TRUST_HOST: "true"
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      LOCAL_STORAGE_ROOT: ${{ runner.temp }}/professor-portfolio-storage
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Build production bundle
+        run: pnpm build

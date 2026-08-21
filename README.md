@@ -1,9 +1,40 @@
 # Professor-portfolio-website
 
-A maintainable foundation for an academic portfolio built with Next.js App Router, TypeScript,
-Tailwind CSS, Prisma, MongoDB, and Zod.
+An academic portfolio and publishing platform for a professor or research group. The application
+provides a public, Persian-first academic website and a protected administrator workspace for
+maintaining profile content, research/publications, blog posts, files, administrators, and audit
+records. The UI is localized for Farsi and uses RTL layout; code, routes, database fields, and
+internal identifiers remain in English.
 
-## Current scope
+## Technology stack
+
+- Next.js `16.3.1` with the App Router and Server Components
+- React `19.2.8`
+- TypeScript `5.9.3` with strict checking
+- Tailwind CSS `4.1.7` and PostCSS
+- Prisma `6.19.1` with MongoDB
+- Auth.js / `next-auth` `5.0.0-beta.32` with Credentials authentication
+- Zod `4.1.11` for server-side validation
+- `bcryptjs` `3.0.3` for password hashing
+- ESLint `9.35.0`, Prettier `3.9.6`, and Node's test runner through `tsx`
+
+## Architecture overview
+
+The project follows a feature-oriented structure:
+
+1. App Router pages and layouts compose the public and administrator experiences.
+2. Presentation components render data and own only the interactivity they require.
+3. Feature schemas normalize and validate input with Zod.
+4. Server policies enforce authentication, permissions, visibility, and state transitions.
+5. Services coordinate policies, repositories, storage, cache revalidation, and audit events.
+6. Repositories are the only layer that reads or writes Prisma models.
+7. Storage providers handle file bytes independently from MongoDB metadata.
+
+Server Components are the default. Client Components are limited to interactive forms, navigation,
+file management, and password-unlock controls. Public readers query only published/public records;
+administrator pages and private file routes are dynamic and use no-store responses where needed.
+
+## Main features
 
 This stage establishes the application shell, the initial server-side data layer, administrator
 authentication, and centralized role-based authorization:
@@ -50,6 +81,25 @@ Research/publication CRUD remains intentionally deferred to a later stage. Secur
 is available at `/admin/files`; profile images, publication PDFs, and blog cover assets still use
 validated URL/metadata fields until those records are connected to the file manager.
 
+## Required environment variables
+
+Copy `.env.example` to `.env` for local development. Never commit `.env` or place secrets in
+client-exposed variables.
+
+| Variable                     | Required             | Purpose                                                                 |
+| ---------------------------- | -------------------- | ----------------------------------------------------------------------- |
+| `DATABASE_URL`               | Yes                  | Server-only MongoDB connection string                                   |
+| `DATABASE_ENV`               | Yes for seed safety  | Must be `development` for local seed operations                         |
+| `AUTH_SECRET`                | Yes                  | At least 32 characters; signs/encrypts Auth.js and file-access tokens   |
+| `AUTH_TRUST_HOST`            | Deployment-dependent | Set to `true` behind a trusted reverse proxy                            |
+| `NEXT_PUBLIC_SITE_URL`       | Recommended          | Public HTTPS origin for canonical URLs, sitemap, and same-origin checks |
+| `LOCAL_STORAGE_ROOT`         | Optional             | Local file root; defaults to `./storage`                                |
+| `ADMIN_SEED_PASSWORD`        | Seed only            | Initial development administrator password; never committed             |
+| `SEED_DATABASE_CONFIRMATION` | Seed only            | Must be `YES` to permit the guarded seed                                |
+
+`DATABASE_URL`, `AUTH_SECRET`, `ADMIN_SEED_PASSWORD`, and storage credentials for a future
+provider are server-only values. Do not prefix them with `NEXT_PUBLIC_`.
+
 ## Local setup
 
 Requirements:
@@ -57,6 +107,7 @@ Requirements:
 - Node.js 20.9 or newer
 - pnpm 10 or newer
 - A MongoDB connection string for Prisma operations
+- OpenSSL or another secure random secret generator
 
 Create a local environment file only when one does not already exist:
 
@@ -64,11 +115,13 @@ Create a local environment file only when one does not already exist:
 cp -n .env.example .env
 ```
 
-Set `DATABASE_ENV=development` and a development MongoDB URL in `.env`, then install dependencies:
+Install dependencies, then set `DATABASE_ENV=development` and a development MongoDB URL in `.env`:
 
 ```bash
 pnpm install
 ```
+
+Edit `.env` and replace the placeholder values before starting the application.
 
 `LOCAL_STORAGE_ROOT` defaults to `./storage`. The directory is created on demand, is ignored by
 Git, and is intended for local development only.
@@ -105,6 +158,24 @@ pnpm db:push
 `prisma db push` is the MongoDB schema workflow for this project. Relational migration
 commands are not used. Do not run destructive flags against a shared or production database.
 
+## MongoDB setup
+
+For local development, run MongoDB locally and use a development-named database such as
+`academic_portfolio_dev`. MongoDB transactions used by administrator, blog, file, and audit
+operations require a replica set; use a local replica set or a hosted MongoDB deployment that
+supports transactions.
+
+For MongoDB Atlas or another hosted provider:
+
+1. Create a database user with only the permissions required by this application.
+2. Restrict network access to application hosts or trusted development IPs.
+3. Put the `mongodb+srv://` connection string only in the deployment secret store.
+4. Use a database name containing `dev`, `development`, or `test` for local seed operations.
+5. Do not run `db:push` or seed commands against production without an explicit review.
+
+The repository includes `docker-compose.test.yaml` for optional local test infrastructure. It is
+not required for the policy/unit test suite and is not a production deployment manifest.
+
 Run a read-only connectivity check:
 
 ```bash
@@ -133,6 +204,20 @@ The seed contains fake `.test` values, is idempotent, and refuses production or
 non-development-named connection strings. On the first run it hashes `ADMIN_SEED_PASSWORD` into
 the development administrator record; it never stores the plaintext password or writes secrets
 to audit logs. Later seed runs preserve an existing administrator hash.
+
+## Database and seed command reference
+
+| Command            | Effect                                          | Safety                       |
+| ------------------ | ----------------------------------------------- | ---------------------------- |
+| `pnpm db:generate` | Generates Prisma Client                         | Read-only database-wise      |
+| `pnpm db:validate` | Validates `prisma/schema.prisma`                | Read-only                    |
+| `pnpm db:push`     | Synchronizes the MongoDB schema                 | Review target database first |
+| `pnpm db:check`    | Performs a read-only MongoDB connectivity check | Read-only                    |
+| `pnpm db:seed`     | Runs the guarded development seed               | Refuses unsafe environments  |
+
+MongoDB does not use relational migration files in this project. The seed writes fake
+development-only records, is idempotent, hashes the initial administrator password, and refuses
+production or non-development-named databases.
 
 Start the development server:
 
@@ -182,6 +267,67 @@ validated and bcrypt-hashed before persistence. A successful visitor unlock crea
 HTTP-only cookie scoped to that file's download endpoint for 15 minutes. The cookie contains no
 plaintext password and is invalidated when an administrator changes or removes the password.
 Private files remain unavailable to public download routes.
+
+## Production build and deployment
+
+Before deployment:
+
+1. Run `pnpm install --frozen-lockfile`.
+2. Provide production `DATABASE_URL`, `AUTH_SECRET`, and `NEXT_PUBLIC_SITE_URL` through the
+   platform secret/environment manager.
+3. Set `AUTH_TRUST_HOST=true` only when the reverse proxy is trusted and forwards the correct
+   host/protocol headers.
+4. Apply the reviewed Prisma schema to the intended MongoDB database with `pnpm db:push`; do not
+   run the guarded seed against production.
+5. Build with `pnpm build`.
+6. Serve with `pnpm start` behind HTTPS and a reverse proxy/load balancer.
+7. Configure persistent object storage, backups, monitoring, and rate limiting before accepting
+   public traffic.
+
+The application is a normal Node.js Next.js server. A platform deployment must preserve the
+runtime environment and filesystem/storage configuration across restarts. Do not rely on the
+ephemeral filesystem of a serverless deployment for uploaded files.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm build
+pnpm start
+```
+
+The production build does not require `ADMIN_SEED_PASSWORD` or
+`SEED_DATABASE_CONFIRMATION`; those variables are only for the guarded development seed.
+
+## Storage configuration and S3-compatible replacement
+
+The default `LocalStorageProvider` stores file bytes beneath `LOCAL_STORAGE_ROOT` and is suitable
+for development or a small single-instance installation. The database stores metadata and a
+random storage key, never the binary or a private filesystem path.
+
+For production, implement the `StorageProvider` contract in
+`src/lib/storage/storage-provider.ts` with an S3-compatible adapter that:
+
+1. Uses a private bucket and server-only credentials.
+2. Maps `put`, `get`, and `delete` to the provider SDK.
+3. Reuses the existing validated storage keys.
+4. Streams objects through the existing server download routes.
+5. Does not return bucket names, credentials, signed URLs, or internal paths in public JSON.
+
+Keep metadata operations in the file repository/service and storage operations behind the provider
+interface. Migrate existing objects and verify checksums before switching providers.
+
+Local storage has no built-in cross-instance replication. A lost local volume can make metadata
+unavailable even when MongoDB is healthy, so production deployments should use durable object
+storage with versioning and lifecycle policies.
+
+## Backup and data retention
+
+- Back up MongoDB with provider-native scheduled snapshots or an equivalent tested backup process.
+- Back up the object-storage bucket separately; MongoDB backups do not contain uploaded binaries.
+- Test restoration of both metadata and files, including storage-key/checksum consistency.
+- Define retention periods for administrator audit logs, uploaded files, and disabled accounts with
+  the university's privacy and records policies.
+- Do not retain passwords, session tokens, access cookies, or secrets in backups or audit metadata.
+- Document who can restore data and record restoration activity.
 
 ## Authentication model
 
@@ -280,6 +426,87 @@ supported by the centralized audit service for the later CRUD stage.
 | `pnpm db:check`     | Run a read-only MongoDB ping                                                            |
 | `pnpm db:seed`      | Run the guarded development seed                                                        |
 
+## GitHub Actions CI/CD
+
+The workflow at `.github/workflows/ci.yml` runs for pull requests targeting `main` and for
+pushes to `main`. It:
+
+1. Checks out the repository.
+2. Installs pnpm `10.17.1` and Node.js `20.x`.
+3. Restores the pnpm dependency cache.
+4. Installs with `pnpm install --frozen-lockfile`.
+5. Runs formatting, ESLint, TypeScript, the focused test suite, and the production build.
+
+The current CI workflow does not deploy to a hosting platform and does not require GitHub Secrets.
+It uses an ephemeral, non-production MongoDB URL and a CI-only Auth.js secret solely to satisfy
+configuration validation. The test suite is policy/unit based, so CI does not start MongoDB or
+seed a database. If integration tests are added later, provide a disposable MongoDB service or
+dedicated test URI and keep it separate from production.
+
+For a future deployment job, keep it separate from `validate` and add only the target platform's
+required secrets (for example, a deployment token, project identifier, and production
+environment variables) in GitHub repository or environment secrets. Never copy `.env` into the
+repository or print secret values in workflow logs.
+
+Run the same checks locally:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+## Troubleshooting
+
+### Prisma cannot connect to MongoDB
+
+Check that `DATABASE_URL` uses `mongodb://` or `mongodb+srv://`, the server is reachable, and
+the MongoDB deployment supports the replica-set transactions used by this application. Run
+`pnpm db:check` before `pnpm db:push`.
+
+### Prisma reports a schema/client mismatch
+
+Run `pnpm db:generate`, then `pnpm db:validate`. Do not use relational migration commands; this
+project uses `prisma db push` for MongoDB schema synchronization.
+
+### The seed refuses to run
+
+The seed intentionally requires all of the following:
+
+- `DATABASE_ENV=development`
+- `SEED_DATABASE_CONFIRMATION=YES`
+- a `DATABASE_URL` whose database name contains `dev`, `development`, or `test`
+- `ADMIN_SEED_PASSWORD`
+- a non-production `NODE_ENV`
+
+Verify each condition without printing the secret value.
+
+### Login fails after changing environment variables
+
+Confirm `AUTH_SECRET` is at least 32 characters, restart the server after changing `.env`, and
+verify that the administrator record is `ACTIVE` with `isActive=true`. Login deliberately returns
+one generic error for unknown, inactive, and incorrect credentials.
+
+### Uploaded files disappear after restart or deployment
+
+The default local provider writes to `LOCAL_STORAGE_ROOT`. Ensure that directory is on a durable
+volume for a single-instance deployment, or replace the provider with an S3-compatible adapter
+before using multiple instances or an ephemeral/serverless filesystem.
+
+### A protected administrator page redirects to login
+
+This is expected when the session is missing, expired, or the administrator was disabled. Check
+the browser's secure-cookie/proxy configuration and `AUTH_TRUST_HOST` only when the proxy is
+trusted.
+
+### A custom mutation returns a same-origin error
+
+Browser mutations must include a same-origin `Origin` or `Referer` header. Check that the public
+origin, reverse proxy headers, and `NEXT_PUBLIC_SITE_URL` are consistent.
+
 ## Project structure
 
 ```text
@@ -301,6 +528,7 @@ src/
     storage/            Server-only storage contract and local filesystem provider
   server/admin/        Protected administrator-domain policies, actions, and services
   server/auth/         Authentication, roles, permissions, and authorization helpers
+  server/security/     Same-origin request protection for custom mutation routes
   server/audit/        Centralized sanitized audit-log writer
   server/db/           Compatibility export for server-only database access
   types/               Auth.js TypeScript module augmentation
@@ -309,12 +537,15 @@ prisma/
   seed.ts              Guarded development seed
   check-connection.ts  Read-only connectivity check
 prisma.config.ts       Prisma schema and seed configuration
+.github/workflows/
+  ci.yml               Pull-request and main-branch quality/build pipeline
 tests/auth/             Focused authentication and authorization tests
 tests/content/          Profile/settings validation and authorization tests
 tests/public/           Public visibility, ordering, and empty-collection tests
 tests/blog/              Blog validation, authorization, visibility, and rendering tests
 tests/files/             Upload, storage, download, and cleanup security tests
 tests/audit/             Audit sanitization, event shape, and authorization tests
+tests/security/           Same-origin and request-security tests
 ```
 
 The data layer currently includes `AdminUser`, `ProfessorProfile`, `SiteSettings`, `BlogPost`,

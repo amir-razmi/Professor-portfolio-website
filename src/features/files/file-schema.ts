@@ -14,10 +14,32 @@ const allowedCategoryValues = [
   FileCategory.OTHER,
 ] as const;
 
-const allowedVisibilityValues = [FileVisibility.PUBLIC, FileVisibility.PRIVATE] as const;
+const allowedVisibilityValues = [
+  FileVisibility.PUBLIC,
+  FileVisibility.PASSWORD_PROTECTED,
+  FileVisibility.PRIVATE,
+] as const;
 
 export const fileCategorySchema = z.enum(allowedCategoryValues);
 export const fileVisibilitySchema = z.enum(allowedVisibilityValues);
+export const filePasswordSchema = z
+  .string()
+  .trim()
+  .min(12, "File passwords must be at least 12 characters.")
+  .max(128, "File passwords must be 128 characters or fewer.");
+export const fileUnlockSchema = z
+  .object({
+    password: filePasswordSchema,
+  })
+  .strict();
+
+const optionalPasswordSchema = z
+  .union([filePasswordSchema, z.literal(""), z.null(), z.undefined()])
+  .transform((value) => (typeof value === "string" && value ? value : undefined));
+
+const booleanFormValueSchema = z
+  .union([z.boolean(), z.literal("true"), z.literal("false"), z.literal("on"), z.literal("")])
+  .transform((value) => value === true || value === "true" || value === "on");
 
 export const fileMetadataSchema = z
   .object({
@@ -31,10 +53,18 @@ export const fileMetadataSchema = z
       .union([z.string().trim().max(500), z.null(), z.undefined()])
       .transform((value) => (typeof value === "string" && value ? value : null)),
     visibility: fileVisibilitySchema,
+    password: optionalPasswordSchema,
+    clearPassword: booleanFormValueSchema.optional().default(false),
   })
   .strict();
 
 export type FileMetadataInput = z.output<typeof fileMetadataSchema>;
+export type FileMetadataPersistenceInput = Omit<FileMetadataInput, "password" | "clearPassword">;
+
+export type StoredPasswordState = {
+  passwordHash: string | null;
+  passwordVersion: string | null;
+};
 
 export function parseFileMetadataInput(input: unknown): FileMetadataInput {
   const parsed = fileMetadataSchema.safeParse(input);
@@ -52,6 +82,8 @@ export function fileMetadataFormDataToInput(formData: FormData): unknown {
     category: formData.get("category"),
     description: formData.get("description"),
     visibility: formData.get("visibility"),
+    password: formData.get("password"),
+    clearPassword: formData.get("clearPassword") ?? undefined,
   };
 }
 
@@ -193,17 +225,40 @@ export function assertCategoryMatchesType(category: FileCategory, fileType: stri
   }
 }
 
-export type ValidatedUpload = FileMetadataInput & {
+export type ValidatedUpload = FileMetadataPersistenceInput & {
   bytes: Uint8Array;
   checksum: string;
   fileType: string;
+  password?: string;
   safeOriginalName: string;
   sizeBytes: number;
   storageKey: string;
 };
 
+export type StoredUpload = FileMetadataPersistenceInput &
+  StoredPasswordState & {
+    bytes: Uint8Array;
+    checksum: string;
+    fileType: string;
+    safeOriginalName: string;
+    sizeBytes: number;
+    storageKey: string;
+  };
+
 export async function validateUpload(file: File, metadataInput: unknown): Promise<ValidatedUpload> {
   const metadata = parseFileMetadataInput(metadataInput);
+
+  if (metadata.clearPassword) {
+    throw new Error("A new upload cannot remove a file password.");
+  }
+
+  if (metadata.visibility === FileVisibility.PASSWORD_PROTECTED && !metadata.password) {
+    throw new Error("Enter a password for password-protected files.");
+  }
+
+  if (metadata.visibility !== FileVisibility.PASSWORD_PROTECTED && metadata.password) {
+    throw new Error("Choose password-protected visibility before adding a file password.");
+  }
 
   if (file.size <= 0 || file.size > MAX_FILE_SIZE_BYTES) {
     throw new Error(`Files must be between 1 byte and ${MAX_FILE_SIZE_BYTES} bytes.`);
@@ -239,13 +294,21 @@ export async function validateUpload(file: File, metadataInput: unknown): Promis
     safeOriginalName.slice(0, Math.max(1, safeOriginalName.length - extension.length - 1));
   const checksum = createHash("sha256").update(bytes).digest("hex");
   const storageKey = `${metadata.category.toLowerCase()}/${randomUUID()}.${extension}`;
+  const password = metadata.password;
+  const persistedMetadata: FileMetadataPersistenceInput = {
+    displayName: metadata.displayName,
+    category: metadata.category,
+    description: metadata.description,
+    visibility: metadata.visibility,
+  };
 
   return {
-    ...metadata,
+    ...persistedMetadata,
     bytes,
     checksum,
     displayName,
     fileType,
+    ...(password ? { password } : {}),
     safeOriginalName,
     sizeBytes: bytes.byteLength,
     storageKey,

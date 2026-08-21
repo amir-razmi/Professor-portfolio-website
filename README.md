@@ -17,6 +17,7 @@ authentication, and centralized role-based authorization:
 - Prisma 6.19.1 schema for administration, profile/settings, publishing, assets, research, and auditing
 - Development-only, idempotent seed data with an explicit safety guard
 - File metadata and storage keys without storing uploaded binary content in MongoDB
+- Public, password-protected, and private file access with short-lived signed unlock cookies
 - Auth.js credentials authentication with an encrypted JWT session cookie
 - Bcrypt password hashing, server-side Zod validation, login, logout, and protected admin access
 - Centralized role and permission checks for server components, actions, route handlers, and services
@@ -161,10 +162,21 @@ The public routes are:
 - `/contact` — published contact details and academic links
 - `/blog` — published blog listing with search, category/tag filters, and pagination
 - `/blog/[slug]` — a published blog article
+- `/files` — public, password-protected, and restricted academic file records
 - `/sitemap.xml` — static public routes plus published blog slugs only
-- `/api/files/public/[id]` — streams a public file; private files return a generic `404`
+- `/api/files/public/[id]` — streams a public file or an unlocked password-protected file
+- `/api/files/public/[id]/unlock` — verifies a file password and issues a short-lived HTTP-only
+  signed access cookie
 - `/api/admin/files/[id]/download` — authenticated file-manager download for public or private
   assets
+
+Public file access
+
+Files use one `FileVisibility` state: `PUBLIC`, `PASSWORD_PROTECTED`, or `PRIVATE`. Passwords are
+validated and bcrypt-hashed before persistence. A successful visitor unlock creates a signed,
+HTTP-only cookie scoped to that file's download endpoint for 15 minutes. The cookie contains no
+plaintext password and is invalidated when an administrator changes or removes the password.
+Private files remain unavailable to public download routes.
 
 ## Authentication model
 

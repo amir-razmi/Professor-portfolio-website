@@ -4,6 +4,7 @@ import { getAuthorizationFailure } from "@/server/auth/authorization-error";
 import { fileErrorResponse } from "@/features/files/server/file-errors";
 import { fileMetadataFormDataToInput, MAX_FILE_SIZE_BYTES } from "@/features/files/file-schema";
 import { listAdminFiles, uploadFile } from "@/features/files/server/file-service";
+import { serializeAdminFile } from "@/features/files/server/file-serialization";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,25 +32,6 @@ function authOrFileError(error: unknown): Response {
   );
 }
 
-function serializeFile(file: Awaited<ReturnType<typeof listAdminFiles>>[number]) {
-  return {
-    id: file.id,
-    displayName: file.displayName,
-    safeOriginalName: file.safeOriginalName,
-    fileType: file.fileType,
-    sizeBytes: file.sizeBytes,
-    category: file.category,
-    description: file.description,
-    visibility: file.visibility,
-    checksum: file.checksum,
-    uploadedAt: file.uploadedAt.toISOString(),
-    uploaderName: file.uploaderName,
-    updatedAt: file.updatedAt.toISOString(),
-    downloadUrl: file.visibility === "PUBLIC" ? `/api/files/public/${file.id}` : null,
-    adminDownloadUrl: `/api/admin/files/${file.id}/download`,
-  };
-}
-
 export async function GET() {
   try {
     const actor = await requirePermission(Permission.MANAGE_FILES, {
@@ -58,7 +40,7 @@ export async function GET() {
     const files = await listAdminFiles(actor);
 
     return Response.json(
-      { files: files.map(serializeFile) },
+      { files: files.map(serializeAdminFile) },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {
@@ -103,7 +85,7 @@ export async function POST(request: Request) {
     const file = await uploadFile(actor, fileValue, fileMetadataFormDataToInput(formData));
 
     return Response.json(
-      { file: serializeFile(file) },
+      { file: serializeAdminFile(file) },
       { status: 201, headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {

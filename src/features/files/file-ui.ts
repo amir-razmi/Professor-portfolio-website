@@ -10,6 +10,7 @@ export type FileCategoryValue = (typeof FILE_CATEGORY)[keyof typeof FILE_CATEGOR
 
 export const FILE_VISIBILITY = {
   PUBLIC: "PUBLIC",
+  PASSWORD_PROTECTED: "PASSWORD_PROTECTED",
   PRIVATE: "PRIVATE",
 } as const;
 

@@ -1,17 +1,25 @@
+import { randomUUID } from "node:crypto";
+
 import { FileCategory, FileVisibility } from "@prisma/client";
 
 import { assertPermission } from "@/server/auth/access-control";
+import { hashPassword, verifyPassword } from "@/server/auth/password";
 import { Permission, type AuthorizationPrincipal } from "@/server/auth/permissions";
 
 import {
   fileMetadataSchema,
   assertCategoryMatchesType,
+  fileUnlockSchema,
   objectIdIsSafe,
   type FileMetadataInput,
+  type FileMetadataPersistenceInput,
+  type StoredUpload,
+  type StoredPasswordState,
   validateUpload,
   type ValidatedUpload,
 } from "../file-schema";
 import { FileOperationError } from "./file-errors";
+import { createFileAccessToken, verifyFileAccessToken } from "./file-access-token";
 
 export type FileRecord = {
   id: string;
@@ -23,6 +31,7 @@ export type FileRecord = {
   category: FileCategory;
   description: string | null;
   visibility: FileVisibility;
+  hasPassword: boolean;
   checksum: string | null;
   uploadedAt: Date;
   uploaderId: string;
@@ -31,12 +40,25 @@ export type FileRecord = {
   updatedAt: Date;
 };
 
+export type FilePasswordAccess = {
+  id: string;
+  visibility: FileVisibility;
+  passwordHash: string | null;
+  passwordVersion: string | null;
+};
+
 export type FileRepository = {
   list: () => Promise<FileRecord[]>;
   findById: (id: string) => Promise<FileRecord | null>;
   findPublicById: (id: string) => Promise<FileRecord | null>;
-  create: (input: ValidatedUpload, actorId: string) => Promise<FileRecord>;
-  updateMetadata: (id: string, input: FileMetadataInput, actorId: string) => Promise<FileRecord>;
+  findPasswordAccess: (id: string) => Promise<FilePasswordAccess | null>;
+  create: (input: StoredUpload, actorId: string) => Promise<FileRecord>;
+  updateMetadata: (
+    id: string,
+    input: FileMetadataPersistenceInput,
+    actorId: string,
+    passwordState?: StoredPasswordState,
+  ) => Promise<FileRecord>;
   delete: (id: string, actorId: string) => Promise<void>;
 };
 
@@ -101,8 +123,26 @@ export async function uploadFileForActor(
     validated = await validateUpload(file, parsedMetadata.data);
   } catch (error) {
     const message = error instanceof Error ? error.message : "The uploaded file is invalid.";
-    invalid(message, { file: [message] });
+    const field = /password/i.test(message) ? "password" : "file";
+    invalid(message, { [field]: [message] });
   }
+
+  const passwordHash = validated.password ? await hashPassword(validated.password) : null;
+  const passwordVersion = validated.password ? randomUUID() : null;
+  const storedUpload: StoredUpload = {
+    displayName: validated.displayName,
+    category: validated.category,
+    description: validated.description,
+    visibility: validated.visibility,
+    bytes: validated.bytes,
+    checksum: validated.checksum,
+    fileType: validated.fileType,
+    safeOriginalName: validated.safeOriginalName,
+    sizeBytes: validated.sizeBytes,
+    storageKey: validated.storageKey,
+    passwordHash,
+    passwordVersion,
+  };
 
   try {
     await storage.put(validated.storageKey, validated.bytes);
@@ -114,7 +154,7 @@ export async function uploadFileForActor(
   }
 
   try {
-    return await repository.create(validated, authorizedActor.id);
+    return await repository.create(storedUpload, authorizedActor.id);
   } catch (error) {
     try {
       await storage.delete(validated.storageKey);
@@ -150,7 +190,53 @@ export async function updateFileMetadataForActor(
     invalid(error instanceof Error ? error.message : "The file category is not compatible.");
   }
 
-  return repository.updateMetadata(fileId, metadata, authorizedActor.id);
+  let passwordState: StoredPasswordState | undefined;
+
+  if (metadata.visibility === FileVisibility.PASSWORD_PROTECTED) {
+    if (metadata.clearPassword) {
+      invalid("Keep a password set while using password-protected visibility.", {
+        clearPassword: ["Remove protection by choosing Public or Private visibility."],
+      });
+    }
+
+    if (metadata.password) {
+      passwordState = {
+        passwordHash: await hashPassword(metadata.password),
+        passwordVersion: randomUUID(),
+      };
+    } else if (!current.hasPassword) {
+      invalid("Enter a password for password-protected files.", {
+        password: ["Enter a password before selecting password-protected visibility."],
+      });
+    }
+  } else {
+    if (metadata.password) {
+      invalid("Choose password-protected visibility before adding a file password.", {
+        password: ["Choose Password-protected visibility first."],
+      });
+    }
+
+    if (current.hasPassword && !metadata.clearPassword) {
+      invalid("Confirm removal before changing away from password protection.", {
+        clearPassword: ["Check the removal confirmation box to continue."],
+      });
+    }
+
+    // Switching away from password protection is an explicit, fail-safe removal.
+    passwordState = {
+      passwordHash: null,
+      passwordVersion: null,
+    };
+  }
+
+  const persistedMetadata: FileMetadataPersistenceInput = {
+    displayName: metadata.displayName,
+    category: metadata.category,
+    description: metadata.description,
+    visibility: metadata.visibility,
+  };
+
+  return repository.updateMetadata(fileId, persistedMetadata, authorizedActor.id, passwordState);
 }
 
 async function readObject(object: {
@@ -216,6 +302,7 @@ export async function getPublicFileForDownload(
   id: string,
   repository: FileRepository,
   storage: FileStorage,
+  accessToken?: string,
 ): Promise<{
   file: FileRecord;
   object: { body: ReadableStream<Uint8Array>; sizeBytes: number };
@@ -230,9 +317,63 @@ export async function getPublicFileForDownload(
     return null;
   }
 
+  if (file.visibility === FileVisibility.PASSWORD_PROTECTED) {
+    const access = await repository.findPasswordAccess(file.id);
+
+    if (
+      !access ||
+      !access.passwordHash ||
+      !access.passwordVersion ||
+      !accessToken ||
+      !verifyFileAccessToken(accessToken, file.id, access.passwordVersion)
+    ) {
+      return null;
+    }
+  }
+
   const object = await storage.get(file.storageKey);
 
   return object ? { file, object } : null;
+}
+
+export async function unlockPublicFile(
+  id: string,
+  input: unknown,
+  repository: FileRepository,
+): Promise<{ token: string; expiresAt: Date }> {
+  if (!objectIdIsSafe(id)) {
+    throw new FileOperationError("The password could not unlock this file.", "INVALID_INPUT", {
+      password: ["The password is incorrect."],
+    });
+  }
+
+  const parsed = fileUnlockSchema.safeParse(input);
+
+  if (!parsed.success) {
+    throw new FileOperationError("The password could not unlock this file.", "INVALID_INPUT", {
+      password: ["Enter the file password."],
+    });
+  }
+
+  const access = await repository.findPasswordAccess(id);
+  const valid =
+    access?.visibility === FileVisibility.PASSWORD_PROTECTED &&
+    Boolean(access.passwordHash) &&
+    Boolean(access.passwordVersion) &&
+    (await verifyPassword(parsed.data.password, access.passwordHash));
+
+  if (!valid || !access?.passwordVersion) {
+    throw new FileOperationError("The password could not unlock this file.", "INVALID_INPUT", {
+      password: ["The password is incorrect."],
+    });
+  }
+
+  const token = createFileAccessToken(id, access.passwordVersion);
+
+  return {
+    token,
+    expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+  };
 }
 
 export async function getFileForDownloadForActor(

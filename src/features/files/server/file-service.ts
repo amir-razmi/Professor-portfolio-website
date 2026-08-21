@@ -7,6 +7,7 @@ import {
   getFileForDownloadForActor,
   getPublicFileForDownload,
   listFilesForActor,
+  unlockPublicFile,
   updateFileMetadataForActor,
   uploadFileForActor,
 } from "./file-policy";
@@ -43,8 +44,12 @@ export function deleteFile(actor: Parameters<typeof deleteFileForActor>[0], id: 
   return deleteFileForActor(actor, id, fileRepository, storage);
 }
 
-export function getPublicFileDownload(id: string) {
-  return getPublicFileForDownload(id, fileRepository, storage);
+export function getPublicFileDownload(id: string, accessToken?: string) {
+  return getPublicFileForDownload(id, fileRepository, storage, accessToken);
+}
+
+export function unlockFile(id: string, input: unknown) {
+  return unlockPublicFile(id, input, fileRepository);
 }
 
 export function getAdminFileDownload(

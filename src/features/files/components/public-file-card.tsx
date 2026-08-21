@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { FILE_CATEGORY_LABELS } from "../file-ui";
 import type { PublicFileRecord } from "../server/public-file-policy";
+import { PasswordUnlockForm } from "./password-unlock-form";
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(date);
@@ -41,7 +42,15 @@ export function PublicFileCard({
         <span className="rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-orange-900">
           {FILE_CATEGORY_LABELS[file.category]}
         </span>
-        {file.isRestricted ? (
+        {file.isPasswordProtected ? (
+          <span
+            aria-label="Password-protected file"
+            className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+          >
+            <LockIcon />
+            Password protected
+          </span>
+        ) : file.isRestricted ? (
           <span
             aria-label="Restricted file"
             className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
@@ -89,6 +98,12 @@ export function PublicFileCard({
           >
             Download file <span aria-hidden="true">↓</span>
           </Link>
+        ) : file.unlockUrl && file.isPasswordProtected ? (
+          <PasswordUnlockForm
+            downloadUrl={`/api/files/public/${file.id}`}
+            fileName={file.displayName}
+            unlockUrl={file.unlockUrl}
+          />
         ) : (
           <p className="inline-flex items-center gap-2 text-sm font-medium text-muted">
             <LockIcon />

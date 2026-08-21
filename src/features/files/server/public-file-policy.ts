@@ -15,11 +15,15 @@ export type PublicFileRecord = {
   visibility: FileVisibility;
   uploadedAt: Date;
   isRestricted: boolean;
+  isPasswordProtected: boolean;
   downloadUrl: string | null;
+  unlockUrl: string | null;
 };
 
 export function toPublicFileRecord(file: FileRecord): PublicFileRecord {
   const isRestricted = file.visibility !== FileVisibility.PUBLIC;
+  const isPasswordProtected =
+    file.visibility === FileVisibility.PASSWORD_PROTECTED && file.hasPassword;
 
   return {
     id: file.id,
@@ -30,7 +34,11 @@ export function toPublicFileRecord(file: FileRecord): PublicFileRecord {
     visibility: file.visibility,
     uploadedAt: file.uploadedAt,
     isRestricted,
+    isPasswordProtected,
     downloadUrl: isRestricted ? null : `/api/files/public/${encodeURIComponent(file.id)}`,
+    unlockUrl: isPasswordProtected
+      ? `/api/files/public/${encodeURIComponent(file.id)}/unlock`
+      : null,
   };
 }
 

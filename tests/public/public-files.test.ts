@@ -22,6 +22,7 @@ function file(overrides: Partial<FileRecord> = {}): FileRecord {
     category: FileCategory.DOCUMENT,
     description: "A public research handout.",
     visibility: FileVisibility.PUBLIC,
+    hasPassword: false,
     checksum: "private-checksum",
     uploadedAt,
     uploaderId: "507f1f77bcf86cd799439012",
@@ -57,6 +58,12 @@ test("public file listing includes visible and restricted records", async () => 
     list: async () => [
       file(),
       file({
+        id: "507f1f77bcf86cd799439014",
+        visibility: FileVisibility.PASSWORD_PROTECTED,
+        hasPassword: true,
+        displayName: "Password-protected notes",
+      }),
+      file({
         id: "507f1f77bcf86cd799439013",
         visibility: FileVisibility.PRIVATE,
         displayName: "Internal review notes",
@@ -68,11 +75,32 @@ test("public file listing includes visible and restricted records", async () => 
     records.map((record) => ({
       name: record.displayName,
       restricted: record.isRestricted,
+      passwordProtected: record.isPasswordProtected,
       canDownload: Boolean(record.downloadUrl),
+      canUnlock: Boolean(record.unlockUrl),
     })),
     [
-      { name: "Research handout", restricted: false, canDownload: true },
-      { name: "Internal review notes", restricted: true, canDownload: false },
+      {
+        name: "Research handout",
+        restricted: false,
+        passwordProtected: false,
+        canDownload: true,
+        canUnlock: false,
+      },
+      {
+        name: "Password-protected notes",
+        restricted: true,
+        passwordProtected: true,
+        canDownload: false,
+        canUnlock: true,
+      },
+      {
+        name: "Internal review notes",
+        restricted: true,
+        passwordProtected: false,
+        canDownload: false,
+        canUnlock: false,
+      },
     ],
   );
 });

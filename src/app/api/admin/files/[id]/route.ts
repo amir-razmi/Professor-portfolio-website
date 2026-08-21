@@ -3,6 +3,7 @@ import { getAuthorizationFailure } from "@/server/auth/authorization-error";
 
 import { fileErrorResponse } from "@/features/files/server/file-errors";
 import { updateFileMetadata } from "@/features/files/server/file-service";
+import { serializeAdminFile } from "@/features/files/server/file-serialization";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -51,22 +52,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
     return Response.json(
       {
-        file: {
-          id: file.id,
-          displayName: file.displayName,
-          safeOriginalName: file.safeOriginalName,
-          fileType: file.fileType,
-          sizeBytes: file.sizeBytes,
-          category: file.category,
-          description: file.description,
-          visibility: file.visibility,
-          checksum: file.checksum,
-          uploadedAt: file.uploadedAt.toISOString(),
-          uploaderName: file.uploaderName,
-          updatedAt: file.updatedAt.toISOString(),
-          downloadUrl: file.visibility === "PUBLIC" ? `/api/files/public/${file.id}` : null,
-          adminDownloadUrl: `/api/admin/files/${file.id}/download`,
-        },
+        file: serializeAdminFile(file),
       },
       { headers: { "Cache-Control": "no-store" } },
     );

@@ -19,6 +19,7 @@ type FileView = {
   category: FileCategoryValue;
   description: string | null;
   visibility: FileVisibilityValue;
+  hasPassword: boolean;
   checksum: string | null;
   uploadedAt: string;
   uploaderName: string;
@@ -143,6 +144,8 @@ export function FileManager({
       category: form.get("category"),
       description: form.get("description"),
       visibility: form.get("visibility"),
+      password: form.get("password"),
+      clearPassword: form.get("clearPassword") === "true",
     };
 
     try {
@@ -322,7 +325,29 @@ export function FileManager({
             >
               <option value={FILE_VISIBILITY.PRIVATE}>Private</option>
               <option value={FILE_VISIBILITY.PUBLIC}>Public download</option>
+              <option value={FILE_VISIBILITY.PASSWORD_PROTECTED}>Password protected</option>
             </select>
+          </div>
+
+          <div>
+            <label htmlFor="file-password" className="block text-sm font-semibold text-slate-900">
+              Download password
+            </label>
+            <input
+              id="file-password"
+              name="password"
+              type="password"
+              minLength={12}
+              maxLength={128}
+              autoComplete="new-password"
+              placeholder="At least 12 characters"
+              className="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+            />
+            <p className="mt-1 text-xs leading-5 text-slate-500">
+              Required when Password protected is selected. The password is never stored in
+              plaintext.
+            </p>
+            <FieldError message={firstError(uploadError, "password")} />
           </div>
 
           <div className="flex items-end">
@@ -350,7 +375,7 @@ export function FileManager({
             </p>
           </div>
           <p className="text-xs text-slate-500">
-            Private files never receive public download links.
+            Passwords are hashed; private files never receive public download links.
           </p>
         </div>
 
@@ -381,11 +406,22 @@ export function FileManager({
                       className={`rounded-full px-2.5 py-1 ${
                         file.visibility === FILE_VISIBILITY.PUBLIC
                           ? "bg-emerald-50 text-emerald-800"
-                          : "bg-slate-100 text-slate-700"
+                          : file.visibility === FILE_VISIBILITY.PASSWORD_PROTECTED
+                            ? "bg-amber-50 text-amber-800"
+                            : "bg-slate-100 text-slate-700"
                       }`}
                     >
-                      {file.visibility === FILE_VISIBILITY.PUBLIC ? "Public" : "Private"}
+                      {file.visibility === FILE_VISIBILITY.PUBLIC
+                        ? "Public"
+                        : file.visibility === FILE_VISIBILITY.PASSWORD_PROTECTED
+                          ? "Password protected"
+                          : "Private"}
                     </span>
+                    {file.hasPassword ? (
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-slate-700">
+                        Password set
+                      </span>
+                    ) : null}
                     {file.downloadUrl ? (
                       <a
                         href={file.downloadUrl}
@@ -456,6 +492,7 @@ export function FileManager({
                     >
                       <option value={FILE_VISIBILITY.PRIVATE}>Private</option>
                       <option value={FILE_VISIBILITY.PUBLIC}>Public download</option>
+                      <option value={FILE_VISIBILITY.PASSWORD_PROTECTED}>Password protected</option>
                     </select>
                   </div>
                   <div>
@@ -473,6 +510,41 @@ export function FileManager({
                       defaultValue={file.description ?? ""}
                       className="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
                     />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor={`password-${file.id}`}
+                      className="block text-sm font-semibold text-slate-900"
+                    >
+                      New download password
+                    </label>
+                    <input
+                      id={`password-${file.id}`}
+                      name="password"
+                      type="password"
+                      minLength={12}
+                      maxLength={128}
+                      autoComplete="new-password"
+                      placeholder={
+                        file.hasPassword
+                          ? "Leave blank to keep the current password"
+                          : "At least 12 characters"
+                      }
+                      className="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+                    />
+                    <p className="mt-1 text-xs leading-5 text-slate-500">
+                      Enter a value to set or replace the password. Choosing Public or Private
+                      removes password protection.
+                    </p>
+                    <label className="mt-2 inline-flex items-center gap-2 text-sm text-slate-700">
+                      <input
+                        type="checkbox"
+                        name="clearPassword"
+                        value="true"
+                        className="h-4 w-4 rounded border-slate-300 text-accent focus:ring-accent"
+                      />
+                      Confirm removal when changing away from password protection
+                    </label>
                   </div>
                 </div>
 

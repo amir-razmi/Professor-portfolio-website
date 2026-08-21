@@ -1,3 +1,7 @@
+import { cookies } from "next/headers";
+
+import { objectIdIsSafe } from "@/features/files/file-schema";
+import { fileAccessCookieName } from "@/features/files/server/file-access-token";
 import { getPublicFileDownload } from "@/features/files/server/file-service";
 import { createFileDownloadResponse } from "@/features/files/server/file-download";
 
@@ -10,7 +14,10 @@ type RouteContext = {
 
 export async function GET(_request: Request, context: RouteContext) {
   const { id } = await context.params;
-  const result = await getPublicFileDownload(id);
+  const accessToken = objectIdIsSafe(id)
+    ? (await cookies()).get(fileAccessCookieName(id))?.value
+    : undefined;
+  const result = await getPublicFileDownload(id, accessToken);
 
   if (!result) {
     return new Response("Not found.", {

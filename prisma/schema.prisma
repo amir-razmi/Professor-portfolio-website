@@ -28,6 +28,7 @@ enum BlogPostStatus {
 
 enum FileVisibility {
   PUBLIC
+  PASSWORD_PROTECTED
   PRIVATE
 }
 
@@ -220,6 +221,9 @@ model FileAsset {
   category               FileCategory?
   description            String?
   visibility             FileVisibility     @default(PRIVATE)
+  // Bcrypt hash and random version only; plaintext file passwords are never persisted.
+  passwordHash           String?
+  passwordVersion        String?
   bucket                 String?
   checksum               String?
   width                  Int?
@@ -300,6 +304,7 @@ model AuditLog {
   targetResource String
   targetId       String?
   summary        String?
+  metadata       Json?
   actorId        String?     @db.ObjectId
   actor          AdminUser?  @relation("AuditLogActor", fields: [actorId], references: [id])
   ipAddress      String?
@@ -308,6 +313,7 @@ model AuditLog {
   createdAt      DateTime    @default(now())
 
   @@index([targetResource])
+  @@index([targetResource, createdAt])
   @@index([targetId])
   @@index([actorId, createdAt])
   @@index([createdAt])

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { FileManager } from "@/features/files/components/file-manager";
 import { listAdminFiles } from "@/features/files/server/file-service";
+import { serializeAdminFile } from "@/features/files/server/file-serialization";
 import { Permission } from "@/server/auth/authorization";
 import { requirePagePermission } from "@/server/auth/page-authorization";
 
@@ -16,22 +17,7 @@ export default async function AdminFilesPage() {
   const admin = await requirePagePermission(Permission.MANAGE_FILES);
   const files = await listAdminFiles(admin);
 
-  const initialFiles = files.map((file) => ({
-    id: file.id,
-    displayName: file.displayName,
-    safeOriginalName: file.safeOriginalName,
-    fileType: file.fileType,
-    sizeBytes: file.sizeBytes,
-    category: file.category,
-    description: file.description,
-    visibility: file.visibility,
-    checksum: file.checksum,
-    uploadedAt: file.uploadedAt.toISOString(),
-    uploaderName: file.uploaderName,
-    updatedAt: file.updatedAt.toISOString(),
-    downloadUrl: file.visibility === "PUBLIC" ? `/api/files/public/${file.id}` : null,
-    adminDownloadUrl: `/api/admin/files/${file.id}/download`,
-  }));
+  const initialFiles = files.map(serializeAdminFile);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">

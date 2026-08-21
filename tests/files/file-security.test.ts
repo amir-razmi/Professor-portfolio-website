@@ -62,6 +62,7 @@ function record(overrides: Partial<FileRecord> = {}): FileRecord {
     category: FileCategory.DOCUMENT,
     description: "A development-only file.",
     visibility: FileVisibility.PRIVATE,
+    hasPassword: false,
     checksum: "abc123",
     uploadedAt: baseDate,
     uploaderId: admin.id,
@@ -77,6 +78,7 @@ function repository(overrides: Partial<FileRepository> = {}): FileRepository {
     list: async () => [],
     findById: async () => record(),
     findPublicById: async () => null,
+    findPasswordAccess: async () => null,
     create: async (input, actorId) =>
       record({
         displayName: input.displayName,

@@ -4,8 +4,8 @@ import { AuditAction, FileVisibility, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
-import type { FileMetadataInput } from "../file-schema";
-import type { FileRecord, FileRepository } from "./file-policy";
+import type { FileMetadataPersistenceInput, StoredPasswordState } from "../file-schema";
+import type { FilePasswordAccess, FileRecord, FileRepository } from "./file-policy";
 import { FileOperationError } from "./file-errors";
 
 const fileSelect = {
@@ -20,6 +20,8 @@ const fileSelect = {
   category: true,
   description: true,
   visibility: true,
+  passwordHash: true,
+  passwordVersion: true,
   checksum: true,
   uploadedAt: true,
   uploadedById: true,
@@ -47,6 +49,7 @@ function mapFile(file: FilePayload): FileRecord {
     category: file.category ?? "OTHER",
     description: file.description,
     visibility: file.visibility,
+    hasPassword: Boolean(file.passwordHash && file.passwordVersion),
     checksum: file.checksum,
     uploadedAt: file.uploadedAt ?? file.createdAt,
     uploaderId: file.uploadedById,
@@ -83,12 +86,26 @@ export const fileRepository: FileRepository = {
     const file = await prisma.fileAsset.findFirst({
       where: {
         id,
-        visibility: FileVisibility.PUBLIC,
+        visibility: {
+          in: [FileVisibility.PUBLIC, FileVisibility.PASSWORD_PROTECTED],
+        },
       },
       select: fileSelect,
     });
 
     return file ? mapFile(file) : null;
+  },
+
+  async findPasswordAccess(id): Promise<FilePasswordAccess | null> {
+    return prisma.fileAsset.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        visibility: true,
+        passwordHash: true,
+        passwordVersion: true,
+      },
+    });
   },
 
   async create(input, actorId) {
@@ -104,6 +121,8 @@ export const fileRepository: FileRepository = {
             category: input.category,
             description: input.description,
             visibility: input.visibility,
+            passwordHash: input.passwordHash,
+            passwordVersion: input.passwordVersion,
             checksum: input.checksum,
             uploadedById: actorId,
             createdById: actorId,
@@ -139,7 +158,12 @@ export const fileRepository: FileRepository = {
     }
   },
 
-  async updateMetadata(id, input: FileMetadataInput, actorId) {
+  async updateMetadata(
+    id,
+    input: FileMetadataPersistenceInput,
+    actorId,
+    passwordState?: StoredPasswordState,
+  ) {
     const current = await prisma.fileAsset.findUnique({
       where: { id },
       select: { visibility: true },
@@ -158,6 +182,12 @@ export const fileRepository: FileRepository = {
           description: input.description,
           visibility: input.visibility,
           updatedById: actorId,
+          ...(passwordState
+            ? {
+                passwordHash: passwordState.passwordHash,
+                passwordVersion: passwordState.passwordVersion,
+              }
+            : {}),
         },
         select: fileSelect,
       });

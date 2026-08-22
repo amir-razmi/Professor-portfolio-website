@@ -58,7 +58,7 @@ export default async function AuditLogsPage({
         <AdminPageHeader
           eyebrow="گزارش فعالیت"
           title="فعالیت‌های مهم فضای مدیریت را بررسی کنید."
-          description="رویدادها فقط با خلاصه و فراداده امن ثبت می‌شوند؛ گذرواژه، هش، توکن، نشست و اطلاعات محرمانه هرگز نمایش داده نمی‌شود."
+          description="رویدادها فقط با خلاصه و متادیتا امن ثبت می‌شوند؛ گذرواژه، هش، توکن، نشست و اطلاعات محرمانه هرگز نمایش داده نمی‌شود."
         />
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">

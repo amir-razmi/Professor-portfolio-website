@@ -274,8 +274,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </FormSection>
 
       <FormSection
-        title="پیوندهای علمی و اجتماعی"
-        description="فقط پیوندهای معتبر HTTP یا HTTPS پذیرفته می‌شوند."
+        title="لینکهای علمی و اجتماعی"
+        description="فقط لینکهای معتبر HTTP یا HTTPS پذیرفته می‌شوند."
       >
         <UrlField
           name="websiteUrl"

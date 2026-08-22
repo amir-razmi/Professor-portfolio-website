@@ -25,7 +25,7 @@ export default async function AdminFilesPage() {
         <AdminPageHeader
           eyebrow="فایل‌ها"
           title="اسناد و رسانه‌ها را ایمن مدیریت کنید."
-          description="فایل‌های تأییدشده را بارگذاری کنید، دارایی‌های خصوصی را از نشانی‌های عمومی دور نگه دارید و فراداده را بدون ذخیره محتوای باینری در MongoDB مدیریت کنید."
+          description="فایل‌های تأییدشده را بارگذاری کنید، فایل های خصوصی را از لینک های عمومی دور نگه دارید و متادیتا را بدون ذخیره محتوای باینری در MongoDB مدیریت کنید."
         />
         <FileManager initialFiles={initialFiles} />
       </div>

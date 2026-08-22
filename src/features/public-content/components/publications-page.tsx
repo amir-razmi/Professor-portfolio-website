@@ -30,7 +30,7 @@ export function PublicationsPageContent({
           <SectionHeading
             eyebrow="کتاب‌شناسی"
             title="مقاله‌ها، فصل‌ها و دیگر آثار"
-            description="فقط آثار منتشرشده نمایش داده می‌شوند. برای جزئیات بیشتر از DOI، رکورد خارجی یا پیوند PDF استفاده کنید."
+            description="فقط آثار منتشرشده نمایش داده می‌شوند. برای جزئیات بیشتر از DOI، رکورد خارجی یا لینک PDF استفاده کنید."
           />
           {publications.length ? (
             <div id="publications-list" className="mt-10 grid gap-5 lg:grid-cols-2">

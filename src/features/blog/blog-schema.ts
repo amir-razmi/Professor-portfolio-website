@@ -21,7 +21,7 @@ const slugSchema = z
   .string()
   .trim()
   .min(1, "شناسه نشانی را وارد کنید.")
-  .max(160, "حداکثر ۱۶۰ نویسه وارد کنید.")
+  .max(160, "حداکثر ۱۶۰ کاراکتر وارد کنید.")
   .transform(normalizeBlogSlug)
   .refine((value) => slugPattern.test(value), {
     message: "فقط از حروف کوچک لاتین، عدد و خط تیره تکی استفاده کنید.",
@@ -71,14 +71,14 @@ export const blogPostSchema = z
     id: z
       .union([objectIdSchema, z.null(), z.undefined()])
       .transform((value) => (typeof value === "string" ? value : null)),
-    title: z.string().trim().min(3, "عنوان باید حداقل ۳ نویسه داشته باشد.").max(180),
+    title: z.string().trim().min(3, "عنوان باید حداقل ۳ کاراکتر داشته باشد.").max(180),
     slug: slugSchema,
     excerpt: optionalText(500),
     content: z
       .string()
       .trim()
       .min(1, "محتوای یادداشت را وارد کنید.")
-      .max(100_000, "حداکثر ۱۰۰٬۰۰۰ نویسه وارد کنید."),
+      .max(100_000, "حداکثر ۱۰۰٬۰۰۰ کاراکتر وارد کنید."),
     status: blogStatusSchema,
     publishedAt: optionalDate,
     categoryIds: idListSchema,
@@ -122,8 +122,8 @@ export function blogPostFormDataToInput(formData: FormData): unknown {
 const taxonomyNameSchema = z
   .string()
   .trim()
-  .min(2, "نام باید حداقل ۲ نویسه داشته باشد.")
-  .max(80, "حداکثر ۸۰ نویسه وارد کنید.");
+  .min(2, "نام باید حداقل ۲ کاراکتر داشته باشد.")
+  .max(80, "حداکثر ۸۰ کاراکتر وارد کنید.");
 
 const taxonomySlugSchema = z
   .union([z.string().trim().max(120), z.null(), z.undefined()])

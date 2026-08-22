@@ -236,7 +236,7 @@ export default async function HomeFeaturePage() {
           <SectionHeading
             eyebrow="تماس"
             title="راهی برای ارتباط حرفه‌ای"
-            description="برای همکاری، آموزش و تبادل علمی از اطلاعات تماس و پیوندهای علمی زیر استفاده کنید."
+            description="برای همکاری، آموزش و تبادل علمی از اطلاعات تماس و لینکهای علمی زیر استفاده کنید."
           />
           <Surface className="bg-white">
             <ContactDetails profile={profile} settings={settings} />

@@ -163,7 +163,7 @@ export function FileManager({
         setRowMessages((current) => ({
           ...current,
           [fileId]: {
-            message: payload?.message ?? "ذخیره فراداده ممکن نشد.",
+            message: payload?.message ?? "ذخیره متادیتا ممکن نشد.",
             tone: "error",
           },
         }));
@@ -173,13 +173,13 @@ export function FileManager({
       setFiles((current) => current.map((file) => (file.id === fileId ? payload.file! : file)));
       setRowMessages((current) => ({
         ...current,
-        [fileId]: { message: "فراداده ذخیره شد.", tone: "success" },
+        [fileId]: { message: "متادیتا ذخیره شد.", tone: "success" },
       }));
     } catch {
       setRowMessages((current) => ({
         ...current,
         [fileId]: {
-          message: "درخواست فراداده انجام نشد.",
+          message: "درخواست متادیتا انجام نشد.",
           tone: "error",
         },
       }));
@@ -331,7 +331,7 @@ export function FileManager({
 
           <div>
             <label htmlFor="file-password" className="block text-sm font-semibold text-slate-900">
-              گذرواژه دریافت
+              پسورد
             </label>
             <input
               id="file-password"
@@ -340,7 +340,7 @@ export function FileManager({
               minLength={12}
               maxLength={128}
               autoComplete="new-password"
-              placeholder="حداقل ۱۲ نویسه"
+              placeholder="حداقل ۱۲ کاراکتر"
               className="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
             />
             <p className="mt-1 text-xs leading-5 text-slate-500">
@@ -371,10 +371,7 @@ export function FileManager({
             <h2 className="text-xl font-semibold tracking-tight text-slate-950">سوابق فایل‌ها</h2>
             <p className="mt-1 text-sm text-slate-600">{files.length} فایل در فضای مدیریت.</p>
           </div>
-          <p className="text-xs text-slate-500">
-            گذرواژه‌ها به‌صورت امن درهم‌سازی می‌شوند؛ فایل‌های خصوصی هیچ‌گاه پیوند دریافت عمومی
-            ندارند.
-          </p>
+          <p className="text-xs text-slate-500">فایل‌های خصوصی هیچ‌گاه لینک دریافت عمومی ندارند.</p>
         </div>
 
         {files.length ? (
@@ -524,7 +521,7 @@ export function FileManager({
                       maxLength={128}
                       autoComplete="new-password"
                       placeholder={
-                        file.hasPassword ? "برای حفظ گذرواژه فعلی خالی بگذارید" : "حداقل ۱۲ نویسه"
+                        file.hasPassword ? "برای حفظ گذرواژه فعلی خالی بگذارید" : "حداقل ۱۲ کاراکتر"
                       }
                       className="mt-2 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
                     />
@@ -550,7 +547,7 @@ export function FileManager({
                     disabled={busyId === file.id}
                     className="min-h-10 rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {busyId === file.id ? "در حال ذخیره…" : "ذخیره فراداده"}
+                    {busyId === file.id ? "در حال ذخیره…" : "ذخیره متادیتا"}
                   </button>
                   <button
                     type="button"

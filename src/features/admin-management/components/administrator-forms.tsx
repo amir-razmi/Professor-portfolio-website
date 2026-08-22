@@ -150,7 +150,7 @@ export function AdministratorCreateForm() {
 
       <FormSection
         title="گذرواژه اولیه"
-        description="حداقل ۱۲ نویسه استفاده کنید و گذرواژه موقت را از یک کانال امن دانشگاهی به اشتراک بگذارید."
+        description="حداقل ۱۲ کاراکتر استفاده کنید و گذرواژه موقت را از یک کانال امن دانشگاهی به اشتراک بگذارید."
       >
         <FormField>
           <FormLabel htmlFor="admin-password">گذرواژه</FormLabel>
@@ -414,7 +414,7 @@ export function AdministratorPasswordResetForm({
       <FormField>
         <FormLabel htmlFor="reset-admin-password">گذرواژه جدید</FormLabel>
         <FormHint id="reset-admin-password-hint">
-          حداقل ۱۲ نویسه؛ گذرواژه فعلی هرگز نمایش داده نمی‌شود.
+          حداقل ۱۲ کاراکتر؛ گذرواژه فعلی هرگز نمایش داده نمی‌شود.
         </FormHint>
         <input
           id="reset-admin-password"

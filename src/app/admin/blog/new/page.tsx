@@ -23,7 +23,7 @@ export default async function NewBlogPostPage() {
         <AdminPageHeader
           eyebrow="یادداشت جدید"
           title="یک یادداشت دانشگاهی تازه آغاز کنید."
-          description="ابتدا پیش‌نویس را ذخیره کنید و پس از آماده‌شدن محتوا، پیوندها و دسته‌بندی آن را منتشر کنید."
+          description="ابتدا پیش‌نویس را ذخیره کنید و پس از آماده‌شدن محتوا، لینکها و دسته‌بندی آن را منتشر کنید."
         />
         <BlogPostForm
           initialPost={null}

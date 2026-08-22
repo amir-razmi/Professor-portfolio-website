@@ -25,8 +25,8 @@ export const fileVisibilitySchema = z.enum(allowedVisibilityValues);
 export const filePasswordSchema = z
   .string()
   .trim()
-  .min(12, "گذرواژه فایل باید حداقل ۱۲ نویسه داشته باشد.")
-  .max(128, "گذرواژه فایل باید حداکثر ۱۲۸ نویسه داشته باشد.");
+  .min(12, "گذرواژه فایل باید حداقل ۱۲ کاراکتر داشته باشد.")
+  .max(128, "گذرواژه فایل باید حداکثر ۱۲۸ کاراکتر داشته باشد.");
 export const fileUnlockSchema = z
   .object({
     password: filePasswordSchema,
@@ -47,7 +47,7 @@ export const fileMetadataSchema = z
       .string()
       .trim()
       .min(1, "نام نمایشی را وارد کنید.")
-      .max(120, "حداکثر ۱۲۰ نویسه وارد کنید."),
+      .max(120, "حداکثر ۱۲۰ کاراکتر وارد کنید."),
     category: fileCategorySchema,
     description: z
       .union([z.string().trim().max(500), z.null(), z.undefined()])
@@ -70,7 +70,7 @@ export function parseFileMetadataInput(input: unknown): FileMetadataInput {
   const parsed = fileMetadataSchema.safeParse(input);
 
   if (!parsed.success) {
-    throw new Error("فیلدهای فراداده فایل را بررسی کنید.");
+    throw new Error("فیلدهای متادیتا فایل را بررسی کنید.");
   }
 
   return parsed.data;

@@ -19,7 +19,7 @@ export function ContactPageContent({ profile, settings }: Readonly<PublicPortfol
         description={
           profile?.shortBio ??
           settings?.siteDescription ??
-          "برای مکاتبات حرفه‌ای از اطلاعات تماس و پیوندهای علمی زیر استفاده کنید."
+          "برای مکاتبات حرفه‌ای از اطلاعات تماس و لینکهای علمی زیر استفاده کنید."
         }
       />
       <Container className="py-16 sm:py-20 lg:py-24">

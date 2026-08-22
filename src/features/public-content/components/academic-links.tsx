@@ -24,12 +24,12 @@ export function AcademicLinks({
   });
 
   if (!links.length) {
-    return <p className="text-sm leading-7 text-muted">پیوندهای علمی به‌زودی افزوده می‌شوند.</p>;
+    return <p className="text-sm leading-7 text-muted">لینکهای علمی به‌زودی افزوده می‌شوند.</p>;
   }
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-slate-950">پیوندهای علمی و اجتماعی</h3>
+      <h3 className="text-lg font-semibold text-slate-950">لینکهای علمی و اجتماعی</h3>
       <ul className="mt-4 flex flex-wrap gap-3">
         {links.map((link) => (
           <li key={link.url}>

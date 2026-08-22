@@ -5,8 +5,8 @@ const BCRYPT_COST = 12;
 
 export const adminPasswordSchema = z
   .string()
-  .min(12, "گذرواژه مدیر باید حداقل ۱۲ نویسه داشته باشد.")
-  .max(128, "گذرواژه مدیر باید حداکثر ۱۲۸ نویسه داشته باشد.");
+  .min(12, "گذرواژه مدیر باید حداقل ۱۲ کاراکتر داشته باشد.")
+  .max(128, "گذرواژه مدیر باید حداکثر ۱۲۸ کاراکتر داشته باشد.");
 
 export async function hashPassword(password: string): Promise<string> {
   const result = adminPasswordSchema.safeParse(password);

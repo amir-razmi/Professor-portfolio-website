@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return createPublicMetadata({
     title: "تماس",
-    description: profile?.shortBio ?? settings?.siteDescription ?? "اطلاعات تماس و پیوندهای علمی.",
+    description: profile?.shortBio ?? settings?.siteDescription ?? "اطلاعات تماس و لینکهای علمی.",
     path: "/contact",
     siteName,
   });

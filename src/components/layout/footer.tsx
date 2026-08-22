@@ -21,7 +21,7 @@ export function SiteFooter({
             {contactEmail}
           </a>
         ) : (
-          <p>برای ارائه روشن و دقیق فعالیت‌های علمی.</p>
+          <p>Developed By Amir Mohammad Razmi</p>
         )}
       </Container>
     </footer>

@@ -193,7 +193,7 @@ export function BlogPostForm({ categories, canPublish, initialPost, tags }: Blog
 
       <FormSection
         title="جزئیات انتشار"
-        description="تاریخ‌ها در پایگاه داده بر اساس UTC ذخیره می‌شوند. فقط یادداشت‌های منتشرشده در صفحات عمومی و فراداده‌ها نمایش داده می‌شوند."
+        description="تاریخ‌ها در پایگاه داده بر اساس UTC ذخیره می‌شوند. فقط یادداشت‌های منتشرشده در صفحات عمومی و متادیتا‌ها نمایش داده می‌شوند."
       >
         <FormField>
           <FormLabel htmlFor="publishedAt">تاریخ انتشار</FormLabel>

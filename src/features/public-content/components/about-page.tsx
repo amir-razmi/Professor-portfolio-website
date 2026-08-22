@@ -136,7 +136,7 @@ export function AboutPageContent({ profile, settings }: Readonly<PublicPortfolio
               <SectionHeading
                 eyebrow="تماس"
                 title="در ارتباط باشید"
-                description="اطلاعات تماس و پیوندهای علمی برای مکاتبات حرفه‌ای."
+                description="اطلاعات تماس و لینکهای علمی برای مکاتبات حرفه‌ای."
               />
               <div className="mt-8 grid gap-8 lg:grid-cols-2">
                 <Surface className="bg-white">

@@ -86,18 +86,22 @@ validated URL/metadata fields until those records are connected to the file mana
 Copy `.env.example` to `.env` for local development. Never commit `.env` or place secrets in
 client-exposed variables.
 
-| Variable                     | Required             | Purpose                                                                 |
-| ---------------------------- | -------------------- | ----------------------------------------------------------------------- |
-| `DATABASE_URL`               | Yes                  | Server-only MongoDB connection string                                   |
-| `DATABASE_ENV`               | Yes for seed safety  | Must be `development` for local seed operations                         |
-| `AUTH_SECRET`                | Yes                  | At least 32 characters; signs/encrypts Auth.js and file-access tokens   |
-| `AUTH_TRUST_HOST`            | Deployment-dependent | Set to `true` behind a trusted reverse proxy                            |
-| `NEXT_PUBLIC_SITE_URL`       | Recommended          | Public HTTPS origin for canonical URLs, sitemap, and same-origin checks |
-| `LOCAL_STORAGE_ROOT`         | Optional             | Local file root; defaults to `./storage`                                |
-| `ADMIN_SEED_PASSWORD`        | Seed only            | Initial development administrator password; never committed             |
-| `SEED_DATABASE_CONFIRMATION` | Seed only            | Must be `YES` to permit the guarded seed                                |
+| Variable                       | Required             | Purpose                                                                 |
+| ------------------------------ | -------------------- | ----------------------------------------------------------------------- |
+| `DATABASE_URL`                 | Yes                  | Server-only MongoDB connection string                                   |
+| `DATABASE_ENV`                 | Yes for seed safety  | Must be `development` for local seed operations                         |
+| `AUTH_SECRET`                  | Yes                  | At least 32 characters; signs/encrypts Auth.js and file-access tokens   |
+| `AUTH_TRUST_HOST`              | Deployment-dependent | Set to `true` behind a trusted reverse proxy                            |
+| `NEXT_PUBLIC_SITE_URL`         | Recommended          | Public HTTPS origin for canonical URLs, sitemap, and same-origin checks |
+| `LOCAL_STORAGE_ROOT`           | Optional             | Local file root; defaults to `./storage`                                |
+| `ADMIN_SEED_PASSWORD`          | Seed only            | Initial development administrator password; never committed             |
+| `SEED_DATABASE_CONFIRMATION`   | Seed only            | Must be `YES` to permit the guarded seed                                |
+| `BOOTSTRAP_ADMIN_EMAIL`        | Bootstrap only       | First administrator email; used by the explicit Compose bootstrap job   |
+| `BOOTSTRAP_ADMIN_NAME`         | Bootstrap only       | First administrator display name                                        |
+| `BOOTSTRAP_ADMIN_PASSWORD`     | Bootstrap only       | First administrator password; hashed, never stored as plaintext         |
+| `BOOTSTRAP_ADMIN_CONFIRMATION` | Bootstrap only       | Must be `YES` for the one-shot bootstrap command                        |
 
-`DATABASE_URL`, `AUTH_SECRET`, `ADMIN_SEED_PASSWORD`, and storage credentials for a future
+`DATABASE_URL`, `AUTH_SECRET`, all seed/bootstrap credentials, and storage credentials for a future
 provider are server-only values. Do not prefix them with `NEXT_PUBLIC_`.
 
 ## Local setup
@@ -205,19 +209,51 @@ non-development-named connection strings. On the first run it hashes `ADMIN_SEED
 the development administrator record; it never stores the plaintext password or writes secrets
 to audit logs. Later seed runs preserve an existing administrator hash.
 
+### First administrator in production
+
+Do not make the running application create an administrator automatically. Automatic startup
+provisioning can recreate accounts after a reset, hide deployment mistakes, and put a long-lived
+password in every application process. Instead, this project uses an explicit, one-shot bootstrap
+command.
+
+The bootstrap command:
+
+- Creates exactly one `SUPER_ADMIN` only when no active `SUPER_ADMIN` exists.
+- Hashes `BOOTSTRAP_ADMIN_PASSWORD` with bcrypt inside the one-shot tooling container.
+- Never updates an existing password implicitly.
+- Is idempotent for the same already-active bootstrap account.
+- Refuses to create another account when an active `SUPER_ADMIN` already exists.
+- Refuses if the requested email belongs to an existing non-super-admin or inactive account.
+- Writes a sanitized audit event with no actor ID because the account does not exist before
+  bootstrap.
+
+For a normal Node deployment, set the four `BOOTSTRAP_ADMIN_*` values in the deployment secret
+store and run:
+
+```bash
+DATABASE_ENV=production \
+BOOTSTRAP_ADMIN_CONFIRMATION=YES \
+pnpm db:bootstrap-admin
+```
+
+Unset the bootstrap password and confirmation immediately after the command succeeds. Later
+password changes should use the protected administrator-management flow or a separately reviewed
+recovery process.
+
 ## Database and seed command reference
 
-| Command            | Effect                                          | Safety                       |
-| ------------------ | ----------------------------------------------- | ---------------------------- |
-| `pnpm db:generate` | Generates Prisma Client                         | Read-only database-wise      |
-| `pnpm db:validate` | Validates `prisma/schema.prisma`                | Read-only                    |
-| `pnpm db:push`     | Synchronizes the MongoDB schema                 | Review target database first |
-| `pnpm db:check`    | Performs a read-only MongoDB connectivity check | Read-only                    |
-| `pnpm db:seed`     | Runs the guarded development seed               | Refuses unsafe environments  |
+| Command                   | Effect                                          | Safety                         |
+| ------------------------- | ----------------------------------------------- | ------------------------------ |
+| `pnpm db:generate`        | Generates Prisma Client                         | Read-only database-wise        |
+| `pnpm db:validate`        | Validates `prisma/schema.prisma`                | Read-only                      |
+| `pnpm db:push`            | Synchronizes the MongoDB schema                 | Review target database first   |
+| `pnpm db:check`           | Performs a read-only MongoDB connectivity check | Read-only                      |
+| `pnpm db:seed`            | Runs the guarded development seed               | Refuses unsafe environments    |
+| `pnpm db:bootstrap-admin` | Creates the first production `SUPER_ADMIN`      | Requires explicit confirmation |
 
-MongoDB does not use relational migration files in this project. The seed writes fake
-development-only records, is idempotent, hashes the initial administrator password, and refuses
-production or non-development-named databases.
+MongoDB does not use relational migration files in this project. The development seed writes fake
+development-only records and refuses production databases. The separate bootstrap command is for
+the first real administrator and requires an explicit confirmation; it does not seed demo content.
 
 Start the development server:
 
@@ -277,11 +313,12 @@ Before deployment:
    platform secret/environment manager.
 3. Set `AUTH_TRUST_HOST=true` only when the reverse proxy is trusted and forwards the correct
    host/protocol headers.
-4. Apply the reviewed Prisma schema to the intended MongoDB database with `pnpm db:push`; do not
-   run the guarded seed against production.
-5. Build with `pnpm build`.
-6. Serve with `pnpm start` behind HTTPS and a reverse proxy/load balancer.
-7. Configure persistent object storage, backups, monitoring, and rate limiting before accepting
+4. Apply the reviewed Prisma schema to the intended MongoDB database with `pnpm db:push`.
+5. Run the explicit first-administrator bootstrap once, using the production secret store and
+   `BOOTSTRAP_ADMIN_CONFIRMATION=YES`.
+6. Build with `pnpm build`.
+7. Serve with `pnpm start` behind HTTPS and a reverse proxy/load balancer.
+8. Configure persistent object storage, backups, monitoring, and rate limiting before accepting
    public traffic.
 
 The application is a normal Node.js Next.js server. A platform deployment must preserve the
@@ -294,8 +331,8 @@ pnpm build
 pnpm start
 ```
 
-The production build does not require `ADMIN_SEED_PASSWORD` or
-`SEED_DATABASE_CONFIRMATION`; those variables are only for the guarded development seed.
+The production build does not require `ADMIN_SEED_PASSWORD`, `SEED_DATABASE_CONFIRMATION`, or
+`BOOTSTRAP_ADMIN_*`; bootstrap values are needed only for the explicit one-shot command.
 
 ## Docker
 
@@ -340,75 +377,97 @@ The local filesystem volume is suitable only for development or a single durable
 production or multiple replicas, replace the local storage provider with the documented
 S3-compatible adapter and keep the container filesystem disposable.
 
-## Docker Compose local stack
+## Docker Compose production deployment
 
-`docker-compose.yml` provides a production-style local stack with:
+The root `docker-compose.yml` is a single-server production deployment. It runs:
 
-- MongoDB 7 running as a single-node replica set, which supports the transactions used by the
-  application.
-- The standalone Next.js application on `http://localhost:3000`.
-- Named volumes for MongoDB data and local uploaded-file storage.
-- One-shot `setup` and `seed` profiles for Prisma schema synchronization and development data.
+- The Next.js standalone application.
+- MongoDB 7 as a single-node authenticated replica set.
+- Persistent MongoDB data in a Docker-managed local volume.
+- Persistent local file storage from the host path configured by `FILE_STORAGE_PATH`, mounted at
+  `/app/storage`.
 
-Prepare local environment values before starting the stack:
+The single-node replica set provides the transaction support required by Prisma. It is not a
+high-availability cluster: all database data is still on this one server. All services are on a
+private Compose network; MongoDB is not published to the host by default. Configure host-level
+backups, monitoring, and an outage recovery plan.
+
+Create the runtime environment file and set strong random values:
 
 ```bash
 cp .env.example .env
-openssl rand -base64 32
-# Put the generated value in AUTH_SECRET in .env.
+openssl rand -base64 32 | tr -d '\n'
+openssl rand -base64 756 | tr -d '\n'
+openssl rand -hex 32
+openssl rand -hex 32
 ```
 
-Start MongoDB and initialize its replica set:
+Put the first value in `AUTH_SECRET`, and the second value in `MONGODB_REPLICA_SET_KEY`. The
+replica-set key must remain base64-compatible because MongoDB validates the keyfile format. Also
+put the two hex values in `MONGODB_ROOT_PASSWORD` and `MONGODB_PASSWORD`; hex avoids characters
+that require URL escaping in the internal MongoDB connection string. Keep `.env` outside source
+control.
+
+On the first deployment, start the database, keyfile, and storage initialization services:
 
 ```bash
-docker compose up -d mongodb mongodb-init
+docker compose up -d mongo-keyfile mongodb mongo-init storage-init
 ```
 
-Synchronize the Prisma schema against the Compose database. This uses the `tooling` Docker stage,
-so Prisma CLI and the generated client are available without adding development dependencies to
-the production application image:
+Synchronize the reviewed Prisma schema before serving application traffic:
 
 ```bash
 docker compose --profile setup run --build --rm db-setup
 ```
 
-Seed fake development-only records when needed. The seed is guarded and targets the
-`academic_portfolio_dev` database inside the Compose MongoDB service:
+Create the first administrator before starting public traffic. Set
+`BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_NAME`, `BOOTSTRAP_ADMIN_PASSWORD`, and
+`BOOTSTRAP_ADMIN_CONFIRMATION=YES` in `.env`, then run:
 
 ```bash
-read -s ADMIN_SEED_PASSWORD
-export ADMIN_SEED_PASSWORD
-export SEED_DATABASE_CONFIRMATION=YES
-docker compose --profile seed run --build --rm db-seed
-unset ADMIN_SEED_PASSWORD SEED_DATABASE_CONFIRMATION
+docker compose --profile bootstrap run --build --rm admin-bootstrap
 ```
 
-Start the application:
+The command is safe to rerun with the same active `SUPER_ADMIN` email: it makes no changes and
+does not reset the password. Remove or unset `BOOTSTRAP_ADMIN_PASSWORD` and
+`BOOTSTRAP_ADMIN_CONFIRMATION` from `.env` immediately after successful bootstrap.
+
+Then build and start the application:
 
 ```bash
-docker compose up -d app
+docker compose up -d --build app
+docker compose ps
 docker compose logs -f app
 ```
 
-The application connects to MongoDB through the internal hostname
-`mongodb://mongodb:27017/academic_portfolio_dev?replicaSet=rs0`. MongoDB is also exposed on
-`localhost:27018` for read-only inspection or host-side tooling. The Compose app image is
-production-style and does not hot-reload source changes; use `pnpm dev` for the local hot-reload
-workflow.
+The site is available at `http://localhost:${APP_PORT:-3000}`. The host-local path configured by
+`FILE_STORAGE_PATH` (default `/srv/professor-portfolio/storage`) is mounted at `/app/storage`;
+uploaded files are not stored in MongoDB. The `storage-init` service creates the directory and
+grants it to the container's non-root application user. The application connects to MongoDB using
+the internal replica-set host and the dedicated `MONGODB_USERNAME` account.
 
-Stop the stack while preserving named volumes:
+For internet-facing deployment, place a TLS-terminating reverse proxy (such as Caddy or Nginx)
+in front of the published app port and restrict the host firewall to the proxy/HTTPS ports.
+
+Prisma schema synchronization and administrator bootstrap are intentionally not run automatically
+during app startup. The `setup` and `bootstrap` profiles are explicit one-shot operations using the
+same authenticated replica-set URL as the app. Do not run the development seed against production.
+
+Stop the stack without deleting data:
 
 ```bash
 docker compose down
 ```
 
-To remove the local database and uploaded-file volumes as well, use `docker compose down -v`
-only when the development data is intentionally disposable.
+Do not use `docker compose down -v` in production. It deletes the MongoDB and keyfile volumes
+(and any named volumes in the stack). Back up the MongoDB volume and the host-local
+`FILE_STORAGE_PATH` directory before upgrades or host maintenance.
 
 ## Storage configuration and S3-compatible replacement
 
 The default `LocalStorageProvider` stores file bytes beneath `LOCAL_STORAGE_ROOT` and is suitable
-for development or a small single-instance installation. The database stores metadata and a
+for this single-server Compose deployment when the host directory is backed up. It is not
+appropriate for multiple app replicas without shared storage. The database stores metadata and a
 random storage key, never the binary or a private filesystem path.
 
 For production, implement the `StorageProvider` contract in
@@ -423,14 +482,15 @@ For production, implement the `StorageProvider` contract in
 Keep metadata operations in the file repository/service and storage operations behind the provider
 interface. Migrate existing objects and verify checksums before switching providers.
 
-Local storage has no built-in cross-instance replication. A lost local volume can make metadata
-unavailable even when MongoDB is healthy, so production deployments should use durable object
-storage with versioning and lifecycle policies.
+Local storage has no built-in cross-instance replication. A lost host or storage directory can
+make uploaded files unavailable even when MongoDB is healthy, so back up the
+`FILE_STORAGE_PATH` directory separately and test restoring it together with MongoDB.
 
 ## Backup and data retention
 
 - Back up MongoDB with provider-native scheduled snapshots or an equivalent tested backup process.
-- Back up the object-storage bucket separately; MongoDB backups do not contain uploaded binaries.
+- Back up the `FILE_STORAGE_PATH` directory separately; MongoDB backups do not contain uploaded
+  binaries.
 - Test restoration of both metadata and files, including storage-key/checksum consistency.
 - Define retention periods for administrator audit logs, uploaded files, and disabled accounts with
   the university's privacy and records policies.
@@ -518,21 +578,22 @@ supported by the centralized audit service for the later CRUD stage.
 
 ## Scripts
 
-| Command             | Purpose                                                                                 |
-| ------------------- | --------------------------------------------------------------------------------------- |
-| `pnpm dev`          | Start the development server                                                            |
-| `pnpm build`        | Generate Prisma Client and create a production build                                    |
-| `pnpm start`        | Serve the production build                                                              |
-| `pnpm lint`         | Run ESLint                                                                              |
-| `pnpm test`         | Run focused authentication, authorization, content, public, blog, file, and audit tests |
-| `pnpm typecheck`    | Run the TypeScript compiler without emitting files                                      |
-| `pnpm format`       | Format supported files with Prettier                                                    |
-| `pnpm format:check` | Check formatting without writing                                                        |
-| `pnpm db:generate`  | Generate Prisma Client                                                                  |
-| `pnpm db:validate`  | Validate the Prisma schema                                                              |
-| `pnpm db:push`      | Synchronize the Prisma schema with MongoDB                                              |
-| `pnpm db:check`     | Run a read-only MongoDB ping                                                            |
-| `pnpm db:seed`      | Run the guarded development seed                                                        |
+| Command                   | Purpose                                                                                 |
+| ------------------------- | --------------------------------------------------------------------------------------- |
+| `pnpm dev`                | Start the development server                                                            |
+| `pnpm build`              | Generate Prisma Client and create a production build                                    |
+| `pnpm start`              | Serve the production build                                                              |
+| `pnpm lint`               | Run ESLint                                                                              |
+| `pnpm test`               | Run focused authentication, authorization, content, public, blog, file, and audit tests |
+| `pnpm typecheck`          | Run the TypeScript compiler without emitting files                                      |
+| `pnpm format`             | Format supported files with Prettier                                                    |
+| `pnpm format:check`       | Check formatting without writing                                                        |
+| `pnpm db:generate`        | Generate Prisma Client                                                                  |
+| `pnpm db:validate`        | Validate the Prisma schema                                                              |
+| `pnpm db:push`            | Synchronize the Prisma schema with MongoDB                                              |
+| `pnpm db:check`           | Run a read-only MongoDB ping                                                            |
+| `pnpm db:seed`            | Run the guarded development seed                                                        |
+| `pnpm db:bootstrap-admin` | Create the first production `SUPER_ADMIN` with explicit confirmation                    |
 
 ## GitHub Actions CI/CD
 
@@ -592,6 +653,21 @@ The seed intentionally requires all of the following:
 
 Verify each condition without printing the secret value.
 
+### The administrator bootstrap refuses to run
+
+The bootstrap command intentionally requires:
+
+- `DATABASE_ENV=production` (or an explicitly identified development environment)
+- `BOOTSTRAP_ADMIN_CONFIRMATION=YES`
+- `BOOTSTRAP_ADMIN_EMAIL`
+- `BOOTSTRAP_ADMIN_NAME`
+- `BOOTSTRAP_ADMIN_PASSWORD` with at least 12 characters
+
+For `DATABASE_ENV=development`, the database name must include `dev`, `development`, or `test`.
+If an active `SUPER_ADMIN` already exists, the command refuses to create a second account. If the
+email belongs to another administrator or an inactive account, use the protected management or
+recovery process instead of changing records manually.
+
 ### Login fails after changing environment variables
 
 Confirm `AUTH_SECRET` is at least 32 characters, restart the server after changing `.env`, and
@@ -643,6 +719,7 @@ src/
 prisma/
   schema.prisma        MongoDB datasource, enums, models, and indexes
   seed.ts              Guarded development seed
+  bootstrap-admin.ts   Explicit first-production-administrator bootstrap
   check-connection.ts  Read-only connectivity check
 prisma.config.ts       Prisma schema and seed configuration
 .github/workflows/

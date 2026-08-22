@@ -16,7 +16,8 @@
     "db:validate": "prisma validate",
     "db:push": "prisma db push",
     "db:check": "tsx prisma/check-connection.ts",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "db:bootstrap-admin": "tsx prisma/bootstrap-admin.ts"
   },
   "dependencies": {
     "@prisma/client": "6.19.1",

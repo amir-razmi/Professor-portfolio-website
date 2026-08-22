@@ -9,7 +9,8 @@ export type AuditMetadataValue =
 export type AuditMetadata = Record<string, AuditMetadataValue>;
 
 export type AuditLogInput = {
-  actorId: string;
+  // System bootstrap events may occur before the first administrator exists.
+  actorId?: string | null;
   action: AuditAction;
   targetResource: string;
   targetId?: string | null;
@@ -92,7 +93,7 @@ export async function writeAuditLog(writer: AuditLogWriter, input: AuditLogInput
   try {
     await writer.auditLog.create({
       data: {
-        actorId: input.actorId,
+        actorId: input.actorId ?? null,
         action: input.action,
         targetResource: input.targetResource,
         targetId: input.targetId ?? null,

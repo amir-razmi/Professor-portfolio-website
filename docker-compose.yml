@@ -1,75 +1,29 @@
 services:
-  mongodb:
-    image: mongo:7.0
-    restart: unless-stopped
-    command:
-      - mongod
-      - --bind_ip_all
-      - --replSet
-      - rs0
-    ports:
-      - "27018:27017"
-    volumes:
-      - mongodb_data:/data/db
-    healthcheck:
-      test: ["CMD-SHELL", 'mongosh --quiet --eval "db.adminCommand({ ping: 1 }).ok" | grep -q 1']
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 10s
-
-  mongodb-init:
-    image: mongo:7.0
-    restart: "no"
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    entrypoint:
-      - /bin/sh
-      - -c
-    command:
-      - |
-        set -eu
-        until mongosh --host mongodb:27017 --quiet --eval "db.adminCommand({ ping: 1 }).ok" | grep -q 1; do
-          sleep 1
-        done
-        mongosh --host mongodb:27017 --quiet --eval '
-          try {
-            rs.status();
-            print("MongoDB replica set is already initialized");
-          } catch (error) {
-            rs.initiate({
-              _id: "rs0",
-              members: [{ _id: 0, host: "mongodb:27017" }]
-            });
-            print("MongoDB replica set initialized");
-          }
-        '
-        until mongosh --host mongodb:27017 --quiet --eval "try { rs.status().members.some((member) => member.stateStr === 'PRIMARY') } catch (error) { false }" | grep -q true; do
-          sleep 1
-        done
-
   app:
     build:
       context: .
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+    image: professor-portfolio:production
     restart: unless-stopped
     depends_on:
-      mongodb-init:
+      mongo-init:
+        condition: service_completed_successfully
+      storage-init:
         condition: service_completed_successfully
     ports:
-      - "3000:3000"
+      - "${APP_PORT:-3000}:3000"
     environment:
-      DATABASE_ENV: development
-      DATABASE_URL: mongodb://mongodb:27017/academic_portfolio_dev?replicaSet=rs0
-      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env before starting Compose}
+      NODE_ENV: production
+      DATABASE_ENV: production
+      DATABASE_URL: mongodb://${MONGODB_USERNAME:?Set MONGODB_USERNAME in .env}:${MONGODB_PASSWORD:?Set MONGODB_PASSWORD in .env}@mongodb:27017/${MONGODB_DATABASE:-academic_portfolio}?authSource=${MONGODB_DATABASE:-academic_portfolio}&replicaSet=${MONGODB_REPLICA_SET_NAME:-rs0}
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env}
       AUTH_TRUST_HOST: ${AUTH_TRUST_HOST:-true}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       LOCAL_STORAGE_ROOT: /app/storage
     volumes:
-      - app_storage:/app/storage
+      - ${FILE_STORAGE_PATH:-/srv/professor-portfolio/storage}:/app/storage
     healthcheck:
       test:
         [
@@ -81,50 +35,182 @@ services:
       interval: 10s
       timeout: 5s
       retries: 12
-      start_period: 15s
+      start_period: 20s
+
+  storage-init:
+    image: alpine:3.20
+    restart: "no"
+    user: "0:0"
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        mkdir -p /storage
+        chown 1001:1001 /storage
+        chmod 750 /storage
+    volumes:
+      - ${FILE_STORAGE_PATH:-/srv/professor-portfolio/storage}:/storage
 
   db-setup:
     build:
       context: .
       dockerfile: Dockerfile
       target: tooling
-    profiles:
-      - setup
+    image: professor-portfolio:tooling
+    profiles: ["setup"]
     restart: "no"
     depends_on:
-      mongodb-init:
+      mongo-init:
         condition: service_completed_successfully
     environment:
-      DATABASE_ENV: development
-      DATABASE_URL: mongodb://mongodb:27017/academic_portfolio_dev?replicaSet=rs0
-      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env before running database setup}
+      DATABASE_ENV: production
+      DATABASE_URL: mongodb://${MONGODB_USERNAME:?Set MONGODB_USERNAME in .env}:${MONGODB_PASSWORD:?Set MONGODB_PASSWORD in .env}@mongodb:27017/${MONGODB_DATABASE:-academic_portfolio}?authSource=${MONGODB_DATABASE:-academic_portfolio}&replicaSet=${MONGODB_REPLICA_SET_NAME:-rs0}
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env}
       AUTH_TRUST_HOST: ${AUTH_TRUST_HOST:-true}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       LOCAL_STORAGE_ROOT: /app/storage
     command: ["pnpm", "db:push"]
 
-  db-seed:
+  admin-bootstrap:
     build:
       context: .
       dockerfile: Dockerfile
       target: tooling
-    profiles:
-      - seed
+    image: professor-portfolio:tooling
+    profiles: ["bootstrap"]
     restart: "no"
     depends_on:
-      mongodb-init:
+      mongo-init:
         condition: service_completed_successfully
     environment:
-      DATABASE_ENV: development
-      DATABASE_URL: mongodb://mongodb:27017/academic_portfolio_dev?replicaSet=rs0
-      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env before running the seed}
-      AUTH_TRUST_HOST: ${AUTH_TRUST_HOST:-true}
-      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
-      LOCAL_STORAGE_ROOT: /app/storage
-      ADMIN_SEED_PASSWORD: ${ADMIN_SEED_PASSWORD:?Set ADMIN_SEED_PASSWORD in .env before running the seed}
-      SEED_DATABASE_CONFIRMATION: ${SEED_DATABASE_CONFIRMATION:?Set SEED_DATABASE_CONFIRMATION=YES before running the seed}
-    command: ["pnpm", "db:seed"]
+      NODE_ENV: production
+      DATABASE_ENV: ${DATABASE_ENV:-production}
+      DATABASE_URL: mongodb://${MONGODB_USERNAME:?Set MONGODB_USERNAME in .env}:${MONGODB_PASSWORD:?Set MONGODB_PASSWORD in .env}@mongodb:27017/${MONGODB_DATABASE:-academic_portfolio}?authSource=${MONGODB_DATABASE:-academic_portfolio}&replicaSet=${MONGODB_REPLICA_SET_NAME:-rs0}
+      # The bootstrap profile validates these values inside the one-shot script.
+      # Keep them optional here so the normal app stack does not require bootstrap
+      # credentials before the profile is explicitly invoked.
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BOOTSTRAP_ADMIN_NAME: ${BOOTSTRAP_ADMIN_NAME:-}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+      BOOTSTRAP_ADMIN_CONFIRMATION: ${BOOTSTRAP_ADMIN_CONFIRMATION:-}
+    command: ["pnpm", "db:bootstrap-admin"]
+
+  mongo-keyfile:
+    image: alpine:3.20
+    restart: "no"
+    environment:
+      MONGODB_REPLICA_SET_KEY: ${MONGODB_REPLICA_SET_KEY:?Set MONGODB_REPLICA_SET_KEY in .env}
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        expected="$$(printf '%s' "$$MONGODB_REPLICA_SET_KEY")"
+        case "$$expected" in
+          *[!A-Za-z0-9+/=]*|'')
+            echo "MONGODB_REPLICA_SET_KEY must be a non-empty base64 value (letters, digits, +, /, =)." >&2
+            exit 1
+            ;;
+        esac
+        if [ -f /keyfile/mongodb-keyfile ]; then
+          actual="$$(cat /keyfile/mongodb-keyfile)"
+          if [ "$$actual" != "$$expected" ]; then
+            echo "The existing MongoDB keyfile differs from MONGODB_REPLICA_SET_KEY." >&2
+            exit 1
+          fi
+        else
+          umask 177
+          printf '%s' "$$expected" > /keyfile/mongodb-keyfile
+        fi
+        chown 999:999 /keyfile/mongodb-keyfile
+        chmod 400 /keyfile/mongodb-keyfile
+    volumes:
+      - mongodb_keyfile:/keyfile
+
+  mongodb:
+    # A single-node replica set is enough for Prisma transactions. It is not HA;
+    # use a managed/multi-host MongoDB deployment when host failover is required.
+    image: mongo:7.0
+    hostname: mongodb
+    restart: unless-stopped
+    depends_on:
+      mongo-keyfile:
+        condition: service_completed_successfully
+    command:
+      - mongod
+      - --bind_ip_all
+      - --replSet
+      - ${MONGODB_REPLICA_SET_NAME:-rs0}
+      - --auth
+      - --keyFile
+      - /etc/mongodb-keyfile/mongodb-keyfile
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USER:?Set MONGODB_ROOT_USER in .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:?Set MONGODB_ROOT_PASSWORD in .env}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-academic_portfolio}
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_keyfile:/etc/mongodb-keyfile:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'mongosh --quiet --host 127.0.0.1 --username "$${MONGO_INITDB_ROOT_USERNAME}" --password "$${MONGO_INITDB_ROOT_PASSWORD}" --authenticationDatabase admin --eval "db.adminCommand({ ping: 1 }).ok" | grep -q 1',
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+  mongo-init:
+    image: mongo:7.0
+    restart: "no"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      MONGO_ROOT_USER: ${MONGODB_ROOT_USER:?Set MONGODB_ROOT_USER in .env}
+      MONGO_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:?Set MONGODB_ROOT_PASSWORD in .env}
+      MONGODB_DATABASE: ${MONGODB_DATABASE:-academic_portfolio}
+      MONGODB_USERNAME: ${MONGODB_USERNAME:?Set MONGODB_USERNAME in .env}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:?Set MONGODB_PASSWORD in .env}
+      MONGODB_REPLICA_SET_NAME: ${MONGODB_REPLICA_SET_NAME:-rs0}
+    entrypoint:
+      - /bin/bash
+      - -ec
+    command:
+      - |
+        mongo_auth=(mongosh --quiet --host mongodb:27017 --username "$$MONGO_ROOT_USER" --password "$$MONGO_ROOT_PASSWORD" --authenticationDatabase admin)
+
+        "$${mongo_auth[@]}" --eval '
+          const setName = process.env.MONGODB_REPLICA_SET_NAME;
+          try {
+            rs.status();
+          } catch (error) {
+            rs.initiate({
+              _id: setName,
+              members: [{ _id: 0, host: "mongodb:27017" }]
+            });
+          }
+        '
+
+        until "$${mongo_auth[@]}" --eval 'try { quit(rs.status().myState === 1 ? 0 : 1) } catch (error) { quit(1) }'; do
+          sleep 2
+        done
+
+        "$${mongo_auth[@]}" --eval '
+          const database = db.getSiblingDB(process.env.MONGODB_DATABASE);
+          const username = process.env.MONGODB_USERNAME;
+          if (!database.getUser(username)) {
+            database.createUser({
+              user: username,
+              pwd: process.env.MONGODB_PASSWORD,
+              roles: [{ role: "readWrite", db: process.env.MONGODB_DATABASE }]
+            });
+          }
+        '
 
 volumes:
   mongodb_data:
-  app_storage:
+    driver: local
+  mongodb_keyfile:
+    driver: local

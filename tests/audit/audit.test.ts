@@ -73,6 +73,25 @@ test("representative administrative events identify actor, action, and target", 
   assert.deepEqual(calls[0]?.data.metadata, { changed: true });
 });
 
+test("system bootstrap events can omit an actor without storing sensitive metadata", async () => {
+  const { writer, calls } = createWriter();
+
+  await writeAuditLog(writer, {
+    actorId: null,
+    action: AuditAction.CREATE,
+    targetResource: "AdminUser",
+    targetId: "507f1f77bcf86cd799439012",
+    summary: "Initial administrator bootstrap.",
+    metadata: {
+      bootstrap: true,
+      password: "never-store",
+    },
+  });
+
+  assert.equal(calls[0]?.data.actorId, null);
+  assert.deepEqual(calls[0]?.data.metadata, { bootstrap: true });
+});
+
 test("audit persistence failures do not break the primary operation", async () => {
   const writer: AuditLogWriter = {
     auditLog: {
